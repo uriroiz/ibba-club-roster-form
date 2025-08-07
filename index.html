@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -21,19 +21,15 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
+            background: white;
+            border-radius: 12px;
             padding: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e2e8f0;
         }
 
         h1 {
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #1e293b;
             font-size: 2.5em;
             font-weight: 700;
             text-align: center;
@@ -42,7 +38,7 @@
 
         .subtitle {
             text-align: center;
-            color: #555;
+            color: #64748b;
             margin-bottom: 20px;
             font-size: 1.1em;
         }
@@ -51,38 +47,38 @@
             text-align: center;
             margin-bottom: 30px;
             font-size: 0.9em;
-            color: #666;
+            color: #64748b;
         }
 
         .version {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: #3b82f6;
             color: white;
             padding: 4px 12px;
-            border-radius: 20px;
+            border-radius: 16px;
             font-weight: 600;
             margin-right: 10px;
-            box-shadow: 0 2px 8px rgba(30, 60, 114, 0.2);
+            box-shadow: 0 1px 3px rgba(59, 130, 246, 0.3);
         }
 
         .date {
-            color: #777;
+            color: #64748b;
             font-style: italic;
         }
 
         .team-info {
-            background: linear-gradient(135deg, #434343 0%, #000000 100%);
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
             padding: 25px;
-            border-radius: 12px;
+            border-radius: 8px;
             margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .submitter-info {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
             padding: 25px;
-            border-radius: 12px;
+            border-radius: 8px;
             margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(30, 60, 114, 0.2);
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
         }
 
         .submitter-info h2 {
@@ -116,22 +112,19 @@
 
         .team-info input, .team-info select, .submitter-info input {
             padding: 12px 16px;
-            border: none;
-            border-radius: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
             font-size: 16px;
             flex: 1;
             max-width: 350px;
-            background: rgba(255,255,255,0.9);
-            backdrop-filter: blur(5px);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
+            background: white;
+            transition: all 0.2s ease;
         }
 
         .team-info input:focus, .team-info select:focus, .submitter-info input:focus {
             outline: none;
-            background: white;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
         .roster-section {
@@ -139,10 +132,7 @@
         }
 
         .roster-section h2 {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #1e293b;
             font-size: 1.8em;
             font-weight: 700;
             margin-bottom: 20px;
@@ -155,9 +145,9 @@
             position: absolute;
             bottom: 0;
             left: 0;
-            width: 100px;
+            width: 80px;
             height: 3px;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: #3b82f6;
             border-radius: 2px;
         }
 
@@ -166,31 +156,32 @@
             border-collapse: collapse;
             margin-bottom: 20px;
             background: white;
-            border-radius: 15px;
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         th {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
+            background: #f8fafc;
+            color: #374151;
             padding: 15px 10px;
             font-weight: 600;
             text-align: left;
-            font-size: 0.9em;
+            font-size: 0.875em;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            border-bottom: 2px solid #e5e7eb;
         }
 
         td {
             padding: 12px 10px;
-            border-bottom: 1px solid #e8e8e8;
-            transition: all 0.3s ease;
+            border-bottom: 1px solid #f3f4f6;
+            transition: all 0.2s ease;
         }
 
         tr:hover {
-            background-color: #f5f7fa;
-            transform: scale(1.005);
+            background-color: #f9fafb;
         }
 
         tr:nth-child(even) {
@@ -199,19 +190,18 @@
 
         input[type="text"], input[type="email"], select {
             width: 100%;
-            padding: 8px 10px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
             font-size: 14px;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             background: white;
         }
 
         input[type="text"]:focus, input[type="email"]:focus, select:focus {
             outline: none;
-            border-color: #1e3c72;
-            box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
-            transform: translateY(-1px);
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
         .jersey-input {
@@ -220,8 +210,8 @@
         }
 
         .duplicate-warning {
-            border-color: #dc3545 !important;
-            background-color: #fff5f5 !important;
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
             animation: shake 0.5s ease-in-out;
         }
 
@@ -232,23 +222,23 @@
         }
 
         .warning-message {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
-            color: #721c24;
-            padding: 10px 15px;
-            border-radius: 10px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 6px;
             margin-top: 10px;
             display: none;
             font-weight: 500;
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.2);
         }
 
         .staff-row {
-            background: linear-gradient(135deg, #e8f4f8 0%, #d1ecf1 100%) !important;
+            background: #f0f9ff !important;
         }
 
         .staff-row td:first-child {
             font-weight: bold;
-            color: #2d3748;
+            color: #1e293b;
         }
 
         .buttons {
@@ -260,65 +250,55 @@
         }
 
         .btn {
-            padding: 15px 35px;
+            padding: 12px 24px;
             border: none;
-            border-radius: 50px;
-            font-size: 16px;
+            border-radius: 6px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            position: relative;
-            overflow: hidden;
+            transition: all 0.2s ease;
+            text-transform: none;
+            letter-spacing: 0;
         }
 
         .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn:hover::before {
-            left: 100%;
+            display: none;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: #3b82f6;
             color: white;
-            box-shadow: 0 10px 30px rgba(30, 60, 114, 0.3);
+            box-shadow: 0 1px 3px rgba(59, 130, 246, 0.3);
         }
 
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(30, 60, 114, 0.4);
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.4);
         }
 
         .btn-secondary {
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            background: #6b7280;
             color: white;
-            box-shadow: 0 10px 30px rgba(108, 117, 125, 0.3);
+            box-shadow: 0 1px 3px rgba(107, 114, 128, 0.3);
         }
 
         .btn-secondary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(108, 117, 125, 0.4);
+            background: #4b5563;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(107, 114, 128, 0.4);
         }
 
         .btn-success {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: #10b981;
             color: white;
-            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
+            box-shadow: 0 1px 3px rgba(16, 185, 129, 0.3);
         }
 
         .btn-success:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(40, 167, 69, 0.4);
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.4);
         }
 
         .sn-col { width: 50px; }
@@ -330,21 +310,21 @@
         .loading {
             display: none;
             text-align: center;
-            color: #667eea;
+            color: #3b82f6;
             font-weight: 600;
             margin-top: 20px;
         }
 
         .success-message {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+            padding: 16px;
+            border-radius: 6px;
             margin-top: 20px;
             display: none;
             font-weight: 500;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
         }
 
         @media (max-width: 768px) {
@@ -371,7 +351,7 @@
             .team-info input, .team-info select, .submitter-info input {
                 width: 100%;
                 max-width: none;
-                font-size: 16px; /* Prevents zoom on iOS */
+                font-size: 16px;
             }
             
             table {
@@ -418,11 +398,6 @@
                 font-size: 1.2em;
             }
         }
-
-        /* Pixellot branding colors */
-        .pixellot-accent {
-            background: linear-gradient(135deg, #00d4ff 0%, #090979 100%);
-        }
     </style>
 </head>
 <body>
@@ -431,11 +406,20 @@
         <p class="subtitle">Professional roster management for Pixellot leagues</p>
         
         <div class="version-info">
-            <span class="version">Version 2.3.1</span>
+            <span class="version">Version 2.5.0</span>
             <span class="date">Updated: August 2025</span>
         </div>
         
         <form id="rosterForm" action="https://formsubmit.co/pixellotibba@gmail.com" method="POST">
+            <!-- Hidden fields for FormSubmit configuration -->
+            <input type="hidden" name="_subject" value="" id="emailSubject">
+            <input type="hidden" name="_captcha" value="false">
+            <input type="hidden" name="_template" value="table">
+            <input type="hidden" name="_next" value="https://uriroiz.github.io/roster-form/?submitted=true">
+            
+            <!-- Hidden field for formatted data -->
+            <input type="hidden" name="roster_data" id="rosterData">
+
             <div class="team-info">
                 <div class="info-row">
                     <label for="teamName">🏆 Team Name:</label>
@@ -506,56 +490,47 @@
                     <tbody>
                         <tr class="staff-row">
                             <td>17</td>
-                            <td><strong>Coach</strong></td>
+                            <td><strong>Head Coach</strong></td>
                             <td><input type="text" name="coach_first" placeholder="First name"></td>
                             <td><input type="text" name="coach_last" placeholder="Last name"></td>
-                            <td><select name="coach_position"><option value="">-</option><option value="Head Coach">Head Coach</option></select></td>
-                            <td><input type="email" name="coach_email" placeholder="Email address"></td>
+                            <td>-</td>
+                            <td><input type="email" name="coach_email" placeholder="Email address (optional)"></td>
                         </tr>
                         <tr class="staff-row">
                             <td>18</td>
                             <td><strong>Asst. Coach</strong></td>
                             <td><input type="text" name="asst1_first" placeholder="First name"></td>
                             <td><input type="text" name="asst1_last" placeholder="Last name"></td>
-                            <td><select name="asst1_position"><option value="">-</option><option value="Assistant Coach">Assistant Coach</option></select></td>
-                            <td><input type="email" name="asst1_email" placeholder="Email address"></td>
+                            <td>-</td>
+                            <td><input type="email" name="asst1_email" placeholder="Email address (optional)"></td>
                         </tr>
                         <tr class="staff-row">
                             <td>19</td>
                             <td><strong>Asst. Coach</strong></td>
                             <td><input type="text" name="asst2_first" placeholder="First name"></td>
                             <td><input type="text" name="asst2_last" placeholder="Last name"></td>
-                            <td><select name="asst2_position"><option value="">-</option><option value="Assistant Coach">Assistant Coach</option></select></td>
-                            <td><input type="email" name="asst2_email" placeholder="Email address"></td>
+                            <td>-</td>
+                            <td><input type="email" name="asst2_email" placeholder="Email address (optional)"></td>
                         </tr>
                         <tr class="staff-row">
                             <td>20</td>
                             <td><strong>Asst. Coach</strong></td>
                             <td><input type="text" name="asst3_first" placeholder="First name"></td>
                             <td><input type="text" name="asst3_last" placeholder="Last name"></td>
-                            <td><select name="asst3_position"><option value="">-</option><option value="Assistant Coach">Assistant Coach</option></select></td>
-                            <td><input type="email" name="asst3_email" placeholder="Email address"></td>
+                            <td>-</td>
+                            <td><input type="email" name="asst3_email" placeholder="Email address (optional)"></td>
                         </tr>
                         <tr class="staff-row">
                             <td>21</td>
                             <td><strong>GM</strong></td>
                             <td><input type="text" name="gm_first" placeholder="First name"></td>
                             <td><input type="text" name="gm_last" placeholder="Last name"></td>
-                            <td><select name="gm_position"><option value="">-</option><option value="General Manager">General Manager</option></select></td>
-                            <td><input type="email" name="gm_email" placeholder="Email address"></td>
+                            <td>-</td>
+                            <td><input type="email" name="gm_email" placeholder="Email address (optional)"></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-
-            <!-- Hidden fields for FormSubmit configuration -->
-            <input type="hidden" name="_subject" value="" id="emailSubject">
-            <input type="hidden" name="_captcha" value="false">
-            <input type="hidden" name="_template" value="table">
-            <input type="hidden" name="_next" value="https://uriroiz.github.io/roster-form/?submitted=true">
-            
-            <!-- Hidden field for formatted data -->
-            <input type="hidden" name="roster_data" id="rosterData">
 
             <div class="buttons">
                 <button type="button" class="btn btn-secondary" onclick="clearForm()">🗑️ Clear Form</button>
@@ -568,13 +543,53 @@
             </div>
 
             <div class="success-message" id="success">
-                ✅ Roster submitted successfully! You should receive a confirmation email shortly, and we've received your submission.
+                ✅ Roster submitted to Pixellot successfully! A backup copy has been saved to your device.
             </div>
         </form>
     </div>
 
     <script>
-        let jerseyNumbers = [];
+        let duplicateCheckTimeout;
+
+        // Check for duplicate jersey numbers with delay
+        function checkDuplicateJerseys() {
+            clearTimeout(duplicateCheckTimeout);
+            
+            duplicateCheckTimeout = setTimeout(() => {
+                const jerseyInputs = document.querySelectorAll('input[name*="_jersey"]');
+                const warningDiv = document.getElementById('duplicateWarning');
+                let duplicates = false;
+                
+                jerseyInputs.forEach(input => {
+                    input.classList.remove('duplicate-warning');
+                });
+                
+                let numbers = [];
+                jerseyInputs.forEach(input => {
+                    const value = input.value.trim();
+                    if (value !== '' && value.length > 0) {
+                        numbers.push(value);
+                    }
+                });
+                
+                jerseyInputs.forEach(input => {
+                    const value = input.value.trim();
+                    if (value !== '' && value.length > 0) {
+                        const count = numbers.filter(num => num === value).length;
+                        if (count > 1) {
+                            input.classList.add('duplicate-warning');
+                            duplicates = true;
+                        }
+                    }
+                });
+                
+                if (duplicates) {
+                    warningDiv.style.display = 'block';
+                } else {
+                    warningDiv.style.display = 'none';
+                }
+            }, 1500);
+        }
 
         // Generate player rows
         function generatePlayerRows() {
@@ -597,64 +612,15 @@
                             <option value="C">C</option>
                         </select>
                     </td>
-                    <td><input type="email" name="player${i}_email" placeholder="Email address"></td>
+                    <td><input type="email" name="player${i}_email" placeholder="Email address (optional)"></td>
                 `;
                 playersTable.appendChild(row);
             }
         }
 
-        // Check for duplicate jersey numbers with exact match and delay
-        let duplicateCheckTimeout;
-        function checkDuplicateJerseys() {
-            // Clear existing timeout to avoid multiple rapid checks
-            clearTimeout(duplicateCheckTimeout);
-            
-            // Set a delay before checking (wait for user to finish typing)
-            duplicateCheckTimeout = setTimeout(() => {
-                const jerseyInputs = document.querySelectorAll('input[name*="_jersey"]');
-                const warningDiv = document.getElementById('duplicateWarning');
-                let duplicates = false;
-                
-                // Clear previous warnings
-                jerseyInputs.forEach(input => {
-                    input.classList.remove('duplicate-warning');
-                });
-                
-                // Get all non-empty jersey numbers (exact values)
-                let numbers = [];
-                jerseyInputs.forEach(input => {
-                    const value = input.value.trim();
-                    // Only check values that are not empty and appear to be complete
-                    if (value !== '' && value.length > 0) {
-                        numbers.push(value);
-                    }
-                });
-                
-                // Check for exact duplicates only
-                jerseyInputs.forEach(input => {
-                    const value = input.value.trim();
-                    if (value !== '' && value.length > 0) {
-                        const count = numbers.filter(num => num === value).length;
-                        if (count > 1) {
-                            input.classList.add('duplicate-warning');
-                            duplicates = true;
-                        }
-                    }
-                });
-                
-                // Show/hide warning message
-                if (duplicates) {
-                    warningDiv.style.display = 'block';
-                } else {
-                    warningDiv.style.display = 'none';
-                }
-            }, 500); // Wait 500ms after user stops typing
-        }
-
         // Clear all form fields
         function clearForm() {
             if (confirm('🤔 Are you sure you want to clear all data?')) {
-                // Save submitter info
                 const submitterName = document.getElementById('submitterName').value;
                 const submitterEmail = document.getElementById('submitterEmail').value;
                 
@@ -662,26 +628,21 @@
                 document.getElementById('duplicateWarning').style.display = 'none';
                 document.getElementById('success').style.display = 'none';
                 
-                // Restore submitter info
                 document.getElementById('submitterName').value = submitterName;
                 document.getElementById('submitterEmail').value = submitterEmail;
                 
-                // Hide the submit & new button
                 document.getElementById('submitNewBtn').style.display = 'none';
             }
         }
 
         // Submit and create new roster
         function submitAndNew() {
-            // Save submitter info
             const submitterName = document.getElementById('submitterName').value;
             const submitterEmail = document.getElementById('submitterEmail').value;
             
-            // Clear form data except submitter info
             document.getElementById('teamName').value = '';
             document.getElementById('league').value = '';
             
-            // Clear all player data
             for (let i = 1; i <= 16; i++) {
                 const jerseyInput = document.querySelector(`input[name="player${i}_jersey"]`);
                 const firstInput = document.querySelector(`input[name="player${i}_first"]`);
@@ -696,30 +657,24 @@
                 if (emailInput) emailInput.value = '';
             }
             
-            // Clear staff data
             const staffRoles = ['coach', 'asst1', 'asst2', 'asst3', 'gm'];
             staffRoles.forEach(role => {
                 const firstInput = document.querySelector(`input[name="${role}_first"]`);
                 const lastInput = document.querySelector(`input[name="${role}_last"]`);
-                const positionSelect = document.querySelector(`select[name="${role}_position"]`);
                 const emailInput = document.querySelector(`input[name="${role}_email"]`);
                 
                 if (firstInput) firstInput.value = '';
                 if (lastInput) lastInput.value = '';
-                if (positionSelect) positionSelect.value = '';
                 if (emailInput) emailInput.value = '';
             });
             
-            // Restore submitter info
             document.getElementById('submitterName').value = submitterName;
             document.getElementById('submitterEmail').value = submitterEmail;
             
-            // Hide success message and warnings
             document.getElementById('success').style.display = 'none';
             document.getElementById('duplicateWarning').style.display = 'none';
             document.getElementById('submitNewBtn').style.display = 'none';
             
-            // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -727,14 +682,44 @@
         document.getElementById('rosterForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Show loading
             document.getElementById('loading').style.display = 'block';
             
-            // Collect all form data
             const formData = new FormData(this);
+            
+            // Validate required fields
+            let validationErrors = [];
+            
+            for (let i = 1; i <= 16; i++) {
+                const jersey = formData.get(`player${i}_jersey`);
+                const firstName = formData.get(`player${i}_first`);
+                const lastName = formData.get(`player${i}_last`);
+                
+                if (jersey || firstName || lastName) {
+                    if (!jersey) validationErrors.push(`Player ${i}: Jersey number is required`);
+                    if (!firstName) validationErrors.push(`Player ${i}: First name is required`);
+                    if (!lastName) validationErrors.push(`Player ${i}: Last name is required`);
+                }
+            }
+            
+            if (validationErrors.length > 0) {
+                alert('Please complete the following required fields:\n\n' + validationErrors.join('\n'));
+                document.getElementById('loading').style.display = 'none';
+                return;
+            }
+            
+            // Map Hebrew league names to English
+            const leagueMapping = {
+                'לאומית גברים': 'National Men',
+                'על נשים': 'Premier Women', 
+                'לאומית נשים': 'National Women',
+                'נוער על בנים': 'Youth Premier Boys',
+                'נערות א על בנות': 'Junior A Premier Girls'
+            };
+            
             let rosterData = {
                 teamName: formData.get('teamName'),
                 league: formData.get('league'),
+                leagueEnglish: leagueMapping[formData.get('league')] || 'Unknown League',
                 submitterName: formData.get('submitterName'),
                 submitterEmail: formData.get('submitterEmail'),
                 players: [],
@@ -752,8 +737,7 @@
                     email: formData.get(`player${i}_email`)
                 };
                 
-                // Only add players with at least a name
-                if (player.firstName || player.lastName) {
+                if (player.jersey && player.firstName && player.lastName) {
                     rosterData.players.push(player);
                 }
             }
@@ -767,7 +751,6 @@
                     role: staffLabels[index],
                     firstName: formData.get(`${role}_first`),
                     lastName: formData.get(`${role}_last`),
-                    position: formData.get(`${role}_position`),
                     email: formData.get(`${role}_email`)
                 };
                 
@@ -777,7 +760,7 @@
             });
 
             // Format data for email
-            let emailContent = `PIXELLOT TEAM ROSTER SUBMISSION - Version 2.3.1\n`;
+            let emailContent = `PIXELLOT TEAM ROSTER SUBMISSION - Version 2.4.2\n`;
             emailContent += `Generated: ${new Date().toLocaleString()}\n\n`;
             emailContent += `Team Name: ${rosterData.teamName}\n`;
             emailContent += `League: ${rosterData.league} (${rosterData.leagueEnglish})\n`;
@@ -793,23 +776,18 @@
             });
             
             emailContent += `\nCOACHING STAFF:\n`;
-            emailContent += `Role | First Name | Last Name | Position | Email\n`;
-            emailContent += `-----+------------+-----------+----------+-------\n`;
+            emailContent += `Role | First Name | Last Name | Email\n`;
+            emailContent += `-----+------------+-----------+-------\n`;
             
             rosterData.staff.forEach(staff => {
-                emailContent += `${staff.role.padEnd(4)} | ${(staff.firstName || '').padEnd(10)} | ${(staff.lastName || '').padEnd(9)} | ${(staff.position || '').padEnd(8)} | ${staff.email || ''}\n`;
+                emailContent += `${staff.role.padEnd(4)} | ${(staff.firstName || '').padEnd(10)} | ${(staff.lastName || '').padEnd(9)} | ${staff.email || ''}\n`;
             });
 
-            // Set the hidden field with formatted data
-            document.getElementById('rosterData').value = emailContent;
-            
-            // Set dynamic email subject
+            // Set email subject and data
             document.getElementById('emailSubject').value = `Pixellot Roster: ${rosterData.teamName} - ${rosterData.leagueEnglish}`;
-            
-            // Set the hidden field with formatted data for email
             document.getElementById('rosterData').value = emailContent;
             
-            // Submit to FormSubmit
+            // Submit form
             const submitFormData = new FormData(this);
             
             fetch(this.action, {
@@ -817,19 +795,10 @@
                 body: submitFormData
             }).then(response => {
                 document.getElementById('loading').style.display = 'none';
-                if (response.ok) {
-                    document.getElementById('success').style.display = 'block';
-                    document.getElementById('submitNewBtn').style.display = 'inline-block';
-                    
-                    // Generate CSV for backup
-                    generateCSV(rosterData);
-                    
-                    // No alert popup - just show success message
-                } else {
-                    document.getElementById('success').style.display = 'block';
-                    document.getElementById('submitNewBtn').style.display = 'inline-block';
-                    generateCSV(rosterData);
-                }
+                document.getElementById('success').style.display = 'block';
+                document.getElementById('submitNewBtn').style.display = 'inline-block';
+                
+                generateCSV(rosterData);
             }).catch(error => {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('success').style.display = 'block';
@@ -839,9 +808,9 @@
             });
         });
 
-        // Generate CSV file for download (backup)
+        // Generate CSV file
         function generateCSV(data) {
-            let csv = 'Pixellot Team Roster Submission - Version 2.3.1\n';
+            let csv = 'Pixellot Team Roster Submission - Version 2.4.2\n';
             csv += `Generated: ${new Date().toLocaleString()}\n\n`;
             csv += `Team Name: ${data.teamName}\n`;
             csv += `League: ${data.leagueEnglish}\n`;
@@ -855,35 +824,30 @@
                 csv += `${player.number},${player.jersey || ''},${player.firstName || ''},${player.lastName || ''},${player.position || ''},${player.email || ''}\n`;
             });
             
-            csv += '\nCOACHING STAFF\n';
-            csv += 'Role,First Name,Last Name,Position,Email Address\n';
+            csv += `\nCOACHING STAFF\n`;
+            csv += `Role,First Name,Last Name,Email Address\n`;
             
             data.staff.forEach(staff => {
-                csv += `${staff.role},${staff.firstName || ''},${staff.lastName || ''},${staff.position || ''},${staff.email || ''}\n`;
+                csv += `${staff.role},${staff.firstName || ''},${staff.lastName || ''},${staff.email || ''}\n`;
             });
 
-            // Create and trigger download
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `pixellot_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v2.3.0.csv`;
+            a.download = `pixellot_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v2.4.2.csv`;
             a.click();
             window.URL.revokeObjectURL(url);
         }
 
-        // Initialize the form
+        // Initialize
         generatePlayerRows();
-        
-        // Initially hide the submit & new button until first submission
         document.getElementById('submitNewBtn').style.display = 'none';
         
-        // Check if form was just submitted (to show success without popup)
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('submitted') === 'true') {
             document.getElementById('success').style.display = 'block';
             document.getElementById('submitNewBtn').style.display = 'inline-block';
-            // Clean URL
             window.history.replaceState({}, document.title, window.location.pathname);
         }
     </script>
