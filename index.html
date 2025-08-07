@@ -891,19 +891,24 @@ console.log("🧪 TEST LOG WORKING");  // Add this line here
             });
 
             // Final email parameters
-            const emailParams = {
-                team_name: rosterData.teamName,
-                league: rosterData.leagueEnglish,
-                submitter_name: rosterData.submitterName,
-                submitter_email: rosterData.submitterEmail,
-                roster_data: rosterSummary
-            };
-            console.log("📦 Email Params:", emailParams);
-            alert("📬 Preparing to send email. Check Console for details.");
+const emailParams = {
+    team_name: teamName,
+    league: rosterData.leagueEnglish,
+    submitter_name: submitterName,
+    submitter_email: submitterEmail,
+    roster_data: rosterSummary
+};
+
+console.log("📦 Email Params:", emailParams);
+alert("📬 Preparing to send email. Check Console for details.");
+
+// ✅ Use direct fetch method
+sendEmailViaAPI(emailParams);
+
 
             
             // Send the email
-            emailjs.send(window.EmailJSConfig.serviceId, window.EmailJSConfig.templateId, emailParams)
+            // emailjs.send(window.EmailJSConfig.serviceId, window.EmailJSConfig.templateId, emailParams)
                 .then(function(response) {
                     console.log('✅ EMAIL SENT SUCCESSFULLY!', response);
 
