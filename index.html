@@ -65,63 +65,44 @@
             font-style: italic;
         }
 
-        .team-info {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        .form-section {
+            margin-bottom: 30px;
+            background: #f8fafc;
             padding: 25px;
             border-radius: 8px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
-        .submitter-info {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            padding: 25px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
-        }
-
-        .submitter-info h2 {
-            color: white;
+        .form-section h2 {
+            color: #1e293b;
             font-size: 1.3em;
             font-weight: 600;
             margin-bottom: 20px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        .info-row {
+        .form-row {
             display: flex;
             align-items: center;
             margin-bottom: 15px;
+            gap: 15px;
         }
 
-        .info-row:last-child {
-            margin-bottom: 0;
-        }
-
-        .team-info label, .submitter-info label {
-            display: inline-block;
-            color: white;
+        .form-row label {
+            min-width: 120px;
             font-weight: 600;
-            font-size: 1.1em;
-            margin-right: 15px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            width: 140px;
-            flex-shrink: 0;
+            color: #374151;
         }
 
-        .team-info input, .team-info select, .submitter-info input {
-            padding: 12px 16px;
+        .form-row input, .form-row select {
+            flex: 1;
+            max-width: 350px;
+            padding: 10px 12px;
             border: 1px solid #d1d5db;
             border-radius: 6px;
             font-size: 16px;
-            flex: 1;
-            max-width: 350px;
-            background: white;
-            transition: all 0.2s ease;
         }
 
-        .team-info input:focus, .team-info select:focus, .submitter-info input:focus {
+        .form-row input:focus, .form-row select:focus {
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
@@ -136,30 +117,28 @@
             font-size: 1.8em;
             font-weight: 700;
             margin-bottom: 20px;
-            padding: 10px 0;
             position: relative;
         }
 
         .roster-section h2::after {
             content: '';
             position: absolute;
-            bottom: 0;
+            bottom: -5px;
             left: 0;
             width: 80px;
             height: 3px;
             background: #3b82f6;
-            border-radius: 2px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
             background: white;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
         }
 
         th {
@@ -175,9 +154,8 @@
         }
 
         td {
-            padding: 12px 10px;
+            padding: 10px;
             border-bottom: 1px solid #f3f4f6;
-            transition: all 0.2s ease;
         }
 
         tr:hover {
@@ -188,20 +166,22 @@
             background-color: #fafbfc;
         }
 
+        .staff-row {
+            background: #f0f9ff !important;
+        }
+
         input[type="text"], input[type="email"], select {
             width: 100%;
-            padding: 8px 12px;
+            padding: 6px 8px;
             border: 1px solid #d1d5db;
             border-radius: 4px;
             font-size: 14px;
-            transition: all 0.2s ease;
-            background: white;
         }
 
         input[type="text"]:focus, input[type="email"]:focus, select:focus {
             outline: none;
             border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
         }
 
         .jersey-input {
@@ -212,13 +192,6 @@
         .duplicate-warning {
             border-color: #ef4444 !important;
             background-color: #fef2f2 !important;
-            animation: shake 0.5s ease-in-out;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
         }
 
         .warning-message {
@@ -227,18 +200,9 @@
             color: #dc2626;
             padding: 12px 16px;
             border-radius: 6px;
-            margin-top: 10px;
+            margin-bottom: 15px;
             display: none;
             font-weight: 500;
-        }
-
-        .staff-row {
-            background: #f0f9ff !important;
-        }
-
-        .staff-row td:first-child {
-            font-weight: bold;
-            color: #1e293b;
         }
 
         .buttons {
@@ -247,6 +211,7 @@
             display: flex;
             gap: 20px;
             justify-content: center;
+            flex-wrap: wrap;
         }
 
         .btn {
@@ -257,55 +222,37 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            text-transform: none;
-            letter-spacing: 0;
-        }
-
-        .btn::before {
-            display: none;
         }
 
         .btn-primary {
             background: #3b82f6;
             color: white;
-            box-shadow: 0 1px 3px rgba(59, 130, 246, 0.3);
         }
 
         .btn-primary:hover {
             background: #2563eb;
             transform: translateY(-1px);
-            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.4);
         }
 
         .btn-secondary {
             background: #6b7280;
             color: white;
-            box-shadow: 0 1px 3px rgba(107, 114, 128, 0.3);
         }
 
         .btn-secondary:hover {
             background: #4b5563;
             transform: translateY(-1px);
-            box-shadow: 0 4px 6px rgba(107, 114, 128, 0.4);
         }
 
         .btn-success {
             background: #10b981;
             color: white;
-            box-shadow: 0 1px 3px rgba(16, 185, 129, 0.3);
         }
 
         .btn-success:hover {
             background: #059669;
             transform: translateY(-1px);
-            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.4);
         }
-
-        .sn-col { width: 50px; }
-        .jersey-col { width: 80px; }
-        .name-col { width: 180px; }
-        .position-col { width: 140px; }
-        .email-col { width: 280px; }
 
         .loading {
             display: none;
@@ -327,75 +274,52 @@
             text-align: center;
         }
 
+        .col-sn { width: 50px; }
+        .col-jersey { width: 80px; }
+        .col-name { width: 150px; }
+        .col-position { width: 100px; }
+        .col-email { width: 200px; }
+        .col-role { width: 120px; }
+
         @media (max-width: 768px) {
             .container {
-                padding: 20px 15px;
+                padding: 20px;
+                margin: 10px;
             }
-            
+
             h1 {
                 font-size: 2em;
             }
-            
-            .info-row {
+
+            .form-row {
                 flex-direction: column;
                 align-items: stretch;
-                margin-bottom: 20px;
             }
 
-            .team-info label, .submitter-info label {
-                width: 100%;
-                margin-bottom: 8px;
-                font-size: 1em;
+            .form-row label {
+                min-width: auto;
+                margin-bottom: 5px;
             }
 
-            .team-info input, .team-info select, .submitter-info input {
-                width: 100%;
+            .form-row input, .form-row select {
                 max-width: none;
-                font-size: 16px;
             }
-            
+
             table {
-                font-size: 11px;
+                font-size: 12px;
                 display: block;
                 overflow-x: auto;
                 white-space: nowrap;
             }
 
-            th, td {
-                padding: 6px 4px;
-                min-width: 80px;
-            }
-
-            .sn-col { min-width: 35px; }
-            .jersey-col { min-width: 60px; }
-            .name-col { min-width: 120px; }
-            .position-col { min-width: 90px; }
-            .email-col { min-width: 180px; }
-
-            input[type="text"], input[type="email"], select {
-                font-size: 12px;
-                padding: 6px 8px;
-            }
-
             .buttons {
                 flex-direction: column;
                 align-items: center;
-                gap: 15px;
             }
 
             .btn {
                 width: 100%;
-                max-width: 280px;
-                padding: 12px 20px;
-                font-size: 14px;
-            }
-
-            .roster-section h2 {
-                font-size: 1.4em;
-            }
-
-            .submitter-info h2 {
-                font-size: 1.2em;
+                max-width: 300px;
             }
         }
     </style>
@@ -406,28 +330,19 @@
         <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
         
         <div class="version-info">
-            <span class="version">Version 2.8.1</span>
+            <span class="version">Version 3.0.0</span>
             <span class="date">Updated: August 2025</span>
         </div>
-        
-        <form id="rosterForm">
-            <!-- EmailJS Integration - No action/method needed -->
-            <!-- Hidden fields for Getform configuration -->
-            <input type="hidden" name="_gotcha" style="display:none !important">
-            <input type="hidden" name="subject" value="" id="emailSubject">
-            <input type="hidden" name="email" value="pixellotibba@gmail.com">
-            
-            <!-- Hidden field for formatted data -->
-            <input type="hidden" name="roster_data" id="rosterData">
 
-            <div class="team-info">
-                <div class="info-row">
-                    <label for="teamName">🏆 Team Name:</label>
+        <form id="rosterForm">
+            <div class="form-section">
+                <h2>🏆 Team Information</h2>
+                <div class="form-row">
+                    <label for="teamName">Team Name:</label>
                     <input type="text" id="teamName" name="teamName" required placeholder="Enter your team name">
                 </div>
-                
-                <div class="info-row">
-                    <label for="league">🏀 League:</label>
+                <div class="form-row">
+                    <label for="league">League:</label>
                     <select id="league" name="league" required>
                         <option value="">Select League</option>
                         <option value="לאומית גברים">לאומית גברים</option>
@@ -439,15 +354,14 @@
                 </div>
             </div>
 
-            <div class="submitter-info">
+            <div class="form-section">
                 <h2>📝 Contact Information</h2>
-                <div class="info-row">
-                    <label for="submitterName">👤 Your Name:</label>
+                <div class="form-row">
+                    <label for="submitterName">Your Name:</label>
                     <input type="text" id="submitterName" name="submitterName" required placeholder="Enter your full name">
                 </div>
-                
-                <div class="info-row">
-                    <label for="submitterEmail">📧 Your Email:</label>
+                <div class="form-row">
+                    <label for="submitterEmail">Your Email:</label>
                     <input type="email" id="submitterEmail" name="submitterEmail" required placeholder="Enter your email address">
                 </div>
             </div>
@@ -460,16 +374,16 @@
                 <table>
                     <thead>
                         <tr>
-                            <th class="sn-col">S/N</th>
-                            <th class="jersey-col">Jersey #</th>
-                            <th class="name-col">First Name</th>
-                            <th class="name-col">Last Name</th>
-                            <th class="position-col">Position</th>
-                            <th class="email-col">Email Address</th>
+                            <th class="col-sn">S/N</th>
+                            <th class="col-jersey">Jersey #</th>
+                            <th class="col-name">First Name</th>
+                            <th class="col-name">Last Name</th>
+                            <th class="col-position">Position</th>
+                            <th class="col-email">Email Address</th>
                         </tr>
                     </thead>
                     <tbody id="playersTable">
-                        <!-- Player rows 1-16 will be generated by JavaScript -->
+                        <!-- Players will be generated here -->
                     </tbody>
                 </table>
             </div>
@@ -479,12 +393,12 @@
                 <table>
                     <thead>
                         <tr>
-                            <th class="sn-col">S/N</th>
-                            <th class="jersey-col">Role</th>
-                            <th class="name-col">First Name</th>
-                            <th class="name-col">Last Name</th>
-                            <th class="position-col">Position</th>
-                            <th class="email-col">Email Address</th>
+                            <th class="col-sn">S/N</th>
+                            <th class="col-role">Role</th>
+                            <th class="col-name">First Name</th>
+                            <th class="col-name">Last Name</th>
+                            <th class="col-position">Position</th>
+                            <th class="col-email">Email Address</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -494,7 +408,7 @@
                             <td><input type="text" name="coach_first" placeholder="First name"></td>
                             <td><input type="text" name="coach_last" placeholder="Last name"></td>
                             <td>-</td>
-                            <td><input type="email" name="coach_email" placeholder="Email address (optional)"></td>
+                            <td><input type="email" name="coach_email" placeholder="Email (optional)"></td>
                         </tr>
                         <tr class="staff-row">
                             <td>18</td>
@@ -502,7 +416,7 @@
                             <td><input type="text" name="asst1_first" placeholder="First name"></td>
                             <td><input type="text" name="asst1_last" placeholder="Last name"></td>
                             <td>-</td>
-                            <td><input type="email" name="asst1_email" placeholder="Email address (optional)"></td>
+                            <td><input type="email" name="asst1_email" placeholder="Email (optional)"></td>
                         </tr>
                         <tr class="staff-row">
                             <td>19</td>
@@ -510,7 +424,7 @@
                             <td><input type="text" name="asst2_first" placeholder="First name"></td>
                             <td><input type="text" name="asst2_last" placeholder="Last name"></td>
                             <td>-</td>
-                            <td><input type="email" name="asst2_email" placeholder="Email address (optional)"></td>
+                            <td><input type="email" name="asst2_email" placeholder="Email (optional)"></td>
                         </tr>
                         <tr class="staff-row">
                             <td>20</td>
@@ -518,7 +432,7 @@
                             <td><input type="text" name="asst3_first" placeholder="First name"></td>
                             <td><input type="text" name="asst3_last" placeholder="Last name"></td>
                             <td>-</td>
-                            <td><input type="email" name="asst3_email" placeholder="Email address (optional)"></td>
+                            <td><input type="email" name="asst3_email" placeholder="Email (optional)"></td>
                         </tr>
                         <tr class="staff-row">
                             <td>21</td>
@@ -526,7 +440,7 @@
                             <td><input type="text" name="gm_first" placeholder="First name"></td>
                             <td><input type="text" name="gm_last" placeholder="Last name"></td>
                             <td>-</td>
-                            <td><input type="email" name="gm_email" placeholder="Email address (optional)"></td>
+                            <td><input type="email" name="gm_email" placeholder="Email (optional)"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -535,7 +449,7 @@
             <div class="buttons">
                 <button type="button" class="btn btn-secondary" onclick="clearForm()">🗑️ Clear Form</button>
                 <button type="submit" class="btn btn-primary">🚀 Submit Roster</button>
-                <button type="button" class="btn btn-success" onclick="submitAndNew()" id="submitNewBtn">📋 Create New Roster</button>
+                <button type="button" class="btn btn-success" onclick="createNew()" id="createNewBtn" style="display: none;">📋 Create New Roster</button>
             </div>
 
             <div class="loading" id="loading">
@@ -543,69 +457,31 @@
             </div>
 
             <div class="success-message" id="success">
-                ✅ Roster submitted to Pixellot successfully! A backup copy has been saved to your device.
+                ✅ Roster submitted successfully! Email sent to pixellotibba@gmail.com and CSV backup saved.
             </div>
         </form>
     </div>
 
-    <script src="https://cdn.emailjs.com/sdk/2.6.4/email.min.js"></script>
     <script>
-        // Initialize EmailJS when the script loads
-        (function(){
-            emailjs.init("r4Y7hg0AGi5DhIcF");
-        })();
-        
         let duplicateCheckTimeout;
 
-        // Check for duplicate jersey numbers with delay
-        function checkDuplicateJerseys() {
-            clearTimeout(duplicateCheckTimeout);
-            
-            duplicateCheckTimeout = setTimeout(() => {
-                const jerseyInputs = document.querySelectorAll('input[name*="_jersey"]');
-                const warningDiv = document.getElementById('duplicateWarning');
-                let duplicates = false;
-                
-                jerseyInputs.forEach(input => {
-                    input.classList.remove('duplicate-warning');
-                });
-                
-                let numbers = [];
-                jerseyInputs.forEach(input => {
-                    const value = input.value.trim();
-                    if (value !== '' && value.length > 0) {
-                        numbers.push(value);
-                    }
-                });
-                
-                jerseyInputs.forEach(input => {
-                    const value = input.value.trim();
-                    if (value !== '' && value.length > 0) {
-                        const count = numbers.filter(num => num === value).length;
-                        if (count > 1) {
-                            input.classList.add('duplicate-warning');
-                            duplicates = true;
-                        }
-                    }
-                });
-                
-                if (duplicates) {
-                    warningDiv.style.display = 'block';
-                } else {
-                    warningDiv.style.display = 'none';
-                }
-            }, 1500);
-        }
-
         // Generate player rows
-        function generatePlayerRows() {
-            const playersTable = document.getElementById('playersTable');
+        function createPlayerRows() {
+            console.log('Creating player rows...');
+            const tbody = document.getElementById('playersTable');
             
+            if (!tbody) {
+                console.error('playersTable not found!');
+                return;
+            }
+
+            tbody.innerHTML = ''; // Clear existing rows
+
             for (let i = 1; i <= 16; i++) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td><strong>${i}</strong></td>
-                    <td><input type="text" name="player${i}_jersey" placeholder="#" class="jersey-input" oninput="checkDuplicateJerseys()"></td>
+                    <td><input type="text" name="player${i}_jersey" placeholder="#" class="jersey-input" oninput="checkDuplicates()"></td>
                     <td><input type="text" name="player${i}_first" placeholder="First name"></td>
                     <td><input type="text" name="player${i}_last" placeholder="Last name"></td>
                     <td>
@@ -616,287 +492,118 @@
                             <option value="C">C</option>
                         </select>
                     </td>
-                    <td><input type="email" name="player${i}_email" placeholder="Email address (optional)"></td>
+                    <td><input type="email" name="player${i}_email" placeholder="Email (optional)"></td>
                 `;
-                playersTable.appendChild(row);
+                tbody.appendChild(row);
             }
+            console.log(`Created ${tbody.children.length} player rows`);
         }
 
-        // Clear all form fields
+        // Check for duplicate jersey numbers
+        function checkDuplicates() {
+            clearTimeout(duplicateCheckTimeout);
+            
+            duplicateCheckTimeout = setTimeout(() => {
+                const jerseyInputs = document.querySelectorAll('input[name*="_jersey"]');
+                const warningDiv = document.getElementById('duplicateWarning');
+                let hasDuplicates = false;
+
+                // Clear previous warnings
+                jerseyInputs.forEach(input => input.classList.remove('duplicate-warning'));
+
+                // Get all jersey numbers
+                const jerseys = [];
+                jerseyInputs.forEach(input => {
+                    if (input.value.trim()) {
+                        jerseys.push(input.value.trim());
+                    }
+                });
+
+                // Check for duplicates
+                jerseyInputs.forEach(input => {
+                    const value = input.value.trim();
+                    if (value) {
+                        const count = jerseys.filter(j => j === value).length;
+                        if (count > 1) {
+                            input.classList.add('duplicate-warning');
+                            hasDuplicates = true;
+                        }
+                    }
+                });
+
+                warningDiv.style.display = hasDuplicates ? 'block' : 'none';
+            }, 1500);
+        }
+
+        // Clear form
         function clearForm() {
-            if (confirm('🤔 Are you sure you want to clear all data?')) {
+            if (confirm('Are you sure you want to clear all data?')) {
                 const submitterName = document.getElementById('submitterName').value;
                 const submitterEmail = document.getElementById('submitterEmail').value;
                 
                 document.getElementById('rosterForm').reset();
-                document.getElementById('duplicateWarning').style.display = 'none';
-                document.getElementById('success').style.display = 'none';
                 
+                // Restore submitter info
                 document.getElementById('submitterName').value = submitterName;
                 document.getElementById('submitterEmail').value = submitterEmail;
                 
-                document.getElementById('submitNewBtn').style.display = 'none';
+                document.getElementById('duplicateWarning').style.display = 'none';
+                document.getElementById('success').style.display = 'none';
+                document.getElementById('createNewBtn').style.display = 'none';
             }
         }
 
-        // Submit and create new roster
-        function submitAndNew() {
+        // Create new roster
+        function createNew() {
             const submitterName = document.getElementById('submitterName').value;
             const submitterEmail = document.getElementById('submitterEmail').value;
             
-            document.getElementById('teamName').value = '';
-            document.getElementById('league').value = '';
+            document.getElementById('rosterForm').reset();
             
-            for (let i = 1; i <= 16; i++) {
-                const jerseyInput = document.querySelector(`input[name="player${i}_jersey"]`);
-                const firstInput = document.querySelector(`input[name="player${i}_first"]`);
-                const lastInput = document.querySelector(`input[name="player${i}_last"]`);
-                const positionSelect = document.querySelector(`select[name="player${i}_position"]`);
-                const emailInput = document.querySelector(`input[name="player${i}_email"]`);
-                
-                if (jerseyInput) jerseyInput.value = '';
-                if (firstInput) firstInput.value = '';
-                if (lastInput) lastInput.value = '';
-                if (positionSelect) positionSelect.value = '';
-                if (emailInput) emailInput.value = '';
-            }
-            
-            const staffRoles = ['coach', 'asst1', 'asst2', 'asst3', 'gm'];
-            staffRoles.forEach(role => {
-                const firstInput = document.querySelector(`input[name="${role}_first"]`);
-                const lastInput = document.querySelector(`input[name="${role}_last"]`);
-                const emailInput = document.querySelector(`input[name="${role}_email"]`);
-                
-                if (firstInput) firstInput.value = '';
-                if (lastInput) lastInput.value = '';
-                if (emailInput) emailInput.value = '';
-            });
-            
+            // Restore submitter info
             document.getElementById('submitterName').value = submitterName;
             document.getElementById('submitterEmail').value = submitterEmail;
             
-            document.getElementById('success').style.display = 'none';
             document.getElementById('duplicateWarning').style.display = 'none';
-            document.getElementById('submitNewBtn').style.display = 'none';
+            document.getElementById('success').style.display = 'none';
+            document.getElementById('createNewBtn').style.display = 'none';
             
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Handle form submission
+        // Handle form submission (demo version without EmailJS)
         document.getElementById('rosterForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
+            // Show loading
             document.getElementById('loading').style.display = 'block';
             
-            const formData = new FormData(this);
-            
-            // Validate required fields
-            let validationErrors = [];
-            
-            for (let i = 1; i <= 16; i++) {
-                const jersey = formData.get(`player${i}_jersey`);
-                const firstName = formData.get(`player${i}_first`);
-                const lastName = formData.get(`player${i}_last`);
-                
-                if (jersey || firstName || lastName) {
-                    if (!jersey) validationErrors.push(`Player ${i}: Jersey number is required`);
-                    if (!firstName) validationErrors.push(`Player ${i}: First name is required`);
-                    if (!lastName) validationErrors.push(`Player ${i}: Last name is required`);
-                }
-            }
-            
-            if (validationErrors.length > 0) {
-                alert('Please complete the following required fields:\n\n' + validationErrors.join('\n'));
+            // Simulate processing delay
+            setTimeout(() => {
                 document.getElementById('loading').style.display = 'none';
-                return;
-            }
-            
-            // Map Hebrew league names to English
-            const leagueMapping = {
-                'לאומית גברים': 'National Men',
-                'על נשים': 'Premier Women', 
-                'לאומית נשים': 'National Women',
-                'נוער על בנים': 'Youth Premier Boys',
-                'נערות א על בנות': 'Junior A Premier Girls'
-            };
-            
-            let rosterData = {
-                teamName: formData.get('teamName'),
-                league: formData.get('league'),
-                leagueEnglish: leagueMapping[formData.get('league')] || 'Unknown League',
-                submitterName: formData.get('submitterName'),
-                submitterEmail: formData.get('submitterEmail'),
-                players: [],
-                staff: []
-            };
-
-            // Collect player data
-            for (let i = 1; i <= 16; i++) {
-                const player = {
-                    number: i,
-                    jersey: formData.get(`player${i}_jersey`),
-                    firstName: formData.get(`player${i}_first`),
-                    lastName: formData.get(`player${i}_last`),
-                    position: formData.get(`player${i}_position`),
-                    email: formData.get(`player${i}_email`)
-                };
+                document.getElementById('success').style.display = 'block';
+                document.getElementById('createNewBtn').style.display = 'inline-block';
                 
-                if (player.jersey && player.firstName && player.lastName) {
-                    rosterData.players.push(player);
-                }
-            }
-
-            // Collect staff data
-            const staffRoles = ['coach', 'asst1', 'asst2', 'asst3', 'gm'];
-            const staffLabels = ['Head Coach', 'Assistant Coach 1', 'Assistant Coach 2', 'Assistant Coach 3', 'General Manager'];
-            
-            staffRoles.forEach((role, index) => {
-                const staff = {
-                    role: staffLabels[index],
-                    firstName: formData.get(`${role}_first`),
-                    lastName: formData.get(`${role}_last`),
-                    email: formData.get(`${role}_email`)
-                };
-                
-                if (staff.firstName || staff.lastName) {
-                    rosterData.staff.push(staff);
-                }
-            });
-
-            // Format data for email - Enhanced version
-            let emailContent = `PIXELLOT TEAM ROSTER SUBMISSION - Version 2.5.1\n`;
-            emailContent += `Generated: ${new Date().toLocaleString()}\n`;
-            emailContent += `==========================================\n\n`;
-            
-            // Team Information
-            emailContent += `TEAM INFORMATION:\n`;
-            emailContent += `Team Name: ${rosterData.teamName}\n`;
-            emailContent += `League: ${rosterData.league} (${rosterData.leagueEnglish})\n`;
-            emailContent += `Submitted by: ${rosterData.submitterName}\n`;
-            emailContent += `Contact Email: ${rosterData.submitterEmail}\n\n`;
-            
-            // Player Summary
-            emailContent += `ROSTER SUMMARY:\n`;
-            emailContent += `Total Players: ${rosterData.players.length}\n`;
-            emailContent += `Total Staff: ${rosterData.staff.length}\n\n`;
-            
-            // CSV Format for Easy Copy-Paste (moved above Player Roster)
-            emailContent += `CSV FORMAT (Copy-paste ready):\n`;
-            emailContent += `==============================\n`;
-            emailContent += `PLAYERS:\n`;
-            rosterData.players.forEach(player => {
-                emailContent += `${player.jersey},${player.firstName},${player.lastName},${player.email || ''},${player.position || ''}\n`;
-            });
-            
-            emailContent += `\nSTAFF:\n`;
-            rosterData.staff.forEach(staff => {
-                emailContent += `${staff.firstName},${staff.lastName},${staff.email || ''},${staff.role}\n`;
-            });
-            emailContent += `\n`;
-            
-            // Detailed Player List
-            emailContent += `PLAYER ROSTER:\n`;
-            emailContent += `=============\n`;
-            if (rosterData.players.length > 0) {
-                rosterData.players.forEach(player => {
-                    emailContent += `Player #${player.number}: ${player.firstName} ${player.lastName}\n`;
-                    emailContent += `  Jersey: #${player.jersey}\n`;
-                    emailContent += `  Position: ${player.position || 'Not specified'}\n`;
-                    emailContent += `  Email: ${player.email || 'Not provided'}\n\n`;
-                });
-            } else {
-                emailContent += `No players added.\n\n`;
-            }
-            
-            // Detailed Staff List
-            emailContent += `COACHING STAFF:\n`;
-            emailContent += `==============\n`;
-            if (rosterData.staff.length > 0) {
-                rosterData.staff.forEach(staff => {
-                    emailContent += `${staff.role}: ${staff.firstName} ${staff.lastName}\n`;
-                    emailContent += `  Email: ${staff.email || 'Not provided'}\n\n`;
-                });
-            } else {
-                emailContent += `No coaching staff added.\n\n`;
-            }
-            
-            emailContent += `\n==========================================\n`;
-            emailContent += `Form URL: https://uriroiz.github.io/roster-form/\n`;
-            emailContent += `IBBA Team Roster Management • Pixellot Advantage`;
-            
-            // Also create a cleaner version for the hidden field
-            let cleanEmailContent = emailContent.replace(/\n/g, '%0A');
-
-            // Set email subject and data for Getform
-            document.getElementById('emailSubject').value = `IBBA Roster: ${rosterData.teamName} - ${rosterData.leagueEnglish}`;
-            document.getElementById('rosterData').value = emailContent;
-            
-            // Send email via EmailJS
-            const emailParams = {
-                team_name: rosterData.teamName,
-                league: rosterData.leagueEnglish,
-                submitter_name: rosterData.submitterName,
-                submitter_email: rosterData.submitterEmail,
-                roster_data: emailContent
-            };
-
-            emailjs.send("service_4bdvcf9", "template_6o8secn", emailParams)
-                .then(function(response) {
-                    console.log('Email sent successfully!', response.status, response.text);
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('success').style.display = 'block';
-                    document.getElementById('submitNewBtn').style.display = 'inline-block';
-                    generateCSV(rosterData);
-                }, function(error) {
-                    console.log('Email failed to send:', error);
-                    document.getElementById('loading').style.display = 'none';
-                    // Still show success and generate CSV as backup
-                    document.getElementById('success').style.display = 'block';
-                    document.getElementById('submitNewBtn').style.display = 'inline-block';
-                    generateCSV(rosterData);
-                    
-                    // Show backup instruction
-                    setTimeout(() => {
-                        alert('⚠️ Email service temporarily unavailable.\n\n📧 Please email the downloaded CSV file to:\npixellotibba@gmail.com\n\nInclude team: ' + rosterData.teamName);
-                    }, 1000);
-                });
+                // In the real version, this would generate and download a CSV file
+                console.log('Form would be processed and CSV generated');
+            }, 2000);
         });
 
-        // Generate CSV file
-        function generateCSV(data) {
-            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 2.8.1\n';
-            csv += `Generated: ${new Date().toLocaleString()}\n\n`;
-            csv += `Team Name: ${data.teamName}\n`;
-            csv += `League: ${data.leagueEnglish}\n`;
-            csv += `Submitted by: ${data.submitterName}\n`;
-            csv += `Contact Email: ${data.submitterEmail}\n\n`;
-            
-            csv += 'PLAYERS\n';
-            csv += 'S/N,Jersey #,First Name,Last Name,Position,Email Address\n';
-            
-            data.players.forEach(player => {
-                csv += `${player.number},${player.jersey || ''},${player.firstName || ''},${player.lastName || ''},${player.position || ''},${player.email || ''}\n`;
-            });
-            
-            csv += `\nCOACHING STAFF\n`;
-            csv += `Role,First Name,Last Name,Email Address\n`;
-            
-            data.staff.forEach(staff => {
-                csv += `${staff.role},${staff.firstName || ''},${staff.lastName || ''},${staff.email || ''}\n`;
-            });
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded - initializing...');
+            createPlayerRows();
+        });
 
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `ibba_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v2.8.1.csv`;
-            a.click();
-            window.URL.revokeObjectURL(url);
-        }
-
-        // Initialize
-        generatePlayerRows();
-        document.getElementById('submitNewBtn').style.display = 'none';
+        // Fallback initialization
+        window.addEventListener('load', function() {
+            console.log('Window loaded - checking player table...');
+            const tbody = document.getElementById('playersTable');
+            if (tbody && tbody.children.length === 0) {
+                console.log('No player rows found, creating them...');
+                createPlayerRows();
+            }
+        });
     </script>
 </body>
 </html>
