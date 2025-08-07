@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pixellot Team Roster Submission Form</title>
+    <title>IBBA Team Roster Submission Form - Pixellot Advantage</title>
     <style>
         * {
             margin: 0;
@@ -402,11 +402,11 @@
 </head>
 <body>
     <div class="container">
-        <h1>🏀 Pixellot Team Roster Submission</h1>
-        <p class="subtitle">Professional roster management for Pixellot leagues</p>
+        <h1>🏀 IBBA Team Roster Submission</h1>
+        <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
         
         <div class="version-info">
-            <span class="version">Version 2.5.2</span>
+            <span class="version">Version 2.5.4</span>
             <span class="date">Updated: August 2025</span>
         </div>
         
@@ -606,9 +606,7 @@
                         <select name="player${i}_position">
                             <option value="">-</option>
                             <option value="G">G</option>
-                            <option value="G/F">G/F</option>
                             <option value="F">F</option>
-                            <option value="F/C">F/C</option>
                             <option value="C">C</option>
                         </select>
                     </td>
@@ -776,6 +774,20 @@
             emailContent += `Total Players: ${rosterData.players.length}\n`;
             emailContent += `Total Staff: ${rosterData.staff.length}\n\n`;
             
+            // CSV Format for Easy Copy-Paste (moved above Player Roster)
+            emailContent += `CSV FORMAT (Copy-paste ready):\n`;
+            emailContent += `==============================\n`;
+            emailContent += `PLAYERS:\n`;
+            rosterData.players.forEach(player => {
+                emailContent += `${player.jersey},${player.firstName},${player.lastName},${player.email || ''},${player.position || ''}\n`;
+            });
+            
+            emailContent += `\nSTAFF:\n`;
+            rosterData.staff.forEach(staff => {
+                emailContent += `${staff.firstName},${staff.lastName},${staff.email || ''},${staff.role}\n`;
+            });
+            emailContent += `\n`;
+            
             // Detailed Player List
             emailContent += `PLAYER ROSTER:\n`;
             emailContent += `=============\n`;
@@ -802,28 +814,15 @@
                 emailContent += `No coaching staff added.\n\n`;
             }
             
-            // CSV Format for Easy Copy-Paste
-            emailContent += `CSV FORMAT (Copy-paste ready):\n`;
-            emailContent += `==============================\n`;
-            emailContent += `PLAYERS:\n`;
-            rosterData.players.forEach(player => {
-                emailContent += `${player.jersey},${player.firstName},${player.lastName},${player.email || ''},${player.position || ''}\n`;
-            });
-            
-            emailContent += `\nSTAFF:\n`;
-            rosterData.staff.forEach(staff => {
-                emailContent += `${staff.firstName},${staff.lastName},${staff.email || ''},${staff.role}\n`;
-            });
-            
             emailContent += `\n==========================================\n`;
             emailContent += `Form URL: https://uriroiz.github.io/roster-form/\n`;
-            emailContent += `Pixellot Team Roster Management System`;
+            emailContent += `IBBA Team Roster Management • Pixellot Advantage`;
             
             // Also create a cleaner version for the hidden field
             let cleanEmailContent = emailContent.replace(/\n/g, '%0A');
 
             // Set email subject and data
-            document.getElementById('emailSubject').value = `Pixellot Roster: ${rosterData.teamName} - ${rosterData.leagueEnglish}`;
+            document.getElementById('emailSubject').value = `IBBA Roster: ${rosterData.teamName} - ${rosterData.leagueEnglish}`;
             document.getElementById('rosterData').value = emailContent;
             
             // Submit form
@@ -849,7 +848,7 @@
 
         // Generate CSV file
         function generateCSV(data) {
-            let csv = 'Pixellot Team Roster Submission - Version 2.5.2\n';
+            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 2.5.4\n';
             csv += `Generated: ${new Date().toLocaleString()}\n\n`;
             csv += `Team Name: ${data.teamName}\n`;
             csv += `League: ${data.leagueEnglish}\n`;
@@ -874,7 +873,7 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `pixellot_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v2.5.2.csv`;
+            a.download = `ibba_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v2.5.4.csv`;
             a.click();
             window.URL.revokeObjectURL(url);
         }
