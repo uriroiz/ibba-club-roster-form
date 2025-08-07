@@ -907,31 +907,30 @@ sendEmailViaAPI(emailParams);
 
 
             
-            // Send the email
-            // emailjs.send(window.EmailJSConfig.serviceId, window.EmailJSConfig.templateId, emailParams)
-                .then(function(response) {
-                    console.log('✅ EMAIL SENT SUCCESSFULLY!', response);
+sendEmailViaAPI(emailParams)
+    .then(function(response) {
+        console.log('✅ EMAIL SENT SUCCESSFULLY!', response);
 
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('success').style.display = 'block';
-                    document.getElementById('createNewBtn').style.display = 'inline-block';
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('success').style.display = 'block';
+        document.getElementById('createNewBtn').style.display = 'inline-block';
 
-                    generateCSV(rosterData);
-                    document.getElementById('success').scrollIntoView({ behavior: 'smooth' });
+        generateCSV(rosterData);
+        document.getElementById('success').scrollIntoView({ behavior: 'smooth' });
 
-                    alert('✅ Email sent successfully to pixellotibba@gmail.com!');
-                })
-                .catch(function(error) {
-                    console.error('❌ EmailJS API Error:', error);
+        alert('✅ Email sent successfully to pixellotibba@gmail.com!');
+    })
+    .catch(function(error) {
+        console.error('❌ EmailJS API Error:', error);
 
-                    document.getElementById('loading').style.display = 'none';
-                    alert('❌ Email sending failed. A CSV file will be downloaded instead.\nPlease send it manually to pixellotibba@gmail.com.');
+        document.getElementById('loading').style.display = 'none';
+        alert('❌ Email sending failed. A CSV file will be downloaded instead.\nPlease send it manually to pixellotibba@gmail.com.');
 
-                    document.getElementById('success').style.display = 'block';
-                    document.getElementById('createNewBtn').style.display = 'inline-block';
-                    generateCSV(rosterData);
-                });
-        });
+        document.getElementById('success').style.display = 'block';
+        document.getElementById('createNewBtn').style.display = 'inline-block';
+        generateCSV(rosterData);
+    });
+
 
         // Initialize everything when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
