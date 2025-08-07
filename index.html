@@ -330,7 +330,7 @@
         <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
         
         <div class="version-info">
-            <span class="version">Version 3.3.0</span>
+            <span class="version">Version 3.3.1</span>
             <span class="date">Updated: August 2025</span>
         </div>
 
@@ -746,7 +746,7 @@
 
         // Generate CSV
         function generateCSV(data) {
-            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 3.2.9\n';
+            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 3.3.1\n';
             csv += `Generated: ${new Date().toLocaleString()}\n\n`;
             csv += `Team Name: ${data.teamName}\n`;
             csv += `League: ${data.leagueEnglish}\n`;
@@ -770,7 +770,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `ibba_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v3.2.9.csv`;
+            a.download = `ibba_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v3.3.1.csv`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -873,7 +873,15 @@
             rosterSummary += `Submitted by: ${rosterData.submitterName}\n`;
             rosterSummary += `Email: ${rosterData.submitterEmail}\n`;
             rosterSummary += `Date: ${new Date().toLocaleString()}\n`;
-            rosterSummary += `Version: 3.2.9\n\n`;
+            rosterSummary += `Version: 3.3.1\n\n`;
+
+            // Add CSV format for easy copying
+            rosterSummary += `CSV FORMAT FOR COPYING:\n`;
+            rosterSummary += `=======================\n`;
+            rosterData.players.forEach(player => {
+                rosterSummary += `${player.jersey},${player.firstName},${player.lastName},${player.email || ''},${player.position || ''}\n`;
+            });
+            rosterSummary += `\n`;
 
             rosterSummary += `PLAYERS (${rosterData.players.length}):\n`;
             rosterSummary += `------------------------\n`;
