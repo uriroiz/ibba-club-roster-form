@@ -330,7 +330,7 @@
         <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
         
         <div class="version-info">
-            <span class="version">Version 3.5.0</span>
+            <span class="version">Version 3.5.2</span>
             <span class="date">Updated: August 2025</span>
         </div>
 
@@ -715,7 +715,7 @@
 
         // Generate CSV
         function generateCSV(data) {
-            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 3.5.0\n';
+            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 3.5.2\n';
             csv += `Generated: ${new Date().toLocaleString()}\n\n`;
             csv += `Team Name: ${data.teamName}\n`;
             csv += `League: ${data.leagueEnglish}\n`;
@@ -734,12 +734,16 @@
                 csv += `"${staff.firstName}","${staff.lastName}","${staff.email || ''}","${staff.role}"\n`;
             });
 
-            // Download CSV
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            // Add UTF-8 BOM for proper Hebrew encoding
+            const BOM = '\uFEFF';
+            const csvWithBOM = BOM + csv;
+
+            // Create blob with UTF-8 encoding
+            const blob = new Blob([csvWithBOM], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `ibba_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v3.5.0.csv`;
+            a.download = `ibba_${data.teamName.replace(/[^a-z0-9\u0590-\u05FF]/gi, '_').toLowerCase()}_roster_v3.5.2.csv`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -811,11 +815,11 @@
             }
 
             const leagueMapping = {
-                'לאומית גברים': 'National Men',
-                'על נשים': 'Premier Women',
-                'לאומית נשים': 'National Women',
-                'נוער על בנים': 'Youth Premier Boys',
-                'נערות א על בנות': 'Junior A Premier Girls'
+                'לאומית גברים': 'Mens 2nd Division',
+                'על נשים': 'Womens 1st Division',
+                'לאומית נשים': 'Womens 2nd Division',
+                'נוער על בנים': 'U19 Mens',
+                'נערות א על בנות': 'U19 Girls'
             };
 
             const rosterData = {
@@ -869,7 +873,7 @@
             rosterSummary += `Submitted by: ${rosterData.submitterName}\n`;
             rosterSummary += `Email: ${rosterData.submitterEmail}\n`;
             rosterSummary += `Date: ${new Date().toLocaleString()}\n`;
-            rosterSummary += `Version: 3.5.0\n\n`;
+            rosterSummary += `Version: 3.5.2\n\n`;
 
             // Add CSV format for easy copying
             rosterSummary += `CSV FORMAT FOR COPYING:\n`;
