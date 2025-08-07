@@ -330,7 +330,7 @@
         <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
         
         <div class="version-info">
-            <span class="version">Version 3.2.9</span>
+            <span class="version">Version 3.3.0</span>
             <span class="date">Updated: August 2025</span>
         </div>
 
@@ -446,14 +446,13 @@
                 </table>
             </div>
 
-<div class="buttons">
-    <button type="button" class="btn btn-secondary" onclick="clearForm()">🗑️ Clear Form</button>
-    <button type="button" class="btn btn-success" onclick="autoFillForm()" style="background: #f59e0b; margin-right: 10px;">⚡ Auto Fill (Test)</button>
-    <button type="button" class="btn btn-secondary" onclick="testEmailDirectly()" style="background: #4b5563;">📧 Test EmailJS</button>
-    <button type="submit" class="btn btn-primary">🚀 Submit Roster</button>
-    <button type="button" class="btn btn-success" onclick="createNew()" id="createNewBtn" style="display: none;">📋 Create New Roster</button>
-</div>
-
+            <div class="buttons">
+                <button type="button" class="btn btn-secondary" onclick="clearForm()">🗑️ Clear Form</button>
+                <button type="button" class="btn btn-success" onclick="autoFillForm()" style="background: #f59e0b; margin-right: 10px;">⚡ Auto Fill (Test)</button>
+                <button type="button" class="btn btn-secondary" onclick="testEmailDirectly()" style="background: #4b5563;">📧 Test EmailJS</button>
+                <button type="submit" class="btn btn-primary">🚀 Submit Roster</button>
+                <button type="button" class="btn btn-success" onclick="createNew()" id="createNewBtn" style="display: none;">📋 Create New Roster</button>
+            </div>
 
             <div class="loading" id="loading">
                 🔄 Submitting your roster...
@@ -473,7 +472,7 @@
             templateId: "template_6o8secn"
         };
 
-console.log("🧪 TEST LOG WORKING");  // Add this line here
+        console.log("🧪 TEST LOG WORKING");  
         
         // Debug function to check configuration
         function showDebugInfo() {
@@ -557,9 +556,11 @@ console.log("🧪 TEST LOG WORKING");  // Add this line here
             alert('🧪 Testing email directly...\nCheck console for results.');
             
             var testParams = {
-                message: 'Direct email test from IBBA roster form',
-                from_name: 'Test User',
-                reply_to: 'test@example.com'
+                team_name: 'Test Team',
+                league: 'Test League',
+                submitter_name: 'Test User',
+                submitter_email: 'test@example.com',
+                roster_data: 'This is a test email from the IBBA roster form.'
             };
             
             console.log('🧪 Test parameters:', testParams);
@@ -707,6 +708,7 @@ console.log("🧪 TEST LOG WORKING");  // Add this line here
             alert('✅ Form auto-filled with test data! Ready to submit for testing.');
             console.log('✅ Auto-fill completed');
         }
+
         function clearForm() {
             if (confirm('Are you sure you want to clear all data?')) {
                 const submitterName = document.getElementById('submitterName').value;
@@ -744,7 +746,7 @@ console.log("🧪 TEST LOG WORKING");  // Add this line here
 
         // Generate CSV
         function generateCSV(data) {
-            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 3.0.0\n';
+            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 3.2.9\n';
             csv += `Generated: ${new Date().toLocaleString()}\n\n`;
             csv += `Team Name: ${data.teamName}\n`;
             csv += `League: ${data.leagueEnglish}\n`;
@@ -768,7 +770,7 @@ console.log("🧪 TEST LOG WORKING");  // Add this line here
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `ibba_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v3.1.0.csv`;
+            a.download = `ibba_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v3.2.9.csv`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -871,7 +873,7 @@ console.log("🧪 TEST LOG WORKING");  // Add this line here
             rosterSummary += `Submitted by: ${rosterData.submitterName}\n`;
             rosterSummary += `Email: ${rosterData.submitterEmail}\n`;
             rosterSummary += `Date: ${new Date().toLocaleString()}\n`;
-            rosterSummary += `Version: 3.2.7\n\n`;
+            rosterSummary += `Version: 3.2.9\n\n`;
 
             rosterSummary += `PLAYERS (${rosterData.players.length}):\n`;
             rosterSummary += `------------------------\n`;
@@ -891,46 +893,42 @@ console.log("🧪 TEST LOG WORKING");  // Add this line here
             });
 
             // Final email parameters
-const emailParams = {
-    team_name: teamName,
-    league: rosterData.leagueEnglish,
-    submitter_name: submitterName,
-    submitter_email: submitterEmail,
-    roster_data: rosterSummary
-};
+            const emailParams = {
+                team_name: teamName,
+                league: rosterData.leagueEnglish,
+                submitter_name: submitterName,
+                submitter_email: submitterEmail,
+                roster_data: rosterSummary
+            };
 
-console.log("📦 Email Params:", emailParams);
-alert("📬 Preparing to send email. Check Console for details.");
+            console.log("📦 Email Params:", emailParams);
+            console.log("📬 Preparing to send email...");
 
-// ✅ Use direct fetch method
-sendEmailViaAPI(emailParams);
+            // Send email using the custom API function
+            sendEmailViaAPI(emailParams)
+                .then(function(response) {
+                    console.log('✅ EMAIL SENT SUCCESSFULLY!', response);
 
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('success').style.display = 'block';
+                    document.getElementById('createNewBtn').style.display = 'inline-block';
 
-            
-sendEmailViaAPI(emailParams)
-    .then(function(response) {
-        console.log('✅ EMAIL SENT SUCCESSFULLY!', response);
+                    generateCSV(rosterData);
+                    document.getElementById('success').scrollIntoView({ behavior: 'smooth' });
 
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('success').style.display = 'block';
-        document.getElementById('createNewBtn').style.display = 'inline-block';
+                    alert('✅ Email sent successfully to pixellotibba@gmail.com!');
+                })
+                .catch(function(error) {
+                    console.error('❌ EmailJS API Error:', error);
 
-        generateCSV(rosterData);
-        document.getElementById('success').scrollIntoView({ behavior: 'smooth' });
+                    document.getElementById('loading').style.display = 'none';
+                    alert('❌ Email sending failed. A CSV file will be downloaded instead.\nPlease send it manually to pixellotibba@gmail.com.');
 
-        alert('✅ Email sent successfully to pixellotibba@gmail.com!');
-    })
-    .catch(function(error) {
-        console.error('❌ EmailJS API Error:', error);
-
-        document.getElementById('loading').style.display = 'none';
-        alert('❌ Email sending failed. A CSV file will be downloaded instead.\nPlease send it manually to pixellotibba@gmail.com.');
-
-        document.getElementById('success').style.display = 'block';
-        document.getElementById('createNewBtn').style.display = 'inline-block';
-        generateCSV(rosterData);
-    });
-
+                    document.getElementById('success').style.display = 'block';
+                    document.getElementById('createNewBtn').style.display = 'inline-block';
+                    generateCSV(rosterData);
+                });
+        });
 
         // Initialize everything when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
