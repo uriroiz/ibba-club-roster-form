@@ -330,7 +330,7 @@
         <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
         
         <div class="version-info">
-            <span class="version">Version 3.4.0</span>
+            <span class="version">Version 3.5.0</span>
             <span class="date">Updated: August 2025</span>
         </div>
 
@@ -448,8 +448,9 @@
 
             <div class="buttons">
                 <button type="button" class="btn btn-secondary" onclick="clearForm()">🗑️ Clear Form</button>
-                <button type="button" class="btn btn-success" onclick="autoFillForm()" style="background: #f59e0b; margin-right: 10px;">⚡ Auto Fill (Test)</button>
-                <button type="button" class="btn btn-secondary" onclick="testEmailDirectly()" style="background: #4b5563;">📧 Test EmailJS</button>
+                <!-- Hidden test buttons for future use -->
+                <button type="button" class="btn btn-success" onclick="autoFillForm()" style="background: #f59e0b; margin-right: 10px; display: none;">⚡ Auto Fill (Test)</button>
+                <button type="button" class="btn btn-secondary" onclick="testEmailDirectly()" style="background: #4b5563; display: none;">📧 Test EmailJS</button>
                 <button type="submit" class="btn btn-primary">🚀 Submit Roster</button>
                 <button type="button" class="btn btn-success" onclick="createNew()" id="createNewBtn" style="display: none;">📋 Create New Roster</button>
             </div>
@@ -714,7 +715,7 @@
 
         // Generate CSV
         function generateCSV(data) {
-            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 3.4.0\n';
+            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 3.5.0\n';
             csv += `Generated: ${new Date().toLocaleString()}\n\n`;
             csv += `Team Name: ${data.teamName}\n`;
             csv += `League: ${data.leagueEnglish}\n`;
@@ -738,7 +739,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `ibba_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v3.4.0.csv`;
+            a.download = `ibba_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v3.5.0.csv`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -770,14 +771,41 @@
                 const jersey = formData.get(`player${i}_jersey`);
                 const firstName = formData.get(`player${i}_first`);
                 const lastName = formData.get(`player${i}_last`);
-                if (jersey && firstName && lastName) {
+                const position = formData.get(`player${i}_position`);
+                if (jersey && firstName && lastName && position) {
                     hasPlayers = true;
                     break;
                 }
             }
 
             if (!hasPlayers) {
-                alert('Please add at least one complete player (jersey number, first name, and last name required).');
+                alert('Please add at least one complete player (jersey number, first name, last name, and position are all required).');
+                document.getElementById('loading').style.display = 'none';
+                return;
+            }
+
+            // Validate player data completeness
+            let incompletePlayer = false;
+            let incompletePlayerNumber = 0;
+            
+            for (let i = 1; i <= 16; i++) {
+                const jersey = formData.get(`player${i}_jersey`);
+                const firstName = formData.get(`player${i}_first`);
+                const lastName = formData.get(`player${i}_last`);
+                const position = formData.get(`player${i}_position`);
+                
+                // If any required field is filled, all must be filled
+                if (jersey || firstName || lastName || position) {
+                    if (!jersey || !firstName || !lastName || !position) {
+                        incompletePlayer = true;
+                        incompletePlayerNumber = i;
+                        break;
+                    }
+                }
+            }
+
+            if (incompletePlayer) {
+                alert(`Player #${incompletePlayerNumber} is incomplete. When adding a player, Jersey Number, First Name, Last Name, and Position are all required. Only Email is optional.`);
                 document.getElementById('loading').style.display = 'none';
                 return;
             }
@@ -809,7 +837,7 @@
                     position: formData.get(`player${i}_position`),
                     email: formData.get(`player${i}_email`)
                 };
-                if (player.jersey && player.firstName && player.lastName) {
+                if (player.jersey && player.firstName && player.lastName && player.position) {
                     rosterData.players.push(player);
                 }
             }
@@ -841,7 +869,7 @@
             rosterSummary += `Submitted by: ${rosterData.submitterName}\n`;
             rosterSummary += `Email: ${rosterData.submitterEmail}\n`;
             rosterSummary += `Date: ${new Date().toLocaleString()}\n`;
-            rosterSummary += `Version: 3.4.0\n\n`;
+            rosterSummary += `Version: 3.5.0\n\n`;
 
             // Add CSV format for easy copying
             rosterSummary += `CSV FORMAT FOR COPYING:\n`;
