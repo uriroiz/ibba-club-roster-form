@@ -406,11 +406,12 @@
         <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
         
         <div class="version-info">
-            <span class="version">Version 2.6.1</span>
+            <span class="version">Version 2.8.0</span>
             <span class="date">Updated: August 2025</span>
         </div>
         
-        <form id="rosterForm" action="https://getform.io/f/apjmkqxa" method="POST">
+        <form id="rosterForm">
+            <!-- EmailJS Integration - No action/method needed -->
             <!-- Hidden fields for Getform configuration -->
             <input type="hidden" name="_gotcha" style="display:none !important">
             <input type="hidden" name="subject" value="" id="emailSubject">
@@ -547,7 +548,11 @@
         </form>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script>
+        // Initialize EmailJS
+        emailjs.init("r4Y7hg0AGi5DhIcF");
+        
         let duplicateCheckTimeout;
 
         // Check for duplicate jersey numbers with delay
@@ -824,33 +829,40 @@
             document.getElementById('emailSubject').value = `IBBA Roster: ${rosterData.teamName} - ${rosterData.leagueEnglish}`;
             document.getElementById('rosterData').value = emailContent;
             
-            // Submit form to Getform
-            fetch(this.action, {
-                method: 'POST',
-                body: new FormData(this)
-            }).then(response => {
-                document.getElementById('loading').style.display = 'none';
-                if (response.ok) {
+            // Send email via EmailJS
+            const emailParams = {
+                team_name: rosterData.teamName,
+                league: rosterData.leagueEnglish,
+                submitter_name: rosterData.submitterName,
+                submitter_email: rosterData.submitterEmail,
+                roster_data: emailContent
+            };
+
+            emailjs.send("service_4bdvcf9", "template_6o8secn", emailParams)
+                .then(function(response) {
+                    console.log('Email sent successfully!', response.status, response.text);
+                    document.getElementById('loading').style.display = 'none';
                     document.getElementById('success').style.display = 'block';
                     document.getElementById('submitNewBtn').style.display = 'inline-block';
                     generateCSV(rosterData);
-                } else {
+                }, function(error) {
+                    console.log('Email failed to send:', error);
+                    document.getElementById('loading').style.display = 'none';
+                    // Still show success and generate CSV as backup
                     document.getElementById('success').style.display = 'block';
                     document.getElementById('submitNewBtn').style.display = 'inline-block';
                     generateCSV(rosterData);
-                }
-            }).catch(error => {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('success').style.display = 'block';
-                document.getElementById('submitNewBtn').style.display = 'inline-block';
-                console.error('Error:', error);
-                generateCSV(rosterData);
-            });
+                    
+                    // Show backup instruction
+                    setTimeout(() => {
+                        alert('⚠️ Email service temporarily unavailable.\n\n📧 Please email the downloaded CSV file to:\npixellotibba@gmail.com\n\nInclude team: ' + rosterData.teamName);
+                    }, 1000);
+                });
         });
 
         // Generate CSV file
         function generateCSV(data) {
-            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 2.6.1\n';
+            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 2.8.0\n';
             csv += `Generated: ${new Date().toLocaleString()}\n\n`;
             csv += `Team Name: ${data.teamName}\n`;
             csv += `League: ${data.leagueEnglish}\n`;
@@ -875,7 +887,7 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `ibba_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v2.6.1.csv`;
+            a.download = `ibba_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v2.8.0.csv`;
             a.click();
             window.URL.revokeObjectURL(url);
         }
