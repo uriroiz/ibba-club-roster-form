@@ -330,7 +330,7 @@
         <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
         
         <div class="version-info">
-            <span class="version">Version 3.2.3</span>
+            <span class="version">Version 3.2.4</span>
             <span class="date">Updated: August 2025</span>
         </div>
 
@@ -471,8 +471,44 @@
             templateId: "template_bciy9uy"
         };
 
-        // Custom EmailJS-like function using fetch API
+        // Debug function to check configuration
+        function showDebugInfo() {
+            var debugInfo = '🔍 EMAILJS DEBUG INFO\n';
+            debugInfo += '========================\n\n';
+            
+            debugInfo += 'Configuration:\n';
+            debugInfo += '- Public Key: ' + window.EmailJSConfig.publicKey + '\n';
+            debugInfo += '- Service ID: ' + window.EmailJSConfig.serviceId + '\n';
+            debugInfo += '- Template ID: ' + window.EmailJSConfig.templateId + '\n\n';
+            
+            debugInfo += 'Browser Info:\n';
+            debugInfo += '- User Agent: ' + navigator.userAgent + '\n';
+            debugInfo += '- Current URL: ' + window.location.href + '\n\n';
+            
+            debugInfo += 'Network Test:\n';
+            debugInfo += 'Testing connection to EmailJS API...\n';
+            
+            console.log(debugInfo);
+            alert(debugInfo + '\nCheck console for network test results...');
+            
+            // Test network connectivity
+            fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                method: 'OPTIONS'
+            })
+            .then(response => {
+                console.log('✅ Network test successful:', response.status);
+                console.log('✅ EmailJS API is reachable');
+            })
+            .catch(error => {
+                console.error('❌ Network test failed:', error);
+                console.error('❌ EmailJS API not reachable');
+            });
+        }
+
+        // Enhanced email sending with step-by-step logging
         function sendEmailViaAPI(params) {
+            console.log('📡 STEP 1: Starting sendEmailViaAPI function');
+            
             var url = 'https://api.emailjs.com/api/v1.0/email/send';
             
             var data = {
@@ -482,19 +518,29 @@
                 template_params: params
             };
 
-            console.log('🌐 Making fetch request to:', url);
-            console.log('📤 Sending data:', data);
+            console.log('📡 STEP 2: Prepared data for sending:');
+            console.log('   URL:', url);
+            console.log('   Service ID:', data.service_id);
+            console.log('   Template ID:', data.template_id);
+            console.log('   User ID:', data.user_id);
+            console.log('   Template Params:', data.template_params);
 
+            console.log('📡 STEP 3: Making fetch request...');
+            
             try {
-                return fetch(url, {
+                const fetchPromise = fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(data)
                 });
+                
+                console.log('📡 STEP 4: Fetch promise created, returning to caller');
+                return fetchPromise;
+                
             } catch (error) {
-                console.error('❌ Fetch error:', error);
+                console.error('📡 STEP 4 ERROR: Exception in fetch:', error);
                 return Promise.reject(error);
             }
         }
