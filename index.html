@@ -330,7 +330,7 @@
         <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
         
         <div class="version-info">
-            <span class="version">Version 3.2.0</span>
+            <span class="version">Version 3.2.2</span>
             <span class="date">Updated: August 2025</span>
         </div>
 
@@ -448,6 +448,7 @@
 
             <div class="buttons">
                 <button type="button" class="btn btn-secondary" onclick="clearForm()">🗑️ Clear Form</button>
+                <button type="button" class="btn btn-success" onclick="autoFillForm()" style="background: #f59e0b; margin-right: 10px;">⚡ Auto Fill (Test)</button>
                 <button type="submit" class="btn btn-primary">🚀 Submit Roster</button>
                 <button type="button" class="btn btn-success" onclick="createNew()" id="createNewBtn" style="display: none;">📋 Create New Roster</button>
             </div>
@@ -566,7 +567,66 @@
             }, 1500);
         }
 
-        // Clear form
+        // Auto-fill form with test data (TEMPORARY - for testing only)
+        function autoFillForm() {
+            console.log('🤖 Auto-filling form with test data...');
+            
+            // Fill team information
+            document.getElementById('teamName').value = 'Maccabi Tel Aviv Test';
+            document.getElementById('league').value = 'לאומית גברים';
+            
+            // Fill contact information
+            document.getElementById('submitterName').value = 'John Test Manager';
+            document.getElementById('submitterEmail').value = 'test@example.com';
+            
+            // Fill some players
+            const testPlayers = [
+                { jersey: '23', first: 'Michael', last: 'Jordan', position: 'G', email: 'mj@test.com' },
+                { jersey: '24', first: 'Kobe', last: 'Bryant', position: 'G', email: 'kb@test.com' },
+                { jersey: '33', first: 'Larry', last: 'Bird', position: 'F', email: 'lb@test.com' },
+                { jersey: '32', first: 'Magic', last: 'Johnson', position: 'G', email: 'magic@test.com' },
+                { jersey: '34', first: 'Shaq', last: 'ONeal', position: 'C', email: 'shaq@test.com' },
+                { jersey: '8', first: 'Tim', last: 'Duncan', position: 'F', email: 'td@test.com' },
+                { jersey: '21', first: 'Kevin', last: 'Garnett', position: 'F', email: 'kg@test.com' },
+                { jersey: '41', first: 'Dirk', last: 'Nowitzki', position: 'F', email: 'dirk@test.com' }
+            ];
+            
+            testPlayers.forEach((player, index) => {
+                const playerNum = index + 1;
+                const jerseyInput = document.querySelector('input[name="player' + playerNum + '_jersey"]');
+                const firstInput = document.querySelector('input[name="player' + playerNum + '_first"]');
+                const lastInput = document.querySelector('input[name="player' + playerNum + '_last"]');
+                const positionSelect = document.querySelector('select[name="player' + playerNum + '_position"]');
+                const emailInput = document.querySelector('input[name="player' + playerNum + '_email"]');
+                
+                if (jerseyInput) jerseyInput.value = player.jersey;
+                if (firstInput) firstInput.value = player.first;
+                if (lastInput) lastInput.value = player.last;
+                if (positionSelect) positionSelect.value = player.position;
+                if (emailInput) emailInput.value = player.email;
+            });
+            
+            // Fill coaching staff
+            const staff = [
+                { role: 'coach', first: 'Phil', last: 'Jackson', email: 'phil@test.com' },
+                { role: 'asst1', first: 'Steve', last: 'Kerr', email: 'steve@test.com' },
+                { role: 'asst2', first: 'Tex', last: 'Winter', email: 'tex@test.com' },
+                { role: 'gm', first: 'Jerry', last: 'West', email: 'jerry@test.com' }
+            ];
+            
+            staff.forEach(member => {
+                const firstInput = document.querySelector('input[name="' + member.role + '_first"]');
+                const lastInput = document.querySelector('input[name="' + member.role + '_last"]');
+                const emailInput = document.querySelector('input[name="' + member.role + '_email"]');
+                
+                if (firstInput) firstInput.value = member.first;
+                if (lastInput) lastInput.value = member.last;
+                if (emailInput) emailInput.value = member.email;
+            });
+            
+            alert('✅ Form auto-filled with test data! Ready to submit for testing.');
+            console.log('✅ Auto-fill completed');
+        }
         function clearForm() {
             if (confirm('Are you sure you want to clear all data?')) {
                 const submitterName = document.getElementById('submitterName').value;
