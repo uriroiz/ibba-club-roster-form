@@ -406,7 +406,7 @@
         <p class="subtitle">Professional roster management for Pixellot leagues</p>
         
         <div class="version-info">
-            <span class="version">Version 2.5.0</span>
+            <span class="version">Version 2.5.2</span>
             <span class="date">Updated: August 2025</span>
         </div>
         
@@ -759,29 +759,68 @@
                 }
             });
 
-            // Format data for email
-            let emailContent = `PIXELLOT TEAM ROSTER SUBMISSION - Version 2.4.2\n`;
-            emailContent += `Generated: ${new Date().toLocaleString()}\n\n`;
+            // Format data for email - Enhanced version
+            let emailContent = `PIXELLOT TEAM ROSTER SUBMISSION - Version 2.5.1\n`;
+            emailContent += `Generated: ${new Date().toLocaleString()}\n`;
+            emailContent += `==========================================\n\n`;
+            
+            // Team Information
+            emailContent += `TEAM INFORMATION:\n`;
             emailContent += `Team Name: ${rosterData.teamName}\n`;
             emailContent += `League: ${rosterData.league} (${rosterData.leagueEnglish})\n`;
             emailContent += `Submitted by: ${rosterData.submitterName}\n`;
             emailContent += `Contact Email: ${rosterData.submitterEmail}\n\n`;
             
+            // Player Summary
+            emailContent += `ROSTER SUMMARY:\n`;
+            emailContent += `Total Players: ${rosterData.players.length}\n`;
+            emailContent += `Total Staff: ${rosterData.staff.length}\n\n`;
+            
+            // Detailed Player List
+            emailContent += `PLAYER ROSTER:\n`;
+            emailContent += `=============\n`;
+            if (rosterData.players.length > 0) {
+                rosterData.players.forEach(player => {
+                    emailContent += `Player #${player.number}: ${player.firstName} ${player.lastName}\n`;
+                    emailContent += `  Jersey: #${player.jersey}\n`;
+                    emailContent += `  Position: ${player.position || 'Not specified'}\n`;
+                    emailContent += `  Email: ${player.email || 'Not provided'}\n\n`;
+                });
+            } else {
+                emailContent += `No players added.\n\n`;
+            }
+            
+            // Detailed Staff List
+            emailContent += `COACHING STAFF:\n`;
+            emailContent += `==============\n`;
+            if (rosterData.staff.length > 0) {
+                rosterData.staff.forEach(staff => {
+                    emailContent += `${staff.role}: ${staff.firstName} ${staff.lastName}\n`;
+                    emailContent += `  Email: ${staff.email || 'Not provided'}\n\n`;
+                });
+            } else {
+                emailContent += `No coaching staff added.\n\n`;
+            }
+            
+            // CSV Format for Easy Copy-Paste
+            emailContent += `CSV FORMAT (Copy-paste ready):\n`;
+            emailContent += `==============================\n`;
             emailContent += `PLAYERS:\n`;
-            emailContent += `S/N | Jersey | First Name | Last Name | Position | Email\n`;
-            emailContent += `----+--------+------------+-----------+----------+-------\n`;
-            
             rosterData.players.forEach(player => {
-                emailContent += `${player.number.toString().padEnd(3)} | ${(player.jersey || '').padEnd(6)} | ${(player.firstName || '').padEnd(10)} | ${(player.lastName || '').padEnd(9)} | ${(player.position || '').padEnd(8)} | ${player.email || ''}\n`;
+                emailContent += `${player.jersey},${player.firstName},${player.lastName},${player.email || ''},${player.position || ''}\n`;
             });
             
-            emailContent += `\nCOACHING STAFF:\n`;
-            emailContent += `Role | First Name | Last Name | Email\n`;
-            emailContent += `-----+------------+-----------+-------\n`;
-            
+            emailContent += `\nSTAFF:\n`;
             rosterData.staff.forEach(staff => {
-                emailContent += `${staff.role.padEnd(4)} | ${(staff.firstName || '').padEnd(10)} | ${(staff.lastName || '').padEnd(9)} | ${staff.email || ''}\n`;
+                emailContent += `${staff.firstName},${staff.lastName},${staff.email || ''},${staff.role}\n`;
             });
+            
+            emailContent += `\n==========================================\n`;
+            emailContent += `Form URL: https://uriroiz.github.io/roster-form/\n`;
+            emailContent += `Pixellot Team Roster Management System`;
+            
+            // Also create a cleaner version for the hidden field
+            let cleanEmailContent = emailContent.replace(/\n/g, '%0A');
 
             // Set email subject and data
             document.getElementById('emailSubject').value = `Pixellot Roster: ${rosterData.teamName} - ${rosterData.leagueEnglish}`;
@@ -810,7 +849,7 @@
 
         // Generate CSV file
         function generateCSV(data) {
-            let csv = 'Pixellot Team Roster Submission - Version 2.4.2\n';
+            let csv = 'Pixellot Team Roster Submission - Version 2.5.2\n';
             csv += `Generated: ${new Date().toLocaleString()}\n\n`;
             csv += `Team Name: ${data.teamName}\n`;
             csv += `League: ${data.leagueEnglish}\n`;
@@ -835,7 +874,7 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `pixellot_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v2.4.2.csv`;
+            a.download = `pixellot_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v2.5.2.csv`;
             a.click();
             window.URL.revokeObjectURL(url);
         }
