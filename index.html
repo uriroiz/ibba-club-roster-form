@@ -330,7 +330,7 @@
         <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
         
         <div class="version-info">
-            <span class="version">Version 3.0.0</span>
+            <span class="version">Version 3.1.0</span>
             <span class="date">Updated: August 2025</span>
         </div>
 
@@ -615,7 +615,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `ibba_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v3.0.0.csv`;
+            a.download = `ibba_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v3.1.0.csv`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
