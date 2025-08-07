@@ -55,28 +55,57 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
-        .team-info label {
+        .submitter-info {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(30, 60, 114, 0.2);
+        }
+
+        .submitter-info h2 {
+            color: white;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .team-info label, .submitter-info label {
             display: inline-block;
             color: white;
             font-weight: 600;
             font-size: 1.1em;
             margin-right: 15px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            width: 140px;
+            flex-shrink: 0;
         }
 
-        .team-info input {
+        .team-info input, .team-info select, .submitter-info input {
             padding: 12px 16px;
             border: none;
             border-radius: 10px;
             font-size: 16px;
-            width: 350px;
+            flex: 1;
+            max-width: 350px;
             background: rgba(255,255,255,0.9);
             backdrop-filter: blur(5px);
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
         }
 
-        .team-info input:focus {
+        .team-info input:focus, .team-info select:focus, .submitter-info input:focus {
             outline: none;
             background: white;
             transform: translateY(-2px);
@@ -259,6 +288,17 @@
             box-shadow: 0 15px 40px rgba(108, 117, 125, 0.4);
         }
 
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(40, 167, 69, 0.4);
+        }
+
         .sn-col { width: 50px; }
         .jersey-col { width: 80px; }
         .name-col { width: 180px; }
@@ -287,25 +327,73 @@
 
         @media (max-width: 768px) {
             .container {
-                padding: 20px;
+                padding: 20px 15px;
             }
             
             h1 {
                 font-size: 2em;
             }
             
-            table {
-                font-size: 12px;
+            .info-row {
+                flex-direction: column;
+                align-items: stretch;
+                margin-bottom: 20px;
+            }
+
+            .team-info label, .submitter-info label {
+                width: 100%;
+                margin-bottom: 8px;
+                font-size: 1em;
+            }
+
+            .team-info input, .team-info select, .submitter-info input {
+                width: 100%;
+                max-width: none;
+                font-size: 16px; /* Prevents zoom on iOS */
             }
             
-            .team-info input {
-                width: 100%;
-                max-width: 300px;
+            table {
+                font-size: 11px;
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            th, td {
+                padding: 6px 4px;
+                min-width: 80px;
+            }
+
+            .sn-col { min-width: 35px; }
+            .jersey-col { min-width: 60px; }
+            .name-col { min-width: 120px; }
+            .position-col { min-width: 90px; }
+            .email-col { min-width: 180px; }
+
+            input[type="text"], input[type="email"], select {
+                font-size: 12px;
+                padding: 6px 8px;
             }
 
             .buttons {
                 flex-direction: column;
                 align-items: center;
+                gap: 15px;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 280px;
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+
+            .roster-section h2 {
+                font-size: 1.4em;
+            }
+
+            .submitter-info h2 {
+                font-size: 1.2em;
             }
         }
 
@@ -322,8 +410,35 @@
         
         <form id="rosterForm" action="https://formspree.io/f/xgveqezg" method="POST">
             <div class="team-info">
-                <label for="teamName">🏆 Team Name:</label>
-                <input type="text" id="teamName" name="teamName" required placeholder="Enter your team name">
+                <div class="info-row">
+                    <label for="teamName">🏆 Team Name:</label>
+                    <input type="text" id="teamName" name="teamName" required placeholder="Enter your team name">
+                </div>
+                
+                <div class="info-row">
+                    <label for="league">🏀 League:</label>
+                    <select id="league" name="league" required>
+                        <option value="">Select League</option>
+                        <option value="לאומית גברים">לאומית גברים</option>
+                        <option value="על נשים">על נשים</option>
+                        <option value="לאומית נשים">לאומית נשים</option>
+                        <option value="נוער על בנים">נוער על בנים</option>
+                        <option value="נערות א על בנות">נערות א על בנות</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="submitter-info">
+                <h2>📝 Contact Information</h2>
+                <div class="info-row">
+                    <label for="submitterName">👤 Your Name:</label>
+                    <input type="text" id="submitterName" name="submitterName" required placeholder="Enter your full name">
+                </div>
+                
+                <div class="info-row">
+                    <label for="submitterEmail">📧 Your Email:</label>
+                    <input type="email" id="submitterEmail" name="submitterEmail" required placeholder="Enter your email address">
+                </div>
             </div>
 
             <div class="roster-section">
@@ -412,6 +527,7 @@
             <div class="buttons">
                 <button type="button" class="btn btn-secondary" onclick="clearForm()">🗑️ Clear Form</button>
                 <button type="submit" class="btn btn-primary">🚀 Submit Roster</button>
+                <button type="button" class="btn btn-success" onclick="submitAndNew()" id="submitNewBtn">📋 Submit & Create New</button>
             </div>
 
             <div class="loading" id="loading">
@@ -495,10 +611,73 @@
         // Clear all form fields
         function clearForm() {
             if (confirm('🤔 Are you sure you want to clear all data?')) {
+                // Save submitter info
+                const submitterName = document.getElementById('submitterName').value;
+                const submitterEmail = document.getElementById('submitterEmail').value;
+                
                 document.getElementById('rosterForm').reset();
                 document.getElementById('duplicateWarning').style.display = 'none';
                 document.getElementById('success').style.display = 'none';
+                
+                // Restore submitter info
+                document.getElementById('submitterName').value = submitterName;
+                document.getElementById('submitterEmail').value = submitterEmail;
+                
+                // Hide the submit & new button
+                document.getElementById('submitNewBtn').style.display = 'none';
             }
+        }
+
+        // Submit and create new roster
+        function submitAndNew() {
+            // Save submitter info
+            const submitterName = document.getElementById('submitterName').value;
+            const submitterEmail = document.getElementById('submitterEmail').value;
+            
+            // Clear form data except submitter info
+            document.getElementById('teamName').value = '';
+            document.getElementById('league').value = '';
+            
+            // Clear all player data
+            for (let i = 1; i <= 16; i++) {
+                const jerseyInput = document.querySelector(`input[name="player${i}_jersey"]`);
+                const firstInput = document.querySelector(`input[name="player${i}_first"]`);
+                const lastInput = document.querySelector(`input[name="player${i}_last"]`);
+                const positionSelect = document.querySelector(`select[name="player${i}_position"]`);
+                const emailInput = document.querySelector(`input[name="player${i}_email"]`);
+                
+                if (jerseyInput) jerseyInput.value = '';
+                if (firstInput) firstInput.value = '';
+                if (lastInput) lastInput.value = '';
+                if (positionSelect) positionSelect.value = '';
+                if (emailInput) emailInput.value = '';
+            }
+            
+            // Clear staff data
+            const staffRoles = ['coach', 'asst1', 'asst2', 'asst3', 'gm'];
+            staffRoles.forEach(role => {
+                const firstInput = document.querySelector(`input[name="${role}_first"]`);
+                const lastInput = document.querySelector(`input[name="${role}_last"]`);
+                const positionSelect = document.querySelector(`select[name="${role}_position"]`);
+                const emailInput = document.querySelector(`input[name="${role}_email"]`);
+                
+                if (firstInput) firstInput.value = '';
+                if (lastInput) lastInput.value = '';
+                if (positionSelect) positionSelect.value = '';
+                if (emailInput) emailInput.value = '';
+            });
+            
+            // Restore submitter info
+            document.getElementById('submitterName').value = submitterName;
+            document.getElementById('submitterEmail').value = submitterEmail;
+            
+            // Hide success message and warnings
+            document.getElementById('success').style.display = 'none';
+            document.getElementById('duplicateWarning').style.display = 'none';
+            document.getElementById('submitNewBtn').style.display = 'none';
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // Handle form submission
@@ -512,6 +691,9 @@
             const formData = new FormData(this);
             let rosterData = {
                 teamName: formData.get('teamName'),
+                league: formData.get('league'),
+                submitterName: formData.get('submitterName'),
+                submitterEmail: formData.get('submitterEmail'),
                 players: [],
                 staff: []
             };
@@ -553,7 +735,10 @@
 
             // Format data for email
             let emailContent = `TEAM ROSTER SUBMISSION\n\n`;
-            emailContent += `Team Name: ${rosterData.teamName}\n\n`;
+            emailContent += `Team Name: ${rosterData.teamName}\n`;
+            emailContent += `League: ${rosterData.league}\n`;
+            emailContent += `Submitted by: ${rosterData.submitterName}\n`;
+            emailContent += `Contact Email: ${rosterData.submitterEmail}\n\n`;
             
             emailContent += `PLAYERS:\n`;
             emailContent += `S/N | Jersey | First Name | Last Name | Position | Email\n`;
@@ -582,6 +767,7 @@
                 document.getElementById('loading').style.display = 'none';
                 if (response.ok) {
                     document.getElementById('success').style.display = 'block';
+                    document.getElementById('submitNewBtn').style.display = 'inline-block';
                     // Also generate CSV for user
                     generateCSV(rosterData);
                 } else {
@@ -597,7 +783,10 @@
         // Generate CSV file for download (backup)
         function generateCSV(data) {
             let csv = 'Team Roster Submission\n\n';
-            csv += `Team Name: ${data.teamName}\n\n`;
+            csv += `Team Name: ${data.teamName}\n`;
+            csv += `League: ${data.league}\n`;
+            csv += `Submitted by: ${data.submitterName}\n`;
+            csv += `Contact Email: ${data.submitterEmail}\n\n`;
             
             csv += 'PLAYERS\n';
             csv += 'S/N,Jersey #,First Name,Last Name,Position,Email Address\n';
@@ -625,6 +814,9 @@
 
         // Initialize the form
         generatePlayerRows();
+        
+        // Initially hide the submit & new button until first submission
+        document.getElementById('submitNewBtn').style.display = 'none';
     </script>
 </body>
 </html>
