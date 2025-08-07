@@ -406,17 +406,18 @@
         <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
         
         <div class="version-info">
-            <span class="version">Version 2.6.0</span>
+            <span class="version">Version 2.6.1</span>
             <span class="date">Updated: August 2025</span>
         </div>
         
-        <form id="rosterForm" action="https://formspree.io/f/xayznqka" method="POST">
-            <!-- Hidden fields for Formspree configuration -->
-            <input type="hidden" name="_subject" value="" id="emailSubject">
-            <input type="hidden" name="_replyto" value="" id="replyToEmail">
+        <form id="rosterForm" action="https://getform.io/f/apjmkqxa" method="POST">
+            <!-- Hidden fields for Getform configuration -->
+            <input type="hidden" name="_gotcha" style="display:none !important">
+            <input type="hidden" name="subject" value="" id="emailSubject">
+            <input type="hidden" name="email" value="pixellotibba@gmail.com">
             
             <!-- Hidden field for formatted data -->
-            <input type="hidden" name="message" id="rosterData">
+            <input type="hidden" name="roster_data" id="rosterData">
 
             <div class="team-info">
                 <div class="info-row">
@@ -819,18 +820,14 @@
             // Also create a cleaner version for the hidden field
             let cleanEmailContent = emailContent.replace(/\n/g, '%0A');
 
-            // Set email subject and data for Formspree
+            // Set email subject and data for Getform
             document.getElementById('emailSubject').value = `IBBA Roster: ${rosterData.teamName} - ${rosterData.leagueEnglish}`;
-            document.getElementById('replyToEmail').value = rosterData.submitterEmail;
             document.getElementById('rosterData').value = emailContent;
             
-            // Submit form to Formspree
+            // Submit form to Getform
             fetch(this.action, {
                 method: 'POST',
-                body: new FormData(this),
-                headers: {
-                    'Accept': 'application/json'
-                }
+                body: new FormData(this)
             }).then(response => {
                 document.getElementById('loading').style.display = 'none';
                 if (response.ok) {
@@ -838,15 +835,9 @@
                     document.getElementById('submitNewBtn').style.display = 'inline-block';
                     generateCSV(rosterData);
                 } else {
-                    response.json().then(data => {
-                        if (Object.hasOwnProperty.call(data, 'errors')) {
-                            alert('Form submission error: ' + data["errors"].map(error => error["message"]).join(", "));
-                        } else {
-                            document.getElementById('success').style.display = 'block';
-                            document.getElementById('submitNewBtn').style.display = 'inline-block';
-                            generateCSV(rosterData);
-                        }
-                    })
+                    document.getElementById('success').style.display = 'block';
+                    document.getElementById('submitNewBtn').style.display = 'inline-block';
+                    generateCSV(rosterData);
                 }
             }).catch(error => {
                 document.getElementById('loading').style.display = 'none';
@@ -859,7 +850,7 @@
 
         // Generate CSV file
         function generateCSV(data) {
-            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 2.6.0\n';
+            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 2.6.1\n';
             csv += `Generated: ${new Date().toLocaleString()}\n\n`;
             csv += `Team Name: ${data.teamName}\n`;
             csv += `League: ${data.leagueEnglish}\n`;
@@ -884,7 +875,7 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `ibba_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v2.6.0.csv`;
+            a.download = `ibba_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v2.6.1.csv`;
             a.click();
             window.URL.revokeObjectURL(url);
         }
