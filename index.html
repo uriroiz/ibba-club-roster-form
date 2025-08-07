@@ -408,7 +408,7 @@
         <h1>🏀 Team Roster Submission</h1>
         <p class="subtitle">Professional roster management made easy</p>
         
-        <form id="rosterForm" action="https://formspree.io/f/xgveqezg" method="POST">
+        <form id="rosterForm">\n            <!-- Remove the action and method attributes -->
             <div class="team-info">
                 <div class="info-row">
                     <label for="teamName">🏆 Team Name:</label>
@@ -759,25 +759,18 @@
             // Set the hidden field with formatted data
             document.getElementById('rosterData').value = emailContent;
             
-            // Submit to Formspree
-            fetch(this.action, {
-                method: 'POST',
-                body: new FormData(this)
-            }).then(response => {
-                document.getElementById('loading').style.display = 'none';
-                if (response.ok) {
-                    document.getElementById('success').style.display = 'block';
-                    document.getElementById('submitNewBtn').style.display = 'inline-block';
-                    // Also generate CSV for user
-                    generateCSV(rosterData);
-                } else {
-                    alert('There was an error submitting your form. Please try again or email the roster directly to urir@pixellot.tv');
-                }
-            }).catch(error => {
-                document.getElementById('loading').style.display = 'none';
-                alert('There was an error submitting your form. Please try again or email the roster directly to urir@pixellot.tv');
-                console.error('Error:', error);
-            });
+            // Submit using a different approach - just generate CSV and show instructions
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('success').style.display = 'block';
+            document.getElementById('submitNewBtn').style.display = 'inline-block';
+            
+            // Generate CSV for download
+            generateCSV(rosterData);
+            
+            // Show email instructions
+            setTimeout(() => {
+                alert(`✅ Roster data downloaded as CSV file!\n\n📧 Please email the downloaded CSV file to: urir@pixellot.tv\n\nInclude this information:\n• Team: ${rosterData.teamName}\n• League: ${rosterData.league}\n• Your name: ${rosterData.submitterName}`);
+            }, 1000);
         });
 
         // Generate CSV file for download (backup)
