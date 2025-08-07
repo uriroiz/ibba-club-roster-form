@@ -431,7 +431,7 @@
         <p class="subtitle">Professional roster management for Pixellot leagues</p>
         
         <div class="version-info">
-            <span class="version">Version 2.2.0</span>
+            <span class="version">Version 2.3.0</span>
             <span class="date">Updated: August 2025</span>
         </div>
         
@@ -769,7 +769,7 @@
             });
 
             // Format data for email
-            let emailContent = `PIXELLOT TEAM ROSTER SUBMISSION - Version 2.2.0\n`;
+            let emailContent = `PIXELLOT TEAM ROSTER SUBMISSION - Version 2.3.0\n`;
             emailContent += `Generated: ${new Date().toLocaleString()}\n\n`;
             emailContent += `Team Name: ${rosterData.teamName}\n`;
             emailContent += `League: ${rosterData.league} (${rosterData.leagueEnglish})\n`;
@@ -833,7 +833,7 @@
 
         // Generate CSV file for download (backup)
         function generateCSV(data) {
-            let csv = 'Pixellot Team Roster Submission - Version 2.2.0\n';
+            let csv = 'Pixellot Team Roster Submission - Version 2.3.0\n';
             csv += `Generated: ${new Date().toLocaleString()}\n\n`;
             csv += `Team Name: ${data.teamName}\n`;
             csv += `League: ${data.leagueEnglish}\n`;
@@ -859,7 +859,7 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `pixellot_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v2.2.0.csv`;
+            a.download = `pixellot_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v2.3.0.csv`;
             a.click();
             window.URL.revokeObjectURL(url);
         }
