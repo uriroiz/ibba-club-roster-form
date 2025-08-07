@@ -462,7 +462,25 @@
         </form>
     </div>
 
+    <script type="text/javascript" src="https://cdn.emailjs.com/dist/email.min.js"></script>
     <script>
+        let emailjsReady = false;
+        
+        // Initialize EmailJS after a small delay to ensure it loads
+        setTimeout(function() {
+            try {
+                if (typeof emailjs !== 'undefined') {
+                    emailjs.init("r4Y7hg0AGi5DhIcF");
+                    emailjsReady = true;
+                    console.log('EmailJS initialized successfully');
+                } else {
+                    console.error('EmailJS still not loaded after delay');
+                }
+            } catch (error) {
+                console.error('EmailJS initialization error:', error);
+            }
+        }, 1000);
+
         let duplicateCheckTimeout;
 
         // Generate player rows
@@ -571,38 +589,257 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Handle form submission (demo version without EmailJS)
+        // Generate CSV
+        function generateCSV(data) {
+            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 3.0.0\n';
+            csv += `Generated: ${new Date().toLocaleString()}\n\n`;
+            csv += `Team Name: ${data.teamName}\n`;
+            csv += `League: ${data.leagueEnglish}\n`;
+            csv += `Submitted by: ${data.submitterName}\n`;
+            csv += `Contact Email: ${data.submitterEmail}\n\n`;
+            
+            csv += 'PLAYERS\n';
+            csv += 'Jersey,First Name,Last Name,Email,Position\n';
+            data.players.forEach(player => {
+                csv += `${player.jersey},"${player.firstName}","${player.lastName}","${player.email || ''}","${player.position || ''}"\n`;
+            });
+            
+            csv += '\nSTAFF\n';
+            csv += 'First Name,Last Name,Email,Role\n';
+            data.staff.forEach(staff => {
+                csv += `"${staff.firstName}","${staff.lastName}","${staff.email || ''}","${staff.role}"\n`;
+            });
+
+            // Download CSV
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ibba_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v3.0.0.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Handle form submission
         document.getElementById('rosterForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             // Show loading
             document.getElementById('loading').style.display = 'block';
             
-            // Simulate processing delay
-            setTimeout(() => {
+            const formData = new FormData(this);
+            
+            // Basic validation
+            const teamName = formData.get('teamName');
+            const league = formData.get('league');
+            const submitterName = formData.get('submitterName');
+            const submitterEmail = formData.get('submitterEmail');
+            
+            if (!teamName || !league || !submitterName || !submitterEmail) {
+                alert('Please fill in all required team and contact information.');
                 document.getElementById('loading').style.display = 'none';
-                document.getElementById('success').style.display = 'block';
-                document.getElementById('createNewBtn').style.display = 'inline-block';
+                return;
+            }
+
+            // Validate at least one player
+            let hasPlayers = false;
+            for (let i = 1; i <= 16; i++) {
+                const jersey = formData.get(`player${i}_jersey`);
+                const firstName = formData.get(`player${i}_first`);
+                const lastName = formData.get(`player${i}_last`);
                 
-                // In the real version, this would generate and download a CSV file
-                console.log('Form would be processed and CSV generated');
-            }, 2000);
+                if (jersey && firstName && lastName) {
+                    hasPlayers = true;
+                    break;
+                }
+            }
+
+            if (!hasPlayers) {
+                alert('Please add at least one complete player (jersey number, first name, and last name required).');
+                document.getElementById('loading').style.display = 'none';
+                return;
+            }
+
+            // Map leagues
+            const leagueMapping = {
+                'לאומית גברים': 'National Men',
+                'על נשים': 'Premier Women', 
+                'לאומית נשים': 'National Women',
+                'נוער על בנים': 'Youth Premier Boys',
+                'נערות א על בנות': 'Junior A Premier Girls'
+            };
+            
+            const rosterData = {
+                teamName: teamName,
+                league: league,
+                leagueEnglish: leagueMapping[league] || 'Unknown League',
+                submitterName: submitterName,
+                submitterEmail: submitterEmail,
+                players: [],
+                staff: []
+            };
+
+            // Collect players
+            for (let i = 1; i <= 16; i++) {
+                const player = {
+                    number: i,
+                    jersey: formData.get(`player${i}_jersey`),
+                    firstName: formData.get(`player${i}_first`),
+                    lastName: formData.get(`player${i}_last`),
+                    position: formData.get(`player${i}_position`),
+                    email: formData.get(`player${i}_email`)
+                };
+                
+                if (player.jersey && player.firstName && player.lastName) {
+                    rosterData.players.push(player);
+                }
+            }
+
+            // Collect staff
+            const staffRoles = [
+                { key: 'coach', label: 'Head Coach' },
+                { key: 'asst1', label: 'Assistant Coach 1' },
+                { key: 'asst2', label: 'Assistant Coach 2' },
+                { key: 'asst3', label: 'Assistant Coach 3' },
+                { key: 'gm', label: 'General Manager' }
+            ];
+            
+            staffRoles.forEach(role => {
+                const staff = {
+                    role: role.label,
+                    firstName: formData.get(`${role.key}_first`),
+                    lastName: formData.get(`${role.key}_last`),
+                    email: formData.get(`${role.key}_email`)
+                };
+                
+                if (staff.firstName || staff.lastName) {
+                    rosterData.staff.push(staff);
+                }
+            });
+
+            // Create detailed roster summary for email
+            let rosterSummary = `IBBA TEAM ROSTER SUBMISSION\n`;
+            rosterSummary += `==============================\n`;
+            rosterSummary += `Team: ${rosterData.teamName}\n`;
+            rosterSummary += `League: ${rosterData.league} (${rosterData.leagueEnglish})\n`;
+            rosterSummary += `Submitted by: ${rosterData.submitterName}\n`;
+            rosterSummary += `Email: ${rosterData.submitterEmail}\n`;
+            rosterSummary += `Date: ${new Date().toLocaleString()}\n`;
+            rosterSummary += `Version: 3.0.0\n\n`;
+            
+            rosterSummary += `PLAYERS (${rosterData.players.length}):\n`;
+            rosterSummary += `------------------------\n`;
+            if (rosterData.players.length > 0) {
+                rosterData.players.forEach(player => {
+                    rosterSummary += `#${player.jersey} - ${player.firstName} ${player.lastName}`;
+                    if (player.position) rosterSummary += ` (${player.position})`;
+                    if (player.email) rosterSummary += ` - ${player.email}`;
+                    rosterSummary += `\n`;
+                });
+            } else {
+                rosterSummary += `No players listed.\n`;
+            }
+            
+            rosterSummary += `\nCOACHING STAFF (${rosterData.staff.length}):\n`;
+            rosterSummary += `----------------------------\n`;
+            if (rosterData.staff.length > 0) {
+                rosterData.staff.forEach(staff => {
+                    rosterSummary += `${staff.role}: ${staff.firstName} ${staff.lastName}`;
+                    if (staff.email) rosterSummary += ` - ${staff.email}`;
+                    rosterSummary += `\n`;
+                });
+            } else {
+                rosterSummary += `No coaching staff listed.\n`;
+            }
+
+            // Simplified email parameters
+            const emailParams = {
+                to_email: 'pixellotibba@gmail.com',
+                from_name: rosterData.submitterName,
+                from_email: rosterData.submitterEmail,
+                team_name: rosterData.teamName,
+                league: rosterData.leagueEnglish,
+                message: rosterSummary
+            };
+
+            // Send email via EmailJS
+            console.log('Checking EmailJS availability...');
+            
+            if (!emailjsReady || typeof emailjs === 'undefined') {
+                console.error('EmailJS not ready. Status:', emailjsReady, 'Type:', typeof emailjs);
+                alert('Email service not ready. Please wait a moment and try again, or refresh the page.');
+                document.getElementById('loading').style.display = 'none';
+                return;
+            }
+            
+            console.log('Sending email with EmailJS...');
+            console.log('Email parameters:', emailParams);
+            
+            emailjs.send("service_4bdvcf9", "template_6o8secn", emailParams)
+                .then(function(response) {
+                    console.log('Email sent successfully!', response);
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('success').style.display = 'block';
+                    document.getElementById('createNewBtn').style.display = 'inline-block';
+                    
+                    // Generate and download CSV
+                    generateCSV(rosterData);
+                    
+                    // Scroll to success message
+                    document.getElementById('success').scrollIntoView({ behavior: 'smooth' });
+                    
+                }, function(error) {
+                    console.error('EmailJS Error:', error);
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    // Still show success and generate CSV as backup
+                    document.getElementById('success').style.display = 'block';
+                    document.getElementById('createNewBtn').style.display = 'inline-block';
+                    generateCSV(rosterData);
+                    
+                    alert('Email may have failed to send, but CSV backup has been downloaded. Please send the CSV file to: pixellotibba@gmail.com');
+                });
         });
 
-        // Initialize when page loads
+        // Initialize everything when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded - initializing...');
-            createPlayerRows();
+            
+            // Force create player rows immediately
+            setTimeout(function() {
+                try {
+                    createPlayerRows();
+                    console.log('Player rows created successfully');
+                } catch (error) {
+                    console.error('Error creating player rows:', error);
+                }
+            }, 100);
         });
 
-        // Fallback initialization
+        // Multiple fallback attempts
         window.addEventListener('load', function() {
             console.log('Window loaded - checking player table...');
-            const tbody = document.getElementById('playersTable');
-            if (tbody && tbody.children.length === 0) {
-                console.log('No player rows found, creating them...');
-                createPlayerRows();
-            }
+            
+            setTimeout(function() {
+                try {
+                    const tbody = document.getElementById('playersTable');
+                    if (!tbody) {
+                        console.error('playersTable element not found!');
+                        return;
+                    }
+                    
+                    if (tbody.children.length === 0) {
+                        console.log('No player rows found, creating them...');
+                        createPlayerRows();
+                    } else {
+                        console.log(`Found ${tbody.children.length} existing player rows`);
+                    }
+                } catch (error) {
+                    console.error('Error in window load handler:', error);
+                }
+            }, 200);
         });
     </script>
 </body>
