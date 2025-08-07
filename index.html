@@ -406,7 +406,7 @@
         <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
         
         <div class="version-info">
-            <span class="version">Version 2.8.0</span>
+            <span class="version">Version 2.8.1</span>
             <span class="date">Updated: August 2025</span>
         </div>
         
@@ -548,10 +548,12 @@
         </form>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="https://cdn.emailjs.com/sdk/2.6.4/email.min.js"></script>
     <script>
-        // Initialize EmailJS
-        emailjs.init("r4Y7hg0AGi5DhIcF");
+        // Initialize EmailJS when the script loads
+        (function(){
+            emailjs.init("r4Y7hg0AGi5DhIcF");
+        })();
         
         let duplicateCheckTimeout;
 
@@ -862,7 +864,7 @@
 
         // Generate CSV file
         function generateCSV(data) {
-            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 2.8.0\n';
+            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 2.8.1\n';
             csv += `Generated: ${new Date().toLocaleString()}\n\n`;
             csv += `Team Name: ${data.teamName}\n`;
             csv += `League: ${data.leagueEnglish}\n`;
@@ -887,7 +889,7 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `ibba_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v2.8.0.csv`;
+            a.download = `ibba_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v2.8.1.csv`;
             a.click();
             window.URL.revokeObjectURL(url);
         }
