@@ -330,7 +330,7 @@
         <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
         
         <div class="version-info">
-            <span class="version">Version 3.3.1</span>
+            <span class="version">Version 3.4.0</span>
             <span class="date">Updated: August 2025</span>
         </div>
 
@@ -465,14 +465,12 @@
     </div>
 
     <script>
-        // Updated EmailJS Configuration (v3.2.7)
+        // Updated EmailJS Configuration (v3.4.0)
         window.EmailJSConfig = {
             publicKey: "_r4Y7hg0AGi5DhIcF",
             serviceId: "service_4bdvcf9",
             templateId: "template_6o8secn"
-        };
-
-        console.log("🧪 TEST LOG WORKING");  
+        };  
         
         // Debug function to check configuration
         function showDebugInfo() {
@@ -508,10 +506,8 @@
             });
         }
 
-        // Enhanced email sending with step-by-step logging
+        // Enhanced email sending function
         function sendEmailViaAPI(params) {
-            console.log('📡 STEP 1: Starting sendEmailViaAPI function');
-            
             var url = 'https://api.emailjs.com/api/v1.0/email/send';
             
             var data = {
@@ -521,15 +517,6 @@
                 template_params: params
             };
 
-            console.log('📡 STEP 2: Prepared data for sending:');
-            console.log('   URL:', url);
-            console.log('   Service ID:', data.service_id);
-            console.log('   Template ID:', data.template_id);
-            console.log('   User ID:', data.user_id);
-            console.log('   Template Params:', data.template_params);
-
-            console.log('📡 STEP 3: Making fetch request...');
-            
             try {
                 const fetchPromise = fetch(url, {
                     method: 'POST',
@@ -539,22 +526,15 @@
                     body: JSON.stringify(data)
                 });
                 
-                console.log('📡 STEP 4: Fetch promise created, returning to caller');
                 return fetchPromise;
                 
             } catch (error) {
-                console.error('📡 STEP 4 ERROR: Exception in fetch:', error);
                 return Promise.reject(error);
             }
         }
 
-        console.log('✅ Custom EmailJS API implementation loaded');
-
         // Simple email test function
         function testEmailDirectly() {
-            console.log('🧪 DIRECT EMAIL TEST STARTED');
-            alert('🧪 Testing email directly...\nCheck console for results.');
-            
             var testParams = {
                 team_name: 'Test Team',
                 league: 'Test League',
@@ -563,16 +543,12 @@
                 roster_data: 'This is a test email from the IBBA roster form.'
             };
             
-            console.log('🧪 Test parameters:', testParams);
-            
             sendEmailViaAPI(testParams)
                 .then(response => {
-                    console.log('🧪 Direct test SUCCESS:', response);
-                    alert('✅ Direct email test succeeded!\nEmailJS is working correctly.');
+                    alert('✅ Email test successful!');
                 })
                 .catch(error => {
-                    console.error('🧪 Direct test FAILED:', error);
-                    alert('❌ Direct email test failed:\n' + error.message + '\n\nCheck console for details.');
+                    alert('❌ Email test failed. Check your internet connection and try again.');
                 });
         }
 
@@ -580,11 +556,9 @@
 
         // Generate player rows
         function createPlayerRows() {
-            console.log('Creating player rows...');
             const tbody = document.getElementById('playersTable');
             
             if (!tbody) {
-                console.error('playersTable not found!');
                 return;
             }
 
@@ -609,7 +583,6 @@
                 `;
                 tbody.appendChild(row);
             }
-            console.log(`Created ${tbody.children.length} player rows`);
         }
 
         // Check for duplicate jersey numbers
@@ -648,10 +621,8 @@
             }, 1500);
         }
 
-        // Auto-fill form with test data (TEMPORARY - for testing only)
+        // Auto-fill form with test data
         function autoFillForm() {
-            console.log('🤖 Auto-filling form with test data...');
-            
             // Fill team information
             document.getElementById('teamName').value = 'Maccabi Tel Aviv Test';
             document.getElementById('league').value = 'לאומית גברים';
@@ -704,9 +675,6 @@
                 if (lastInput) lastInput.value = member.last;
                 if (emailInput) emailInput.value = member.email;
             });
-            
-            alert('✅ Form auto-filled with test data! Ready to submit for testing.');
-            console.log('✅ Auto-fill completed');
         }
 
         function clearForm() {
@@ -746,7 +714,7 @@
 
         // Generate CSV
         function generateCSV(data) {
-            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 3.3.1\n';
+            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 3.4.0\n';
             csv += `Generated: ${new Date().toLocaleString()}\n\n`;
             csv += `Team Name: ${data.teamName}\n`;
             csv += `League: ${data.leagueEnglish}\n`;
@@ -770,7 +738,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `ibba_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v3.3.1.csv`;
+            a.download = `ibba_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v3.4.0.csv`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -873,7 +841,7 @@
             rosterSummary += `Submitted by: ${rosterData.submitterName}\n`;
             rosterSummary += `Email: ${rosterData.submitterEmail}\n`;
             rosterSummary += `Date: ${new Date().toLocaleString()}\n`;
-            rosterSummary += `Version: 3.3.1\n\n`;
+            rosterSummary += `Version: 3.4.0\n\n`;
 
             // Add CSV format for easy copying
             rosterSummary += `CSV FORMAT FOR COPYING:\n`;
@@ -940,39 +908,29 @@
 
         // Initialize everything when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded - initializing...');
-            
-            // Force create player rows immediately
             setTimeout(function() {
                 try {
                     createPlayerRows();
-                    console.log('Player rows created successfully');
                 } catch (error) {
-                    console.error('Error creating player rows:', error);
+                    // Silently handle error
                 }
             }, 100);
         });
 
         // Multiple fallback attempts
         window.addEventListener('load', function() {
-            console.log('Window loaded - checking player table...');
-            
             setTimeout(function() {
                 try {
                     const tbody = document.getElementById('playersTable');
                     if (!tbody) {
-                        console.error('playersTable element not found!');
                         return;
                     }
                     
                     if (tbody.children.length === 0) {
-                        console.log('No player rows found, creating them...');
                         createPlayerRows();
-                    } else {
-                        console.log(`Found ${tbody.children.length} existing player rows`);
                     }
                 } catch (error) {
-                    console.error('Error in window load handler:', error);
+                    // Silently handle error
                 }
             }, 200);
         });
