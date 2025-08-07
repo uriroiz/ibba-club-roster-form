@@ -330,7 +330,7 @@
         <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
         
         <div class="version-info">
-            <span class="version">Version 3.2.2</span>
+            <span class="version">Version 3.2.3</span>
             <span class="date">Updated: August 2025</span>
         </div>
 
@@ -482,15 +482,21 @@
                 template_params: params
             };
 
-            console.log('Sending email with direct API call:', data);
+            console.log('🌐 Making fetch request to:', url);
+            console.log('📤 Sending data:', data);
 
-            return fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
+            try {
+                return fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+            } catch (error) {
+                console.error('❌ Fetch error:', error);
+                return Promise.reject(error);
+            }
         }
 
         console.log('✅ Custom EmailJS API implementation loaded');
