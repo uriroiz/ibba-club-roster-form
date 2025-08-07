@@ -330,7 +330,7 @@
         <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
         
         <div class="version-info">
-            <span class="version">Version 3.5.2</span>
+            <span class="version">Version 3.6.0</span>
             <span class="date">Updated: August 2025</span>
         </div>
 
@@ -466,12 +466,21 @@
     </div>
 
     <script>
-        // Updated EmailJS Configuration (v3.4.0)
+        // Updated EmailJS Configuration (v3.6.0)
         window.EmailJSConfig = {
             publicKey: "_r4Y7hg0AGi5DhIcF",
             serviceId: "service_4bdvcf9",
             templateId: "template_6o8secn"
-        };  
+        };
+
+        // Function to properly capitalize names
+        function capitalizeName(name) {
+            if (!name) return '';
+            
+            return name.toLowerCase().replace(/\b\w/g, function(letter) {
+                return letter.toUpperCase();
+            });
+        }  
         
         // Debug function to check configuration
         function showDebugInfo() {
@@ -715,7 +724,7 @@
 
         // Generate CSV
         function generateCSV(data) {
-            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 3.5.2\n';
+            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 3.6.0\n';
             csv += `Generated: ${new Date().toLocaleString()}\n\n`;
             csv += `Team Name: ${data.teamName}\n`;
             csv += `League: ${data.leagueEnglish}\n`;
@@ -743,7 +752,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `ibba_${data.teamName.replace(/[^a-z0-9\u0590-\u05FF]/gi, '_').toLowerCase()}_roster_v3.5.2.csv`;
+            a.download = `ibba_${data.teamName.replace(/[^a-z0-9\u0590-\u05FF]/gi, '_').toLowerCase()}_roster_v3.6.0.csv`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -826,7 +835,7 @@
                 teamName: teamName,
                 league: league,
                 leagueEnglish: leagueMapping[league] || 'Unknown League',
-                submitterName: submitterName,
+                submitterName: capitalizeName(submitterName),
                 submitterEmail: submitterEmail,
                 players: [],
                 staff: []
@@ -836,8 +845,8 @@
                 const player = {
                     number: i,
                     jersey: formData.get(`player${i}_jersey`),
-                    firstName: formData.get(`player${i}_first`),
-                    lastName: formData.get(`player${i}_last`),
+                    firstName: capitalizeName(formData.get(`player${i}_first`)),
+                    lastName: capitalizeName(formData.get(`player${i}_last`)),
                     position: formData.get(`player${i}_position`),
                     email: formData.get(`player${i}_email`)
                 };
@@ -857,8 +866,8 @@
             staffRoles.forEach(role => {
                 const staff = {
                     role: role.label,
-                    firstName: formData.get(`${role.key}_first`),
-                    lastName: formData.get(`${role.key}_last`),
+                    firstName: capitalizeName(formData.get(`${role.key}_first`)),
+                    lastName: capitalizeName(formData.get(`${role.key}_last`)),
                     email: formData.get(`${role.key}_email`)
                 };
                 if (staff.firstName || staff.lastName) {
@@ -873,7 +882,7 @@
             rosterSummary += `Submitted by: ${rosterData.submitterName}\n`;
             rosterSummary += `Email: ${rosterData.submitterEmail}\n`;
             rosterSummary += `Date: ${new Date().toLocaleString()}\n`;
-            rosterSummary += `Version: 3.5.2\n\n`;
+            rosterSummary += `Version: 3.6.0\n\n`;
 
             // Add CSV format for easy copying
             rosterSummary += `CSV FORMAT FOR COPYING:\n`;
