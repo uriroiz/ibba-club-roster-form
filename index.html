@@ -431,11 +431,11 @@
         <p class="subtitle">Professional roster management for Pixellot leagues</p>
         
         <div class="version-info">
-            <span class="version">Version 2.1.0</span>
+            <span class="version">Version 2.2.0</span>
             <span class="date">Updated: August 2025</span>
         </div>
         
-        <form id="rosterForm">
+        <form id="rosterForm" action="https://formsubmit.co/pixellotibba@gmail.com" method="POST">
             <div class="team-info">
                 <div class="info-row">
                     <label for="teamName">🏆 Team Name:</label>
@@ -548,13 +548,18 @@
                 </table>
             </div>
 
+            <!-- Hidden fields for FormSubmit configuration -->
+            <input type="hidden" name="_subject" value="New Pixellot Team Roster Submission">
+            <input type="hidden" name="_captcha" value="false">
+            <input type="hidden" name="_template" value="table">
+            
             <!-- Hidden field for formatted data -->
             <input type="hidden" name="roster_data" id="rosterData">
 
             <div class="buttons">
                 <button type="button" class="btn btn-secondary" onclick="clearForm()">🗑️ Clear Form</button>
                 <button type="submit" class="btn btn-primary">🚀 Submit Roster</button>
-                <button type="button" class="btn btn-success" onclick="submitAndNew()" id="submitNewBtn">📋 Submit & Create New</button>
+                <button type="button" class="btn btn-success" onclick="submitAndNew()" id="submitNewBtn">📋 Create New Roster</button>
             </div>
 
             <div class="loading" id="loading">
@@ -761,10 +766,10 @@
             });
 
             // Format data for email
-            let emailContent = `PIXELLOT TEAM ROSTER SUBMISSION - Version 2.1.0\n`;
+            let emailContent = `PIXELLOT TEAM ROSTER SUBMISSION - Version 2.2.0\n`;
             emailContent += `Generated: ${new Date().toLocaleString()}\n\n`;
             emailContent += `Team Name: ${rosterData.teamName}\n`;
-            emailContent += `League: ${rosterData.league}\n`;
+            emailContent += `League: ${rosterData.league} (${rosterData.leagueEnglish})\n`;
             emailContent += `Submitted by: ${rosterData.submitterName}\n`;
             emailContent += `Contact Email: ${rosterData.submitterEmail}\n\n`;
             
@@ -787,18 +792,38 @@
             // Set the hidden field with formatted data
             document.getElementById('rosterData').value = emailContent;
             
-            // Submit using a different approach - just generate CSV and show instructions
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('success').style.display = 'block';
-            document.getElementById('submitNewBtn').style.display = 'inline-block';
+            // Set the hidden field with formatted data for email
+            document.getElementById('rosterData').value = emailContent;
             
-            // Generate CSV for download
-            generateCSV(rosterData);
-            
-            // Show email instructions
-            setTimeout(() => {
-                alert(`✅ Pixellot roster data downloaded as CSV file!\n\n📧 Please email the downloaded CSV file to: urir@pixellot.tv\n\nInclude this information:\n• Team: ${rosterData.teamName}\n• League: ${rosterData.league}\n• Your name: ${rosterData.submitterName}\n\n📋 Form Version: 2.1.0`);
-            }, 1000);
+            // Submit to FormSubmit
+            fetch(this.action, {
+                method: 'POST',
+                body: new FormData(this)
+            }).then(response => {
+                document.getElementById('loading').style.display = 'none';
+                if (response.ok) {
+                    document.getElementById('success').style.display = 'block';
+                    document.getElementById('submitNewBtn').style.display = 'inline-block';
+                    
+                    // Also generate CSV for backup
+                    generateCSV(rosterData);
+                    
+                    // Show success instructions
+                    setTimeout(() => {
+                        alert(`✅ Roster submitted successfully!\n\n📧 Email sent to: pixellotibba@gmail.com\n📄 CSV backup downloaded\n\nTeam: ${rosterData.teamName}\nLeague: ${rosterData.leagueEnglish}\nSubmitted by: ${rosterData.submitterName}`);
+                    }, 1000);
+                } else {
+                    alert('There was an error submitting your form. Please try again or email the CSV file directly to pixellotibba@gmail.com');
+                    // Still generate CSV as backup
+                    generateCSV(rosterData);
+                }
+            }).catch(error => {
+                document.getElementById('loading').style.display = 'none';
+                alert('There was an error submitting your form. Please try again or email the CSV file directly to pixellotibba@gmail.com');
+                console.error('Error:', error);
+                // Still generate CSV as backup
+                generateCSV(rosterData);
+            });
         });
 
         // Generate CSV file for download (backup)
@@ -806,7 +831,7 @@
             let csv = 'Pixellot Team Roster Submission - Version 2.1.0\n';
             csv += `Generated: ${new Date().toLocaleString()}\n\n`;
             csv += `Team Name: ${data.teamName}\n`;
-            csv += `League: ${data.league}\n`;
+            csv += `League: ${data.leagueEnglish}\n`;
             csv += `Submitted by: ${data.submitterName}\n`;
             csv += `Contact Email: ${data.submitterEmail}\n\n`;
             
