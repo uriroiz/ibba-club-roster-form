@@ -330,7 +330,7 @@
         <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
         
         <div class="version-info">
-            <span class="version">Version 3.6.0</span>
+            <span class="version">Version 3.6.1</span>
             <span class="date">Updated: August 2025</span>
         </div>
 
@@ -724,7 +724,7 @@
 
         // Generate CSV
         function generateCSV(data) {
-            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 3.6.0\n';
+            let csv = 'IBBA Team Roster Submission - Pixellot Advantage - Version 3.6.1\n';
             csv += `Generated: ${new Date().toLocaleString()}\n\n`;
             csv += `Team Name: ${data.teamName}\n`;
             csv += `League: ${data.leagueEnglish}\n`;
@@ -752,7 +752,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `ibba_${data.teamName.replace(/[^a-z0-9\u0590-\u05FF]/gi, '_').toLowerCase()}_roster_v3.6.0.csv`;
+            a.download = `ibba_${data.teamName.replace(/[^a-z0-9\u0590-\u05FF]/gi, '_').toLowerCase()}_roster_v3.6.1.csv`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -768,13 +768,44 @@
 
             const formData = new FormData(this);
 
-            const teamName = formData.get('teamName');
+            // Enhanced validation for required fields
+            const teamName = formData.get('teamName')?.trim();
             const league = formData.get('league');
-            const submitterName = formData.get('submitterName');
-            const submitterEmail = formData.get('submitterEmail');
+            const submitterName = formData.get('submitterName')?.trim();
+            const submitterEmail = formData.get('submitterEmail')?.trim();
 
-            if (!teamName || !league || !submitterName || !submitterEmail) {
-                alert('Please fill in all required team and contact information.');
+            // Check team name
+            if (!teamName) {
+                alert('Team Name is required and cannot be empty.');
+                document.getElementById('loading').style.display = 'none';
+                return;
+            }
+
+            // Check league selection
+            if (!league) {
+                alert('Please select a League from the dropdown menu.');
+                document.getElementById('loading').style.display = 'none';
+                return;
+            }
+
+            // Check submitter name
+            if (!submitterName) {
+                alert('Your Name is required and cannot be empty.');
+                document.getElementById('loading').style.display = 'none';
+                return;
+            }
+
+            // Check submitter email
+            if (!submitterEmail) {
+                alert('Your Email is required and cannot be empty.');
+                document.getElementById('loading').style.display = 'none';
+                return;
+            }
+
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(submitterEmail)) {
+                alert('Please enter a valid email address.');
                 document.getElementById('loading').style.display = 'none';
                 return;
             }
