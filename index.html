@@ -431,7 +431,7 @@
         <p class="subtitle">Professional roster management for Pixellot leagues</p>
         
         <div class="version-info">
-            <span class="version">Version 2.3.0</span>
+            <span class="version">Version 2.3.1</span>
             <span class="date">Updated: August 2025</span>
         </div>
         
@@ -603,44 +603,52 @@
             }
         }
 
-        // Check for duplicate jersey numbers with exact match
+        // Check for duplicate jersey numbers with exact match and delay
+        let duplicateCheckTimeout;
         function checkDuplicateJerseys() {
-            const jerseyInputs = document.querySelectorAll('input[name*="_jersey"]');
-            const warningDiv = document.getElementById('duplicateWarning');
-            let duplicates = false;
+            // Clear existing timeout to avoid multiple rapid checks
+            clearTimeout(duplicateCheckTimeout);
             
-            // Clear previous warnings
-            jerseyInputs.forEach(input => {
-                input.classList.remove('duplicate-warning');
-            });
-            
-            // Get all non-empty jersey numbers (exact values)
-            let numbers = [];
-            jerseyInputs.forEach(input => {
-                const value = input.value.trim();
-                if (value !== '') {
-                    numbers.push(value);
-                }
-            });
-            
-            // Check for exact duplicates only
-            jerseyInputs.forEach(input => {
-                const value = input.value.trim();
-                if (value !== '') {
-                    const count = numbers.filter(num => num === value).length;
-                    if (count > 1) {
-                        input.classList.add('duplicate-warning');
-                        duplicates = true;
+            // Set a delay before checking (wait for user to finish typing)
+            duplicateCheckTimeout = setTimeout(() => {
+                const jerseyInputs = document.querySelectorAll('input[name*="_jersey"]');
+                const warningDiv = document.getElementById('duplicateWarning');
+                let duplicates = false;
+                
+                // Clear previous warnings
+                jerseyInputs.forEach(input => {
+                    input.classList.remove('duplicate-warning');
+                });
+                
+                // Get all non-empty jersey numbers (exact values)
+                let numbers = [];
+                jerseyInputs.forEach(input => {
+                    const value = input.value.trim();
+                    // Only check values that are not empty and appear to be complete
+                    if (value !== '' && value.length > 0) {
+                        numbers.push(value);
                     }
+                });
+                
+                // Check for exact duplicates only
+                jerseyInputs.forEach(input => {
+                    const value = input.value.trim();
+                    if (value !== '' && value.length > 0) {
+                        const count = numbers.filter(num => num === value).length;
+                        if (count > 1) {
+                            input.classList.add('duplicate-warning');
+                            duplicates = true;
+                        }
+                    }
+                });
+                
+                // Show/hide warning message
+                if (duplicates) {
+                    warningDiv.style.display = 'block';
+                } else {
+                    warningDiv.style.display = 'none';
                 }
-            });
-            
-            // Show/hide warning message
-            if (duplicates) {
-                warningDiv.style.display = 'block';
-            } else {
-                warningDiv.style.display = 'none';
-            }
+            }, 500); // Wait 500ms after user stops typing
         }
 
         // Clear all form fields
@@ -769,7 +777,7 @@
             });
 
             // Format data for email
-            let emailContent = `PIXELLOT TEAM ROSTER SUBMISSION - Version 2.3.0\n`;
+            let emailContent = `PIXELLOT TEAM ROSTER SUBMISSION - Version 2.3.1\n`;
             emailContent += `Generated: ${new Date().toLocaleString()}\n\n`;
             emailContent += `Team Name: ${rosterData.teamName}\n`;
             emailContent += `League: ${rosterData.league} (${rosterData.leagueEnglish})\n`;
@@ -833,7 +841,7 @@
 
         // Generate CSV file for download (backup)
         function generateCSV(data) {
-            let csv = 'Pixellot Team Roster Submission - Version 2.3.0\n';
+            let csv = 'Pixellot Team Roster Submission - Version 2.3.1\n';
             csv += `Generated: ${new Date().toLocaleString()}\n\n`;
             csv += `Team Name: ${data.teamName}\n`;
             csv += `League: ${data.leagueEnglish}\n`;
