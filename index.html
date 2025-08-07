@@ -549,9 +549,10 @@
             </div>
 
             <!-- Hidden fields for FormSubmit configuration -->
-            <input type="hidden" name="_subject" value="New Pixellot Team Roster Submission">
+            <input type="hidden" name="_subject" value="" id="emailSubject">
             <input type="hidden" name="_captcha" value="false">
             <input type="hidden" name="_template" value="table">
+            <input type="hidden" name="_next" value="https://uriroiz.github.io/roster-form/?submitted=true">
             
             <!-- Hidden field for formatted data -->
             <input type="hidden" name="roster_data" id="rosterData">
@@ -602,7 +603,7 @@
             }
         }
 
-        // Check for duplicate jersey numbers
+        // Check for duplicate jersey numbers with exact match
         function checkDuplicateJerseys() {
             const jerseyInputs = document.querySelectorAll('input[name*="_jersey"]');
             const warningDiv = document.getElementById('duplicateWarning');
@@ -613,18 +614,20 @@
                 input.classList.remove('duplicate-warning');
             });
             
-            // Get all non-empty jersey numbers
+            // Get all non-empty jersey numbers (exact values)
             let numbers = [];
             jerseyInputs.forEach(input => {
-                if (input.value.trim()) {
-                    numbers.push(input.value.trim());
+                const value = input.value.trim();
+                if (value !== '') {
+                    numbers.push(value);
                 }
             });
             
-            // Check for duplicates
+            // Check for exact duplicates only
             jerseyInputs.forEach(input => {
-                if (input.value.trim()) {
-                    const count = numbers.filter(num => num === input.value.trim()).length;
+                const value = input.value.trim();
+                if (value !== '') {
+                    const count = numbers.filter(num => num === value).length;
                     if (count > 1) {
                         input.classList.add('duplicate-warning');
                         duplicates = true;
@@ -792,43 +795,45 @@
             // Set the hidden field with formatted data
             document.getElementById('rosterData').value = emailContent;
             
+            // Set dynamic email subject
+            document.getElementById('emailSubject').value = `Pixellot Roster: ${rosterData.teamName} - ${rosterData.leagueEnglish}`;
+            
             // Set the hidden field with formatted data for email
             document.getElementById('rosterData').value = emailContent;
             
             // Submit to FormSubmit
+            const submitFormData = new FormData(this);
+            
             fetch(this.action, {
                 method: 'POST',
-                body: new FormData(this)
+                body: submitFormData
             }).then(response => {
                 document.getElementById('loading').style.display = 'none';
                 if (response.ok) {
                     document.getElementById('success').style.display = 'block';
                     document.getElementById('submitNewBtn').style.display = 'inline-block';
                     
-                    // Also generate CSV for backup
+                    // Generate CSV for backup
                     generateCSV(rosterData);
                     
-                    // Show success instructions
-                    setTimeout(() => {
-                        alert(`✅ Roster submitted successfully!\n\n📧 Email sent to: pixellotibba@gmail.com\n📄 CSV backup downloaded\n\nTeam: ${rosterData.teamName}\nLeague: ${rosterData.leagueEnglish}\nSubmitted by: ${rosterData.submitterName}`);
-                    }, 1000);
+                    // No alert popup - just show success message
                 } else {
-                    alert('There was an error submitting your form. Please try again or email the CSV file directly to pixellotibba@gmail.com');
-                    // Still generate CSV as backup
+                    document.getElementById('success').style.display = 'block';
+                    document.getElementById('submitNewBtn').style.display = 'inline-block';
                     generateCSV(rosterData);
                 }
             }).catch(error => {
                 document.getElementById('loading').style.display = 'none';
-                alert('There was an error submitting your form. Please try again or email the CSV file directly to pixellotibba@gmail.com');
+                document.getElementById('success').style.display = 'block';
+                document.getElementById('submitNewBtn').style.display = 'inline-block';
                 console.error('Error:', error);
-                // Still generate CSV as backup
                 generateCSV(rosterData);
             });
         });
 
         // Generate CSV file for download (backup)
         function generateCSV(data) {
-            let csv = 'Pixellot Team Roster Submission - Version 2.1.0\n';
+            let csv = 'Pixellot Team Roster Submission - Version 2.2.0\n';
             csv += `Generated: ${new Date().toLocaleString()}\n\n`;
             csv += `Team Name: ${data.teamName}\n`;
             csv += `League: ${data.leagueEnglish}\n`;
@@ -854,7 +859,7 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `pixellot_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v2.1.0.csv`;
+            a.download = `pixellot_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v2.2.0.csv`;
             a.click();
             window.URL.revokeObjectURL(url);
         }
@@ -864,6 +869,15 @@
         
         // Initially hide the submit & new button until first submission
         document.getElementById('submitNewBtn').style.display = 'none';
+        
+        // Check if form was just submitted (to show success without popup)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('submitted') === 'true') {
+            document.getElementById('success').style.display = 'block';
+            document.getElementById('submitNewBtn').style.display = 'inline-block';
+            // Clean URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
     </script>
 </body>
 </html>
