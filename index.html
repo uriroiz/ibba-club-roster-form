@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Team Roster Submission Form</title>
+    <title>Pixellot Team Roster Submission Form</title>
     <style>
         * {
             margin: 0;
@@ -43,8 +43,30 @@
         .subtitle {
             text-align: center;
             color: #555;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
             font-size: 1.1em;
+        }
+
+        .version-info {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .version {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-right: 10px;
+            box-shadow: 0 2px 8px rgba(30, 60, 114, 0.2);
+        }
+
+        .date {
+            color: #777;
+            font-style: italic;
         }
 
         .team-info {
@@ -405,8 +427,13 @@
 </head>
 <body>
     <div class="container">
-        <h1>🏀 Team Roster Submission</h1>
-        <p class="subtitle">Professional roster management made easy</p>
+        <h1>🏀 Pixellot Team Roster Submission</h1>
+        <p class="subtitle">Professional roster management for Pixellot leagues</p>
+        
+        <div class="version-info">
+            <span class="version">Version 2.1.0</span>
+            <span class="date">Updated: August 2025</span>
+        </div>
         
         <form id="rosterForm">\n            <!-- Remove the action and method attributes -->
             <div class="team-info">
@@ -734,7 +761,8 @@
             });
 
             // Format data for email
-            let emailContent = `TEAM ROSTER SUBMISSION\n\n`;
+            let emailContent = `PIXELLOT TEAM ROSTER SUBMISSION - Version 2.1.0\n`;
+            emailContent += `Generated: ${new Date().toLocaleString()}\n\n`;
             emailContent += `Team Name: ${rosterData.teamName}\n`;
             emailContent += `League: ${rosterData.league}\n`;
             emailContent += `Submitted by: ${rosterData.submitterName}\n`;
@@ -769,13 +797,14 @@
             
             // Show email instructions
             setTimeout(() => {
-                alert(`✅ Roster data downloaded as CSV file!\n\n📧 Please email the downloaded CSV file to: urir@pixellot.tv\n\nInclude this information:\n• Team: ${rosterData.teamName}\n• League: ${rosterData.league}\n• Your name: ${rosterData.submitterName}`);
+                alert(`✅ Pixellot roster data downloaded as CSV file!\n\n📧 Please email the downloaded CSV file to: urir@pixellot.tv\n\nInclude this information:\n• Team: ${rosterData.teamName}\n• League: ${rosterData.league}\n• Your name: ${rosterData.submitterName}\n\n📋 Form Version: 2.1.0`);
             }, 1000);
         });
 
         // Generate CSV file for download (backup)
         function generateCSV(data) {
-            let csv = 'Team Roster Submission\n\n';
+            let csv = 'Pixellot Team Roster Submission - Version 2.1.0\n';
+            csv += `Generated: ${new Date().toLocaleString()}\n\n`;
             csv += `Team Name: ${data.teamName}\n`;
             csv += `League: ${data.league}\n`;
             csv += `Submitted by: ${data.submitterName}\n`;
@@ -800,7 +829,7 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster.csv`;
+            a.download = `pixellot_${data.teamName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_roster_v2.1.0.csv`;
             a.click();
             window.URL.revokeObjectURL(url);
         }
