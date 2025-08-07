@@ -330,7 +330,7 @@
         <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
         
         <div class="version-info">
-            <span class="version">Version 3.2.6</span>
+            <span class="version">Version 3.2.7</span>
             <span class="date">Updated: August 2025</span>
         </div>
 
@@ -896,7 +896,10 @@
                 submitter_email: rosterData.submitterEmail,
                 roster_data: rosterSummary
             };
+            console.log("📦 Email Params:", emailParams);
+            alert("📬 Preparing to send email. Check Console for details.");
 
+            
             // Send the email
             emailjs.send(window.EmailJSConfig.serviceId, window.EmailJSConfig.templateId, emailParams)
                 .then(function(response) {
