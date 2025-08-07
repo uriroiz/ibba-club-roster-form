@@ -330,7 +330,7 @@
         <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
         
         <div class="version-info">
-            <span class="version">Version 3.1.0</span>
+            <span class="version">Version 3.2.0</span>
             <span class="date">Updated: August 2025</span>
         </div>
 
@@ -462,24 +462,37 @@
         </form>
     </div>
 
-    <script type="text/javascript" src="https://cdn.emailjs.com/dist/email.min.js"></script>
     <script>
-        let emailjsReady = false;
-        
-        // Initialize EmailJS after a small delay to ensure it loads
-        setTimeout(function() {
-            try {
-                if (typeof emailjs !== 'undefined') {
-                    emailjs.init("r4Y7hg0AGi5DhIcF");
-                    emailjsReady = true;
-                    console.log('EmailJS initialized successfully');
-                } else {
-                    console.error('EmailJS still not loaded after delay');
-                }
-            } catch (error) {
-                console.error('EmailJS initialization error:', error);
-            }
-        }, 1000);
+        // EmailJS Implementation that works in artifact environment
+        window.EmailJSConfig = {
+            publicKey: "r4Y7hg0AGi5DhIcF",
+            serviceId: "service_4bdvcf9",
+            templateId: "template_bciy9uy"
+        };
+
+        // Custom EmailJS-like function using fetch API
+        function sendEmailViaAPI(params) {
+            var url = 'https://api.emailjs.com/api/v1.0/email/send';
+            
+            var data = {
+                service_id: window.EmailJSConfig.serviceId,
+                template_id: window.EmailJSConfig.templateId,
+                user_id: window.EmailJSConfig.publicKey,
+                template_params: params
+            };
+
+            console.log('Sending email with direct API call:', data);
+
+            return fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+        }
+
+        console.log('✅ Custom EmailJS API implementation loaded');
 
         let duplicateCheckTimeout;
 
@@ -774,32 +787,51 @@
                 return;
             }
             
-            console.log('Sending email with EmailJS...');
-            console.log('Email parameters:', emailParams);
+            // Test EmailJS with the simplest possible parameters first
+            const simpleTestParams = {
+                message: "Test message from IBBA roster form",
+                from_name: rosterData.submitterName,
+                reply_to: rosterData.submitterEmail
+            };
+
+            console.log('Testing EmailJS with simple parameters:', simpleTestParams);
             
-            emailjs.send("service_4bdvcf9", "template_6o8secn", emailParams)
+            emailjs.send("service_4bdvcf9", "template_bciy9uy", simpleTestParams)
                 .then(function(response) {
-                    console.log('Email sent successfully!', response);
+                    if (response.ok) {
+                        console.log('✅ EMAIL SENT SUCCESSFULLY!');
+                        
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('success').style.display = 'block';
+                        document.getElementById('createNewBtn').style.display = 'inline-block';
+                        
+                        generateCSV(rosterData);
+                        document.getElementById('success').scrollIntoView({ behavior: 'smooth' });
+                        
+                        alert('✅ Email sent successfully to pixellotibba@gmail.com!');
+                    } else {
+                        throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+                    }
+                })
+                .catch(function(error) {
+                    console.error('❌ EmailJS API Error:', error);
+                    
                     document.getElementById('loading').style.display = 'none';
+                    
+                    var errorMsg = 'Email sending failed:\n';
+                    errorMsg += 'Error: ' + error.message + '\n\n';
+                    errorMsg += 'This could be due to:\n';
+                    errorMsg += '1. CORS restrictions in browser\n';
+                    errorMsg += '2. Invalid EmailJS configuration\n';
+                    errorMsg += '3. Network connectivity issues\n\n';
+                    errorMsg += 'CSV backup will be downloaded.\n';
+                    errorMsg += 'Please send the CSV to: pixellotibba@gmail.com';
+                    
+                    alert(errorMsg);
+                    
                     document.getElementById('success').style.display = 'block';
                     document.getElementById('createNewBtn').style.display = 'inline-block';
-                    
-                    // Generate and download CSV
                     generateCSV(rosterData);
-                    
-                    // Scroll to success message
-                    document.getElementById('success').scrollIntoView({ behavior: 'smooth' });
-                    
-                }, function(error) {
-                    console.error('EmailJS Error:', error);
-                    document.getElementById('loading').style.display = 'none';
-                    
-                    // Still show success and generate CSV as backup
-                    document.getElementById('success').style.display = 'block';
-                    document.getElementById('createNewBtn').style.display = 'inline-block';
-                    generateCSV(rosterData);
-                    
-                    alert('Email may have failed to send, but CSV backup has been downloaded. Please send the CSV file to: pixellotibba@gmail.com');
                 });
         });
 
