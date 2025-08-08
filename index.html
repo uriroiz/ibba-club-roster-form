@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>IBBA Team Roster Submission Form – Pixellot Advantage</title>
-  <meta name="description" content="IBBA roster submission with accessibility, validation, season tracking (2025/26 + auto 2026/27), local save, CSV/Email export, staff phone fields, and Google Sheet data sink." />
+  <meta name="description" content="IBBA roster submission with multi-step form, progress tracking, and bulk operations." />
 
   <style>
     :root {
@@ -16,12 +16,37 @@
     html, body { height: 100%; }
     body { margin: 0; padding: 20px; min-height: 100vh; background: linear-gradient(135deg, var(--bg) 0%, var(--bg-2) 100%);
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; color: var(--ink); }
+    
     .container { max-width: 1200px; margin: 0 auto; background: var(--card); border: 1px solid var(--brd); border-radius: 12px; padding: 32px;
       box-shadow: 0 4px 6px rgba(0,0,0,.07), 0 1px 3px rgba(0,0,0,.06); }
+    
     h1 { font-size: clamp(1.8rem, 2.2vw, 2.5rem); font-weight: 800; text-align: center; margin: 0 0 6px; }
     .subtitle { text-align: center; color: var(--muted); margin-bottom: 14px; }
     .version-info { text-align: center; margin-bottom: 24px; font-size: .95rem; color: var(--muted); }
     .version { background: var(--brand); color: #fff; padding: 4px 12px; border-radius: 16px; font-weight: 700; margin-right: 10px; box-shadow: 0 1px 3px rgba(59,130,246,.3); }
+
+    /* Progress Bar */
+    .progress-container { margin-bottom: 32px; }
+    .progress-bar { width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; margin-bottom: 16px; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--brand), var(--brand-600)); transition: width 0.3s ease; border-radius: 4px; }
+    
+    .steps { display: flex; justify-content: space-between; margin-bottom: 16px; }
+    .step { display: flex; align-items: center; flex: 1; position: relative; }
+    .step:not(:last-child)::after { content: ''; position: absolute; top: 12px; left: calc(100% - 50px); right: -50px; height: 2px; background: #e5e7eb; z-index: 0; }
+    .step.active::after, .step.completed::after { background: var(--brand); }
+    .step-circle { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; margin-right: 8px; position: relative; z-index: 1; }
+    .step.pending .step-circle { background: #e5e7eb; color: var(--muted); }
+    .step.active .step-circle { background: var(--brand); color: white; }
+    .step.completed .step-circle { background: var(--ok); color: white; }
+    .step-label { font-size: 14px; font-weight: 600; }
+    .step.pending .step-label { color: var(--muted); }
+    .step.active .step-label { color: var(--brand); }
+    .step.completed .step-label { color: var(--ok); }
+
+    /* Form Steps */
+    .form-step { display: none; }
+    .form-step.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
     .form-section { margin-bottom: 24px; background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid var(--brd); }
     .form-section h2 { font-size: 1.15rem; font-weight: 700; margin: 0 0 14px; }
@@ -43,6 +68,14 @@
     .jersey-input { text-align: center; font-weight: 700; }
     .duplicate { border-color: var(--err) !important; background: var(--err-bg) !important; }
 
+    /* Bulk Operations */
+    .bulk-ops { margin-bottom: 16px; padding: 16px; background: #f0f9ff; border: 1px solid #bfdbfe; border-radius: 8px; }
+    .bulk-ops h3 { margin: 0 0 12px; font-size: 14px; font-weight: 700; color: var(--brand); }
+    .bulk-controls { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .bulk-select { padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
+    .selected-row { background-color: #dbeafe !important; }
+    .select-all-checkbox { margin-right: 8px; }
+
     .status { display: none; padding: 12px 14px; border-radius: 10px; margin-bottom: 12px; font-weight: 600; }
     .status--warn { background: var(--err-bg); color: #991b1b; border: 1px solid var(--err-brd); }
     .status--ok { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
@@ -50,18 +83,24 @@
     .buttons { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
     .btn { padding: 12px 18px; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; transition: transform .12s ease, background .12s ease, opacity .12s ease; }
     .btn:disabled { opacity: .6; cursor: not-allowed; }
-    .btn-primary { background: var(--brand); color: #fff; } .btn-primary:hover { background: var(--brand-600); transform: translateY(-1px); }
-    .btn-secondary { background: #6b7280; color: #fff; } .btn-secondary:hover { background: #4b5563; transform: translateY(-1px); }
-    .btn-success { background: var(--ok); color: #fff; } .btn-success:hover { background: var(--ok-600); transform: translateY(-1px); }
+    .btn-primary { background: var(--brand); color: #fff; } .btn-primary:hover:not(:disabled) { background: var(--brand-600); transform: translateY(-1px); }
+    .btn-secondary { background: #6b7280; color: #fff; } .btn-secondary:hover:not(:disabled) { background: #4b5563; transform: translateY(-1px); }
+    .btn-success { background: var(--ok); color: #fff; } .btn-success:hover:not(:disabled) { background: var(--ok-600); transform: translateY(-1px); }
     .btn-outline { background: transparent; color: var(--ink-2); border: 1px solid var(--brd); }
 
     .loading { display: none; text-align: center; color: var(--brand); font-weight: 800; margin-top: 10px; }
-    .table-tools { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+    .table-tools { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+
+    .step-navigation { display: flex; justify-content: space-between; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--brd); }
 
     @media (max-width: 900px) {
       .col-6, .col-4, .col-3 { grid-column: 1 / -1; }
       .container { padding: 18px; }
       table { display: block; overflow-x: auto; white-space: nowrap; }
+      .bulk-controls { flex-direction: column; align-items: stretch; }
+      .bulk-controls > * { width: 100%; }
+      .steps { flex-direction: column; gap: 8px; }
+      .step::after { display: none; }
     }
   </style>
 </head>
@@ -71,143 +110,212 @@
     <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
 
     <div class="version-info" aria-live="polite">
-      <span id="versionBadge" class="version">Version 3.9.2</span>
+      <span id="versionBadge" class="version">Version 3.10.0</span>
       <span class="date">Updated: August 2025</span>
     </div>
 
+    <!-- Progress Indicator -->
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div id="progressFill" class="progress-fill" style="width: 25%"></div>
+      </div>
+      <div class="steps">
+        <div class="step active" data-step="1">
+          <div class="step-circle">1</div>
+          <div class="step-label">Team Info</div>
+        </div>
+        <div class="step pending" data-step="2">
+          <div class="step-circle">2</div>
+          <div class="step-label">Players</div>
+        </div>
+        <div class="step pending" data-step="3">
+          <div class="step-circle">3</div>
+          <div class="step-label">Staff</div>
+        </div>
+        <div class="step pending" data-step="4">
+          <div class="step-circle">4</div>
+          <div class="step-label">Review</div>
+        </div>
+      </div>
+    </div>
+
     <form id="rosterForm" novalidate>
-      <section class="form-section" aria-labelledby="team-info-h">
-        <h2 id="team-info-h">🏆 Team Information</h2>
-        <div class="grid">
-          <div class="col-6">
-            <label for="teamName">Team Name</label>
-            <input id="teamName" name="teamName" type="text" placeholder="Enter your team name" autocomplete="organization" required />
+      <!-- Step 1: Team Information -->
+      <div class="form-step active" data-step="1">
+        <section class="form-section" aria-labelledby="team-info-h">
+          <h2 id="team-info-h">🏆 Team Information</h2>
+          <div class="grid">
+            <div class="col-6">
+              <label for="teamName">Team Name</label>
+              <input id="teamName" name="teamName" type="text" placeholder="Enter your team name" autocomplete="organization" required />
+            </div>
+            <div class="col-6">
+              <label for="league">League</label>
+              <select id="league" name="league" required>
+                <option value="">Select League</option>
+                <option value="לאומית גברים">לאומית גברים</option>
+                <option value="על נשים">על נשים</option>
+                <option value="לאומית נשים">לאומית נשים</option>
+                <option value="נוער על בנים">נוער על בנים</option>
+                <option value="נערות א על בנות">נערות א על בנות</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label for="season">Season</label>
+              <select id="season" name="season" required></select>
+            </div>
           </div>
-          <div class="col-6">
-            <label for="league">League</label>
-            <select id="league" name="league" required>
-              <option value="">Select League</option>
-              <option value="לאומית גברים">לאומית גברים</option>
-              <option value="על נשים">על נשים</option>
-              <option value="לאומית נשים">לאומית נשים</option>
-              <option value="נוער על בנים">נוער על בנים</option>
-              <option value="נערות א על בנות">נערות א על בנות</option>
-            </select>
+        </section>
+
+        <section class="form-section" aria-labelledby="contact-h">
+          <h2 id="contact-h">📝 Contact Information</h2>
+          <div class="grid">
+            <div class="col-6">
+              <label for="submitterName">Your Name</label>
+              <input id="submitterName" name="submitterName" type="text" placeholder="Enter your full name" autocomplete="name" required />
+            </div>
+            <div class="col-6">
+              <label for="submitterEmail">Your Email</label>
+              <input id="submitterEmail" name="submitterEmail" type="email" placeholder="Enter your email address" autocomplete="email" inputmode="email" required />
+            </div>
           </div>
-          <div class="col-6">
-            <label for="season">Season</label>
-            <select id="season" name="season" required></select>
+        </section>
+      </div>
+
+      <!-- Step 2: Players -->
+      <div class="form-step" data-step="2">
+        <section class="roster-section" aria-labelledby="players-h">
+          <h2 id="players-h">🎯 Player Roster</h2>
+          <div id="dupWarn" class="status status--warn" role="alert" aria-live="assertive"></div>
+          
+          <!-- Bulk Operations -->
+          <div class="bulk-ops">
+            <h3>🎯 Bulk Operations</h3>
+            <div class="bulk-controls">
+              <label style="font-weight: normal; margin: 0;">
+                <input type="checkbox" class="select-all-checkbox" id="selectAllPlayers">
+                Select All Visible Players
+              </label>
+              <select id="bulkPosition" class="bulk-select">
+                <option value="">Set Position for Selected</option>
+                <option value="G">Guard (G)</option>
+                <option value="F">Forward (F)</option>
+                <option value="C">Center (C)</option>
+              </select>
+              <button type="button" class="btn btn-outline" id="applyBulkPosition">Apply Position</button>
+              <button type="button" class="btn btn-outline" id="clearSelected">Clear Selected</button>
+            </div>
           </div>
+
+          <div class="table-tools">
+            <button type="button" class="btn btn-outline" id="addRowBtn">+ Add Player</button>
+            <button type="button" class="btn btn-outline" id="removeRowBtn">− Remove Last</button>
+            <span id="rowCountHelp" class="subtitle" aria-live="polite">0 rows</span>
+          </div>
+          
+          <table aria-describedby="rowCountHelp">
+            <thead>
+              <tr>
+                <th style="width:40px">Select</th>
+                <th style="width:64px">S/N</th>
+                <th style="width:90px">Jersey #</th>
+                <th style="min-width:160px">First Name</th>
+                <th style="min-width:160px">Last Name</th>
+                <th style="width:100px">Position</th>
+                <th style="min-width:220px">Email Address</th>
+              </tr>
+            </thead>
+            <tbody id="playersTable"></tbody>
+          </table>
+        </section>
+      </div>
+
+      <!-- Step 3: Staff -->
+      <div class="form-step" data-step="3">
+        <section class="roster-section" aria-labelledby="staff-h">
+          <h2 id="staff-h">👨‍💼 Coaching Staff</h2>
+          <table>
+            <thead>
+              <tr>
+                <th style="width:64px">S/N</th>
+                <th style="width:140px">Role</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th style="width:100px">Position</th>
+                <th>Email Address</th>
+                <th style="width:140px">Phone</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="staff-row">
+                <td>17</td>
+                <td><strong>Head Coach</strong></td>
+                <td><input type="text" name="coach_first" placeholder="First name" /></td>
+                <td><input type="text" name="coach_last" placeholder="Last name" /></td>
+                <td>-</td>
+                <td><input type="email" name="coach_email" placeholder="Email (optional)" /></td>
+                <td><input type="tel" name="coach_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
+              </tr>
+              <tr class="staff-row">
+                <td>18</td>
+                <td><strong>Asst. Coach</strong></td>
+                <td><input type="text" name="asst1_first" placeholder="First name" /></td>
+                <td><input type="text" name="asst1_last" placeholder="Last name" /></td>
+                <td>-</td>
+                <td><input type="email" name="asst1_email" placeholder="Email (optional)" /></td>
+                <td><input type="tel" name="asst1_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
+              </tr>
+              <tr class="staff-row">
+                <td>19</td>
+                <td><strong>Asst. Coach</strong></td>
+                <td><input type="text" name="asst2_first" placeholder="First name" /></td>
+                <td><input type="text" name="asst2_last" placeholder="Last name" /></td>
+                <td>-</td>
+                <td><input type="email" name="asst2_email" placeholder="Email (optional)" /></td>
+                <td><input type="tel" name="asst2_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
+              </tr>
+              <tr class="staff-row">
+                <td>20</td>
+                <td><strong>Asst. Coach</strong></td>
+                <td><input type="text" name="asst3_first" placeholder="First name" /></td>
+                <td><input type="text" name="asst3_last" placeholder="Last name" /></td>
+                <td>-</td>
+                <td><input type="email" name="asst3_email" placeholder="Email (optional)" /></td>
+                <td><input type="tel" name="asst3_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
+              </tr>
+              <tr class="staff-row">
+                <td>21</td>
+                <td><strong>GM</strong></td>
+                <td><input type="text" name="gm_first" placeholder="First name" /></td>
+                <td><input type="text" name="gm_last" placeholder="Last name" /></td>
+                <td>-</td>
+                <td><input type="email" name="gm_email" placeholder="Email (optional)" /></td>
+                <td><input type="tel" name="gm_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+
+      <!-- Step 4: Review -->
+      <div class="form-step" data-step="4">
+        <section class="form-section">
+          <h2>📋 Review Your Submission</h2>
+          <div id="reviewContent"></div>
+        </section>
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="step-navigation">
+        <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">← Previous</button>
+        <div class="buttons">
+          <button type="button" class="btn btn-secondary" id="clearBtn">🗑️ Clear Form</button>
+          <button type="button" class="btn btn-outline" id="saveBtn">💾 Save Draft</button>
+          <button type="button" class="btn btn-outline" id="restoreBtn">↩ Restore Draft</button>
+          <button type="button" class="btn btn-success" id="newBtn" style="display:none">📋 Create New Roster</button>
         </div>
-      </section>
-
-      <section class="form-section" aria-labelledby="contact-h">
-        <h2 id="contact-h">📝 Contact Information</h2>
-        <div class="grid">
-          <div class="col-6">
-            <label for="submitterName">Your Name</label>
-            <input id="submitterName" name="submitterName" type="text" placeholder="Enter your full name" autocomplete="name" required />
-          </div>
-          <div class="col-6">
-            <label for="submitterEmail">Your Email</label>
-            <input id="submitterEmail" name="submitterEmail" type="email" placeholder="Enter your email address" autocomplete="email" inputmode="email" required />
-          </div>
-        </div>
-      </section>
-
-      <section class="roster-section" aria-labelledby="players-h">
-        <h2 id="players-h">🎯 Player Roster</h2>
-        <div id="dupWarn" class="status status--warn" role="alert" aria-live="assertive"></div>
-        <div class="table-tools">
-          <button type="button" class="btn btn-outline" id="addRowBtn">+ Add Player</button>
-          <button type="button" class="btn btn-outline" id="removeRowBtn">− Remove Last</button>
-          <span id="rowCountHelp" class="subtitle" aria-live="polite">0 rows</span>
-        </div>
-        <table aria-describedby="rowCountHelp">
-          <thead>
-            <tr>
-              <th style="width:64px">S/N</th>
-              <th style="width:90px">Jersey #</th>
-              <th style="min-width:160px">First Name</th>
-              <th style="min-width:160px">Last Name</th>
-              <th style="width:100px">Position</th>
-              <th style="min-width:220px">Email Address</th>
-            </tr>
-          </thead>
-          <tbody id="playersTable"></tbody>
-        </table>
-      </section>
-
-      <section class="roster-section" aria-labelledby="staff-h">
-        <h2 id="staff-h">👨‍💼 Coaching Staff</h2>
-        <table>
-          <thead>
-            <tr>
-              <th style="width:64px">S/N</th>
-              <th style="width:140px">Role</th>
-              <th>First Name</th>
-              <th>Last Name</th>
-              <th style="width:100px">Position</th>
-              <th>Email Address</th>
-              <th style="width:140px">Phone</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="staff-row">
-              <td>17</td>
-              <td><strong>Head Coach</strong></td>
-              <td><input type="text" name="coach_first" placeholder="First name" /></td>
-              <td><input type="text" name="coach_last" placeholder="Last name" /></td>
-              <td>-</td>
-              <td><input type="email" name="coach_email" placeholder="Email (optional)" /></td>
-              <td><input type="tel" name="coach_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
-            </tr>
-            <tr class="staff-row">
-              <td>18</td>
-              <td><strong>Asst. Coach</strong></td>
-              <td><input type="text" name="asst1_first" placeholder="First name" /></td>
-              <td><input type="text" name="asst1_last" placeholder="Last name" /></td>
-              <td>-</td>
-              <td><input type="email" name="asst1_email" placeholder="Email (optional)" /></td>
-              <td><input type="tel" name="asst1_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
-            </tr>
-            <tr class="staff-row">
-              <td>19</td>
-              <td><strong>Asst. Coach</strong></td>
-              <td><input type="text" name="asst2_first" placeholder="First name" /></td>
-              <td><input type="text" name="asst2_last" placeholder="Last name" /></td>
-              <td>-</td>
-              <td><input type="email" name="asst2_email" placeholder="Email (optional)" /></td>
-              <td><input type="tel" name="asst2_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
-            </tr>
-            <tr class="staff-row">
-              <td>20</td>
-              <td><strong>Asst. Coach</strong></td>
-              <td><input type="text" name="asst3_first" placeholder="First name" /></td>
-              <td><input type="text" name="asst3_last" placeholder="Last name" /></td>
-              <td>-</td>
-              <td><input type="email" name="asst3_email" placeholder="Email (optional)" /></td>
-              <td><input type="tel" name="asst3_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
-            </tr>
-            <tr class="staff-row">
-              <td>21</td>
-              <td><strong>GM</strong></td>
-              <td><input type="text" name="gm_first" placeholder="First name" /></td>
-              <td><input type="text" name="gm_last" placeholder="Last name" /></td>
-              <td>-</td>
-              <td><input type="email" name="gm_email" placeholder="Email (optional)" /></td>
-              <td><input type="tel" name="gm_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <div class="buttons">
-        <button type="button" class="btn btn-secondary" id="clearBtn">🗑️ Clear Form</button>
-        <button type="button" class="btn btn-outline" id="saveBtn">💾 Save Draft</button>
-        <button type="button" class="btn btn-outline" id="restoreBtn">↩ Restore Draft</button>
-        <button type="submit" class="btn btn-primary" id="submitBtn">🚀 Submit Roster</button>
-        <button type="button" class="btn btn-success" id="newBtn" style="display:none">📋 Create New Roster</button>
+        <button type="button" class="btn btn-primary" id="nextBtn">Next →</button>
+        <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">🚀 Submit Roster</button>
       </div>
 
       <div id="loading" class="loading">🔄 Submitting your roster...</div>
@@ -223,22 +331,166 @@
       templateId: "template_6o8secn"
     });
 
-    // Google Apps Script data sink (wired to your deployment)
     const DATA_SINK_URL = 'https://script.google.com/macros/s/AKfycbxchgyxazvH9t4N0prpLTboqeAlb6kRz6xUj-klQ1HIYtrZjs9qeKxWVqTttVJKdREj/exec';
     const DATA_SINK_KEY = 'Pixellot2@25';
 
-    const APP_VERSION = '3.9.2';
+    const APP_VERSION = '3.10.0';
     const BUILD_DATE = new Date().toISOString().slice(0,10);
 
-    // Season configuration: default 2025/26; auto-expose 2026/27 on Aug 1, 2026
-    const CURRENT_SEASON_START_YEAR = 2025; // 2025/26
-    const NEXT_SEASON_START_YEAR = 2026;    // 2026/27
-    const SWITCHOVER_DATE = new Date(2026, 7, 1); // Aug 1, 2026 (0-indexed month)
-    const FORCE_EXPOSE_NEXT_SEASON = false; // set true to expose earlier
+    const CURRENT_SEASON_START_YEAR = 2025;
+    const NEXT_SEASON_START_YEAR = 2026;
+    const SWITCHOVER_DATE = new Date(2026, 7, 1);
+    const FORCE_EXPOSE_NEXT_SEASON = false;
 
-    const DEFAULT_PLAYER_ROWS = 16; // initial rows
-    const HARD_MAX_PLAYERS = 40;    // allow more than 16 as requested
-    const STORAGE_KEY = "ibbaRosterDraft_v392";
+    const DEFAULT_PLAYER_ROWS = 16;
+    const HARD_MAX_PLAYERS = 40;
+    const STORAGE_KEY = "ibbaRosterDraft_v3100";
+
+    // === Multi-Step Navigation ===
+    let currentStep = 1;
+    const totalSteps = 4;
+
+    function updateProgress() {
+      const progress = (currentStep / totalSteps) * 100;
+      document.getElementById('progressFill').style.width = progress + '%';
+      
+      // Update step indicators
+      document.querySelectorAll('.step').forEach((step, index) => {
+        const stepNum = index + 1;
+        step.classList.remove('active', 'completed', 'pending');
+        
+        if (stepNum < currentStep) {
+          step.classList.add('completed');
+          step.querySelector('.step-circle').textContent = '✓';
+        } else if (stepNum === currentStep) {
+          step.classList.add('active');
+          step.querySelector('.step-circle').textContent = stepNum;
+        } else {
+          step.classList.add('pending');
+          step.querySelector('.step-circle').textContent = stepNum;
+        }
+      });
+    }
+
+    function showStep(step) {
+      document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
+      document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
+      
+      // Update navigation buttons
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const submitBtn = document.getElementById('submitBtn');
+      
+      prevBtn.style.display = step > 1 ? 'block' : 'none';
+      nextBtn.style.display = step < totalSteps ? 'block' : 'none';
+      submitBtn.style.display = step === totalSteps ? 'block' : 'none';
+      
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Update review content if on review step
+      if (step === 4) {
+        updateReviewContent();
+      }
+    }
+
+    function validateCurrentStep() {
+      const currentStepEl = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+      const requiredFields = currentStepEl.querySelectorAll('[required]');
+      
+      for (const field of requiredFields) {
+        if (!field.value.trim()) {
+          field.focus();
+          field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return false;
+        }
+      }
+      
+      // Additional validation for step 2 (players)
+      if (currentStep === 2) {
+        if (!requireAtLeastOneCompletePlayer()) {
+          alert('Please add at least one complete player (jersey, first, last, position).');
+          return false;
+        }
+        
+        const badRow = validatePlayersCompleteness();
+        if (badRow) {
+          alert(`Player #${badRow} is incomplete. Jersey, First, Last, and Position are all required when adding a player.`);
+          return false;
+        }
+        
+        // Check duplicates
+        checkDuplicates();
+        if (document.getElementById('dupWarn').style.display === 'block') {
+          alert('Resolve duplicate jersey numbers before continuing.');
+          return false;
+        }
+      }
+      
+      return true;
+    }
+
+    function nextStep() {
+      if (!validateCurrentStep()) return;
+      
+      if (currentStep < totalSteps) {
+        currentStep++;
+        showStep(currentStep);
+        updateProgress();
+      }
+    }
+
+    function prevStep() {
+      if (currentStep > 1) {
+        currentStep--;
+        showStep(currentStep);
+        updateProgress();
+      }
+    }
+
+    function updateReviewContent() {
+      const formData = new FormData(document.getElementById('rosterForm'));
+      const roster = buildRoster(formData);
+      
+      let html = '<div class="grid">';
+      
+      // Team Info
+      html += '<div class="col-12"><h3>🏆 Team Information</h3>';
+      html += `<p><strong>Team:</strong> ${roster.teamName}</p>`;
+      html += `<p><strong>League:</strong> ${roster.league} (${roster.leagueEnglish})</p>`;
+      html += `<p><strong>Season:</strong> ${seasonLabel(parseInt(roster.season.split('-')[0], 10))}</p>`;
+      html += `<p><strong>Submitted by:</strong> ${roster.submitterName}</p>`;
+      html += `<p><strong>Email:</strong> ${roster.submitterEmail}</p></div>`;
+      
+      // Players
+      html += '<div class="col-6"><h3>🎯 Players (' + roster.players.length + ')</h3>';
+      if (roster.players.length > 0) {
+        html += '<ul style="margin: 0; padding-left: 20px;">';
+        roster.players.forEach(p => {
+          html += `<li>#${p.jersey} ${p.firstName} ${p.lastName} (${p.position})${p.email ? ' - ' + p.email : ''}</li>`;
+        });
+        html += '</ul>';
+      } else {
+        html += '<p><em>No players added</em></p>';
+      }
+      html += '</div>';
+      
+      // Staff
+      html += '<div class="col-6"><h3>👨‍💼 Coaching Staff (' + roster.staff.length + ')</h3>';
+      if (roster.staff.length > 0) {
+        html += '<ul style="margin: 0; padding-left: 20px;">';
+        roster.staff.forEach(s => {
+          html += `<li><strong>${s.role}:</strong> ${s.firstName} ${s.lastName}${s.email ? ' - ' + s.email : ''}${s.phone ? ' | ' + s.phone : ''}</li>`;
+        });
+        html += '</ul>';
+      } else {
+        html += '<p><em>No staff added</em></p>';
+      }
+      html += '</div>';
+      
+      html += '</div>';
+      document.getElementById('reviewContent').innerHTML = html;
+    }
 
     // === Utilities ===
     const $ = (sel, ctx=document) => ctx.querySelector(sel);
@@ -259,11 +511,11 @@
       return map[h] || 'Unknown League';
     }
 
-    // === Season helpers ===
     function seasonLabel(fromYear) {
-      const toYear = (fromYear + 1).toString().slice(-2); // 2025 -> "26"
+      const toYear = (fromYear + 1).toString().slice(-2);
       return `${fromYear}/${toYear}`;
     }
+
     function populateSeasonSelect() {
       const sel = byId('season');
       sel.innerHTML = '';
@@ -272,8 +524,8 @@
       if (exposeNext) seasons.push(NEXT_SEASON_START_YEAR);
       for (const y of seasons) {
         const opt = document.createElement('option');
-        opt.value = `${y}-${y + 1}`; // canonical value
-        opt.textContent = seasonLabel(y); // display
+        opt.value = `${y}-${y + 1}`;
+        opt.textContent = seasonLabel(y);
         sel.appendChild(opt);
       }
       sel.value = `${exposeNext ? NEXT_SEASON_START_YEAR : CURRENT_SEASON_START_YEAR}-${(exposeNext ? NEXT_SEASON_START_YEAR : CURRENT_SEASON_START_YEAR) + 1}`;
@@ -288,7 +540,8 @@
     function playerRowTemplate(idx) {
       const sn = String(idx).padStart(2, '0');
       return `
-        <tr>
+        <tr data-player-row="${idx}">
+          <td><input type="checkbox" class="player-select" data-player="${idx}" /></td>
           <td><strong>${sn}</strong></td>
           <td><input type="number" min="0" max="99" step="1" name="player${idx}_jersey" class="jersey-input" placeholder="#" inputmode="numeric" aria-label="Jersey number for player ${idx}" /></td>
           <td><input type="text" name="player${idx}_first" placeholder="First name" aria-label="First name for player ${idx}" /></td>
@@ -311,6 +564,7 @@
       const n = Math.min(HARD_MAX_PLAYERS, Math.max(1, count|0));
       for (let i = 1; i <= n; i++) tbody.insertAdjacentHTML('beforeend', playerRowTemplate(i));
       hookDuplicateListeners();
+      hookBulkSelectionListeners();
       bumpRowCount();
     }
 
@@ -320,6 +574,7 @@
       if (curr >= HARD_MAX_PLAYERS) return;
       tbody.insertAdjacentHTML('beforeend', playerRowTemplate(curr + 1));
       hookDuplicateListeners();
+      hookBulkSelectionListeners();
       bumpRowCount();
     }
 
@@ -330,6 +585,89 @@
       tbody.removeChild(tbody.lastElementChild);
       bumpRowCount();
       checkDuplicates();
+      updateSelectAllState();
+    }
+
+    // === Bulk Operations ===
+    function hookBulkSelectionListeners() {
+      // Individual checkboxes
+      $$('.player-select').forEach(checkbox => {
+        checkbox.removeEventListener('change', updateSelectAllState);
+        checkbox.addEventListener('change', function() {
+          updateRowSelection(this);
+          updateSelectAllState();
+        });
+      });
+    }
+
+    function updateRowSelection(checkbox) {
+      const row = checkbox.closest('tr');
+      if (checkbox.checked) {
+        row.classList.add('selected-row');
+      } else {
+        row.classList.remove('selected-row');
+      }
+    }
+
+    function updateSelectAllState() {
+      const allCheckboxes = $$('.player-select');
+      const checkedBoxes = $$('.player-select:checked');
+      const selectAllBox = byId('selectAllPlayers');
+      
+      if (checkedBoxes.length === 0) {
+        selectAllBox.indeterminate = false;
+        selectAllBox.checked = false;
+      } else if (checkedBoxes.length === allCheckboxes.length) {
+        selectAllBox.indeterminate = false;
+        selectAllBox.checked = true;
+      } else {
+        selectAllBox.indeterminate = true;
+        selectAllBox.checked = false;
+      }
+    }
+
+    function toggleSelectAll() {
+      const selectAll = byId('selectAllPlayers');
+      const checkboxes = $$('.player-select');
+      
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = selectAll.checked;
+        updateRowSelection(checkbox);
+      });
+    }
+
+    function applyBulkPosition() {
+      const selectedPosition = byId('bulkPosition').value;
+      if (!selectedPosition) {
+        alert('Please select a position to apply.');
+        return;
+      }
+      
+      const selectedCheckboxes = $$('.player-select:checked');
+      if (selectedCheckboxes.length === 0) {
+        alert('Please select at least one player.');
+        return;
+      }
+      
+      selectedCheckboxes.forEach(checkbox => {
+        const playerNum = checkbox.dataset.player;
+        const positionSelect = document.querySelector(`select[name="player${playerNum}_position"]`);
+        if (positionSelect) {
+          positionSelect.value = selectedPosition;
+        }
+      });
+      
+      // Reset bulk controls
+      byId('bulkPosition').value = '';
+      flashOk(`Applied ${selectedPosition} position to ${selectedCheckboxes.length} player(s).`);
+    }
+
+    function clearSelected() {
+      $$('.player-select:checked').forEach(checkbox => {
+        checkbox.checked = false;
+        updateRowSelection(checkbox);
+      });
+      updateSelectAllState();
     }
 
     // === Duplicate jersey detection ===
@@ -340,10 +678,12 @@
         inp.addEventListener('input', dupHandler);
       });
     }
+
     function dupHandler() {
       window.clearTimeout(dupTimer);
       dupTimer = window.setTimeout(checkDuplicates, 350);
     }
+
     function checkDuplicates() {
       const jerseys = $$('input[name*="_jersey"]').map(i => i.value.trim()).filter(Boolean);
       const counts = jerseys.reduce((m, v) => (m[v] = (m[v]||0)+1, m), {});
@@ -361,18 +701,29 @@
     // === Local draft save/restore ===
     function saveDraft() {
       const data = new FormData(byId('rosterForm'));
-      const obj = {};
+      const obj = { currentStep };
       for (const [k, v] of data.entries()) obj[k] = v;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
       flashOk('Draft saved locally.');
     }
+
     function restoreDraft() {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) { flashWarn('No draft found.'); return; }
       const obj = JSON.parse(raw);
+      
+      // Restore step
+      if (obj.currentStep) {
+        currentStep = obj.currentStep;
+        showStep(currentStep);
+        updateProgress();
+      }
+      
       const maxIdx = Math.max(1, ...Object.keys(obj).map(k => (k.match(/player(\d+)_/)||[])[1]).filter(Boolean).map(Number));
       ensureRows(Math.min(HARD_MAX_PLAYERS, Math.max(DEFAULT_PLAYER_ROWS, maxIdx)));
+      
       for (const k in obj) {
+        if (k === 'currentStep') continue;
         const el = document.querySelector(`[name="${CSS.escape(k)}"]`);
         if (el) el.value = obj[k];
       }
@@ -382,8 +733,108 @@
     }
 
     // === Messaging ===
-    function flashOk(msg) { const el = byId('okMsg'); el.textContent = `✅ ${msg}`; el.style.display = 'block'; setTimeout(() => el.style.display = 'none', 3000); }
-    function flashWarn(msg) { const el = byId('dupWarn'); el.textContent = `⚠️ ${msg}`; el.style.display = 'block'; }
+    function flashOk(msg) { 
+      const el = byId('okMsg'); 
+      el.textContent = `✅ ${msg}`; 
+      el.style.display = 'block'; 
+      setTimeout(() => el.style.display = 'none', 3000); 
+    }
+
+    function flashWarn(msg) { 
+      const el = byId('dupWarn'); 
+      el.textContent = `⚠️ ${msg}`; 
+      el.style.display = 'block'; 
+    }
+
+    // === Validation helpers ===
+    function requireAtLeastOneCompletePlayer() {
+      const rows = $$('#playersTable tr').length;
+      for (let i = 1; i <= rows; i++) {
+        const jersey = document.querySelector(`input[name="player${i}_jersey"]`)?.value;
+        const first = document.querySelector(`input[name="player${i}_first"]`)?.value;
+        const last = document.querySelector(`input[name="player${i}_last"]`)?.value;
+        const pos = document.querySelector(`select[name="player${i}_position"]`)?.value;
+        if (jersey && first && last && pos) return true;
+      }
+      return false;
+    }
+
+    function validatePlayersCompleteness() {
+      const rows = $$('#playersTable tr').length;
+      for (let i = 1; i <= rows; i++) {
+        const jersey = document.querySelector(`input[name="player${i}_jersey"]`)?.value;
+        const first = document.querySelector(`input[name="player${i}_first"]`)?.value;
+        const last = document.querySelector(`input[name="player${i}_last"]`)?.value;
+        const pos = document.querySelector(`select[name="player${i}_position"]`)?.value;
+        const any = jersey || first || last || pos;
+        const all = jersey && first && last && pos;
+        if (any && !all) return i;
+      }
+      return 0;
+    }
+
+    // === Build roster ===
+    function buildRoster(fd) {
+      const teamName = fd.get('teamName').trim();
+      const league = fd.get('league');
+      const season = fd.get('season');
+      const submitterName = ucWords(fd.get('submitterName').trim());
+      const submitterEmail = fd.get('submitterEmail').trim();
+
+      const roster = { teamName, league, leagueEnglish: leagueToEnglish(league), submitterName, submitterEmail, season, players: [], staff: [] };
+
+      const rows = $$('#playersTable tr').length;
+      for (let i = 1; i <= rows; i++) {
+        const jersey = fd.get(`player${i}_jersey`);
+        const first = fd.get(`player${i}_first`);
+        const last = fd.get(`player${i}_last`);
+        const pos = fd.get(`player${i}_position`);
+        const email = fd.get(`player${i}_email`);
+        if (jersey && first && last && pos) {
+          roster.players.push({ number: i, jersey, firstName: ucWords(first), lastName: ucWords(last), position: pos, email });
+        }
+      }
+
+      const staffRoles = [
+        { key: 'coach', label: 'Head Coach' },
+        { key: 'asst1', label: 'Assistant Coach 1' },
+        { key: 'asst2', label: 'Assistant Coach 2' },
+        { key: 'asst3', label: 'Assistant Coach 3' },
+        { key: 'gm', label: 'General Manager' }
+      ];
+      for (const role of staffRoles) {
+        const f = fd.get(`${role.key}_first`);
+        const l = fd.get(`${role.key}_last`);
+        const e = fd.get(`${role.key}_email`);
+        const p = fd.get(`${role.key}_phone`);
+        if (f || l) roster.staff.push({ role: role.label, firstName: ucWords(f||''), lastName: ucWords(l||''), email: e||'', phone: (p||'').trim() });
+      }
+
+      return roster;
+    }
+
+    function rosterSummary(roster) {
+      let out = '';
+      out += 'IBBA TEAM ROSTER SUBMISSION\n';
+      out += '==============================\n';
+      out += `Team: ${roster.teamName}\n`;
+      out += `League: ${roster.league} (${roster.leagueEnglish})\n`;
+      out += `Season: ${roster.season}\n`;
+      out += `Submitted by: ${roster.submitterName}\n`;
+      out += `Email: ${roster.submitterEmail}\n`;
+      out += `Date: ${new Date().toLocaleString()}\n`;
+      out += `Version: ${APP_VERSION}\n\n`;
+      out += 'CSV FORMAT FOR COPYING:\n';
+      out += '=======================\n';
+      roster.players.forEach(p => { out += `${p.jersey},${p.firstName},${p.lastName},${p.email||''},${p.position||''}\n`; });
+      out += `\nPLAYERS (${roster.players.length}):\n`;
+      out += '------------------------\n';
+      roster.players.forEach(p => { out += `#${p.jersey} - ${p.firstName} ${p.lastName}${p.position?` (${p.position})`:''}${p.email?` - ${p.email}`:''}\n`; });
+      out += `\nCOACHING STAFF (${roster.staff.length}):\n`;
+      out += '----------------------------\n';
+      roster.staff.forEach(s => { out += `${s.role}: ${s.firstName} ${s.lastName}${s.email?` - ${s.email}`:''}${s.phone?` | ${s.phone}`:''}\n`; });
+      return out;
+    }
 
     // === CSV ===
     function downloadCSV(roster) {
@@ -451,122 +902,50 @@
       }
     }
 
-    // === Validation helpers ===
-    function requireAtLeastOneCompletePlayer(fd) {
-      const rows = $$('#playersTable tr').length;
-      for (let i = 1; i <= rows; i++) {
-        const jersey = fd.get(`player${i}_jersey`);
-        const first = fd.get(`player${i}_first`);
-        const last = fd.get(`player${i}_last`);
-        const pos = fd.get(`player${i}_position`);
-        if (jersey && first && last && pos) return true;
-      }
-      return false;
-    }
-    function validatePlayersCompleteness(fd) {
-      const rows = $$('#playersTable tr').length;
-      for (let i = 1; i <= rows; i++) {
-        const jersey = fd.get(`player${i}_jersey`);
-        const first = fd.get(`player${i}_first`);
-        const last = fd.get(`player${i}_last`);
-        const pos = fd.get(`player${i}_position`);
-        const any = jersey || first || last || pos;
-        const all = jersey && first && last && pos;
-        if (any && !all) return i;
-      }
-      return 0;
-    }
-
-    // === Build roster ===
-    function buildRoster(fd) {
-      const teamName = fd.get('teamName').trim();
-      const league = fd.get('league');
-      const season = fd.get('season'); // canonical "2025-2026"
-      const submitterName = ucWords(fd.get('submitterName').trim());
-      const submitterEmail = fd.get('submitterEmail').trim();
-
-      const roster = { teamName, league, leagueEnglish: leagueToEnglish(league), submitterName, submitterEmail, season, players: [], staff: [] };
-
-      const rows = $$('#playersTable tr').length;
-      for (let i = 1; i <= rows; i++) {
-        const jersey = fd.get(`player${i}_jersey`);
-        const first = fd.get(`player${i}_first`);
-        const last = fd.get(`player${i}_last`);
-        const pos = fd.get(`player${i}_position`);
-        const email = fd.get(`player${i}_email`);
-        if (jersey && first && last && pos) {
-          roster.players.push({ number: i, jersey, firstName: ucWords(first), lastName: ucWords(last), position: pos, email });
-        }
-      }
-
-      const staffRoles = [
-        { key: 'coach', label: 'Head Coach' },
-        { key: 'asst1', label: 'Assistant Coach 1' },
-        { key: 'asst2', label: 'Assistant Coach 2' },
-        { key: 'asst3', label: 'Assistant Coach 3' },
-        { key: 'gm', label: 'General Manager' }
-      ];
-      for (const role of staffRoles) {
-        const f = fd.get(`${role.key}_first`);
-        const l = fd.get(`${role.key}_last`);
-        const e = fd.get(`${role.key}_email`);
-        const p = fd.get(`${role.key}_phone`);
-        if (f || l) roster.staff.push({ role: role.label, firstName: ucWords(f||''), lastName: ucWords(l||''), email: e||'', phone: (p||'').trim() });
-      }
-
-      return roster;
-    }
-
-    function rosterSummary(roster) {
-      let out = '';
-      out += 'IBBA TEAM ROSTER SUBMISSION\n';
-      out += '==============================\n';
-      out += `Team: ${roster.teamName}\n`;
-      out += `League: ${roster.league} (${roster.leagueEnglish})\n`;
-      out += `Season: ${roster.season}\n`;
-      out += `Submitted by: ${roster.submitterName}\n`;
-      out += `Email: ${roster.submitterEmail}\n`;
-      out += `Date: ${new Date().toLocaleString()}\n`;
-      out += `Version: ${APP_VERSION}\n\n`;
-      out += 'CSV FORMAT FOR COPYING:\n';
-      out += '=======================\n';
-      roster.players.forEach(p => { out += `${p.jersey},${p.firstName},${p.lastName},${p.email||''},${p.position||''}\n`; });
-      out += `\nPLAYERS (${roster.players.length}):\n`;
-      out += '------------------------\n';
-      roster.players.forEach(p => { out += `#${p.jersey} - ${p.firstName} ${p.lastName}${p.position?` (${p.position})`:''}${p.email?` - ${p.email}`:''}\n`; });
-      out += `\nCOACHING STAFF (${roster.staff.length}):\n`;
-      out += '----------------------------\n';
-      roster.staff.forEach(s => { out += `${s.role}: ${s.firstName} ${s.lastName}${s.email?` - ${s.email}`:''}${s.phone?` | ${s.phone}`:''}\n`; });
-      return out;
-    }
-
-    // === Submit wiring ===
+    // === Initialize ===
     document.addEventListener('DOMContentLoaded', () => {
       const vb = byId('versionBadge'); if (vb) vb.textContent = `Version ${APP_VERSION}`;
 
       populateSeasonSelect();
       ensureRows(DEFAULT_PLAYER_ROWS);
+      updateProgress();
+      
+      // Navigation event listeners
+      byId('nextBtn').addEventListener('click', nextStep);
+      byId('prevBtn').addEventListener('click', prevStep);
+      
+      // Player table controls
       byId('addRowBtn').addEventListener('click', addRow);
       byId('removeRowBtn').addEventListener('click', removeRow);
+      
+      // Bulk operations
+      byId('selectAllPlayers').addEventListener('change', toggleSelectAll);
+      byId('applyBulkPosition').addEventListener('click', applyBulkPosition);
+      byId('clearSelected').addEventListener('click', clearSelected);
 
+      // Other controls
       byId('clearBtn').addEventListener('click', () => {
         if (!confirm('Clear all data (except your name/email if present)?')) return;
         const keepName = byId('submitterName').value; const keepEmail = byId('submitterEmail').value;
         byId('rosterForm').reset(); ensureRows(DEFAULT_PLAYER_ROWS); populateSeasonSelect();
         byId('submitterName').value = keepName; byId('submitterEmail').value = keepEmail;
         byId('dupWarn').style.display = 'none'; byId('okMsg').style.display = 'none'; byId('newBtn').style.display = 'none';
+        currentStep = 1; showStep(currentStep); updateProgress();
       });
+      
       byId('newBtn').addEventListener('click', () => {
         const keepName = byId('submitterName').value; const keepEmail = byId('submitterEmail').value;
         byId('rosterForm').reset(); ensureRows(DEFAULT_PLAYER_ROWS); populateSeasonSelect();
         byId('submitterName').value = keepName; byId('submitterEmail').value = keepEmail;
         byId('dupWarn').style.display = 'none'; byId('okMsg').style.display = 'none'; byId('newBtn').style.display = 'none';
+        currentStep = 1; showStep(currentStep); updateProgress();
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
 
       byId('saveBtn').addEventListener('click', saveDraft);
       byId('restoreBtn').addEventListener('click', restoreDraft);
 
+      // Form submission
       byId('rosterForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const form = e.currentTarget;
@@ -575,18 +954,9 @@
         const ok = byId('okMsg');
         ok.style.display = 'none';
 
-        if (!form.reportValidity()) return;
         const fd = new FormData(form);
-
-        if (!requireAtLeastOneCompletePlayer(fd)) { alert('Please add at least one complete player (jersey, first, last, position).'); return; }
-        const badRow = validatePlayersCompleteness(fd);
-        if (badRow) { alert(`Player #${badRow} is incomplete. Jersey, First, Last, and Position are all required when adding a player.`); return; }
-
         const submitEmail = fd.get('submitterEmail')?.trim();
         if (!emailValid(submitEmail)) { alert('Please enter a valid email address.'); return; }
-
-        checkDuplicates();
-        if (byId('dupWarn').style.display === 'block') { alert('Resolve duplicate jersey numbers before submitting.'); return; }
 
         const roster = buildRoster(fd);
         const params = {
@@ -611,7 +981,6 @@
           ok.textContent = '✅ Roster submitted successfully! Email sent, data logged, and CSV downloaded.';
           ok.style.display = 'block';
           byId('newBtn').style.display = 'inline-block';
-          alert('✅ Email sent successfully to pixellotibba@gmail.com');
         } catch (err) {
           console.error('Email API error:', err);
           alert('Email sending failed. A CSV file will be downloaded instead. Please email it to pixellotibba@gmail.com.');
