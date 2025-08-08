@@ -188,20 +188,47 @@
           
           <!-- Bulk Operations -->
           <div class="bulk-ops">
-            <h3>🎯 Bulk Operations</h3>
-            <div class="bulk-controls">
-              <label style="font-weight: normal; margin: 0;">
-                <input type="checkbox" class="select-all-checkbox" id="selectAllPlayers">
-                Select All Visible Players
-              </label>
-              <select id="bulkPosition" class="bulk-select">
-                <option value="">Set Position for Selected</option>
-                <option value="G">Guard (G)</option>
-                <option value="F">Forward (F)</option>
-                <option value="C">Center (C)</option>
-              </select>
-              <button type="button" class="btn btn-outline" id="applyBulkPosition">Apply Position</button>
-              <button type="button" class="btn btn-outline" id="clearSelected">Clear Selected</button>
+            <h3>⚡ Bulk Operations</h3>
+            <div class="bulk-workflow">
+              <div class="bulk-step">
+                <span class="step-number">1</span>
+                <div class="step-content">
+                  <label class="bulk-select-all">
+                    <input type="checkbox" class="select-all-checkbox" id="selectAllPlayers">
+                    <strong>Select Players</strong>
+                  </label>
+                  <small>Check individual players below or use "Select All"</small>
+                </div>
+              </div>
+              
+              <div class="bulk-step">
+                <span class="step-number">2</span>
+                <div class="step-content">
+                  <label for="bulkPosition"><strong>Choose Position</strong></label>
+                  <select id="bulkPosition" class="bulk-select">
+                    <option value="">Choose position to apply...</option>
+                    <option value="G">🏃‍♂️ Guard (G)</option>
+                    <option value="F">🏀 Forward (F)</option>
+                    <option value="C">🏢 Center (C)</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="bulk-step">
+                <span class="step-number">3</span>
+                <div class="step-content">
+                  <button type="button" class="btn btn-primary" id="applyBulkPosition">
+                    ✨ Apply Position
+                  </button>
+                  <button type="button" class="btn btn-outline" id="clearSelected">
+                    🗑️ Clear Selection
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div id="bulkStatus" class="bulk-status">
+              <span id="selectionCount">0 players selected</span>
             </div>
           </div>
 
