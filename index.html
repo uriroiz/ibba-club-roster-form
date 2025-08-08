@@ -972,6 +972,9 @@
       ensureRows(DEFAULT_PLAYER_ROWS);
       updateProgress();
       
+      // Initialize bulk operations state
+      setTimeout(() => updateSelectAllState(), 100);
+      
       // Navigation event listeners
       byId('nextBtn').addEventListener('click', nextStep);
       byId('prevBtn').addEventListener('click', prevStep);
