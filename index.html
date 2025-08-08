@@ -1,5 +1,4 @@
-// Initialize with disabled state
-      updateSelectAllState();<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -88,7 +87,6 @@
     .bulk-status span { font-weight: 600; color: var(--brand); }
     
     .selected-row { background-color: #dbeafe !important; border-left: 4px solid var(--brand) !important; }
-    .select-all-checkbox { margin-right: 8px; }
 
     .status { display: none; padding: 12px 14px; border-radius: 10px; margin-bottom: 12px; font-weight: 600; }
     .status--warn { background: var(--err-bg); color: #991b1b; border: 1px solid var(--err-brd); }
@@ -111,7 +109,6 @@
       .col-6, .col-4, .col-3 { grid-column: 1 / -1; }
       .container { padding: 18px; }
       table { display: block; overflow-x: auto; white-space: nowrap; }
-      .bulk-controls { flex-direction: column; align-items: stretch; gap: 16px; }
       .bulk-workflow { flex-direction: column; gap: 16px; }
       .bulk-step { flex-direction: row; align-items: center; }
       .step-content { margin-left: 8px; }
@@ -126,7 +123,7 @@
     <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
 
     <div class="version-info" aria-live="polite">
-      <span id="versionBadge" class="version">Version 3.11.1</span>
+      <span id="versionBadge" class="version">Version 3.12.0</span>
       <span class="date">Updated: August 2025</span>
     </div>
 
@@ -212,7 +209,7 @@
                 <span class="step-number">1</span>
                 <div class="step-content">
                   <label class="bulk-select-all">
-                    <input type="checkbox" class="select-all-checkbox" id="selectAllPlayers">
+                    <input type="checkbox" id="selectAllPlayers">
                     <strong>Select Players</strong>
                   </label>
                   <small>Check individual players below or use "Select All"</small>
@@ -377,7 +374,7 @@
     const DATA_SINK_URL = 'https://script.google.com/macros/s/AKfycbxchgyxazvH9t4N0prpLTboqeAlb6kRz6xUj-klQ1HIYtrZjs9qeKxWVqTttVJKdREj/exec';
     const DATA_SINK_KEY = 'Pixellot2@25';
 
-    const APP_VERSION = '3.11.1';
+    const APP_VERSION = '3.12.0';
     const BUILD_DATE = new Date().toISOString().slice(0,10);
 
     const CURRENT_SEASON_START_YEAR = 2025;
@@ -387,7 +384,7 @@
 
     const DEFAULT_PLAYER_ROWS = 16;
     const HARD_MAX_PLAYERS = 40;
-    const STORAGE_KEY = "ibbaRosterDraft_v3111";
+    const STORAGE_KEY = "ibbaRosterDraft_v3120";
 
     // === Multi-Step Navigation ===
     let currentStep = 1;
@@ -536,10 +533,6 @@
     }
 
     // === Utilities ===
-    const $ = (sel, ctx=document) => ctx.querySelector(sel);
-    const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
-    const byId = id => document.getElementById(id);
-
     function ucWords(str="") { return str.toLowerCase().replace(/\b\w/g, ch => ch.toUpperCase()); }
     function emailValid(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
 
@@ -560,7 +553,7 @@
     }
 
     function populateSeasonSelect() {
-      const sel = byId('season');
+      const sel = document.getElementById('season');
       sel.innerHTML = '';
       const seasons = [CURRENT_SEASON_START_YEAR];
       const exposeNext = FORCE_EXPOSE_NEXT_SEASON || (new Date() >= SWITCHOVER_DATE);
@@ -575,8 +568,8 @@
     }
 
     function bumpRowCount() {
-      const rows = $$('#playersTable tr').length;
-      byId('rowCountHelp').textContent = `${rows} rows (max ${HARD_MAX_PLAYERS})`;
+      const rows = document.querySelectorAll('#playersTable tr').length;
+      document.getElementById('rowCountHelp').textContent = `${rows} rows (max ${HARD_MAX_PLAYERS})`;
     }
 
     // === Players table ===
@@ -602,7 +595,7 @@
     }
 
     function ensureRows(count) {
-      const tbody = byId('playersTable');
+      const tbody = document.getElementById('playersTable');
       tbody.innerHTML = '';
       const n = Math.min(HARD_MAX_PLAYERS, Math.max(1, count|0));
       for (let i = 1; i <= n; i++) tbody.insertAdjacentHTML('beforeend', playerRowTemplate(i));
@@ -612,8 +605,8 @@
     }
 
     function addRow() {
-      const tbody = byId('playersTable');
-      const curr = $$('#playersTable tr').length;
+      const tbody = document.getElementById('playersTable');
+      const curr = document.querySelectorAll('#playersTable tr').length;
       if (curr >= HARD_MAX_PLAYERS) return;
       tbody.insertAdjacentHTML('beforeend', playerRowTemplate(curr + 1));
       hookDuplicateListeners();
@@ -622,8 +615,8 @@
     }
 
     function removeRow() {
-      const tbody = byId('playersTable');
-      const curr = $$('#playersTable tr').length;
+      const tbody = document.getElementById('playersTable');
+      const curr = document.querySelectorAll('#playersTable tr').length;
       if (curr <= 1) return;
       tbody.removeChild(tbody.lastElementChild);
       bumpRowCount();
@@ -634,13 +627,15 @@
     // === Bulk Operations ===
     function hookBulkSelectionListeners() {
       // Individual checkboxes
-      $$('.player-select').forEach(checkbox => {
-        checkbox.removeEventListener('change', updateSelectAllState);
-        checkbox.addEventListener('change', function() {
-          updateRowSelection(this);
-          updateSelectAllState();
-        });
+      document.querySelectorAll('.player-select').forEach(checkbox => {
+        checkbox.removeEventListener('change', handlePlayerSelectChange);
+        checkbox.addEventListener('change', handlePlayerSelectChange);
       });
+    }
+
+    function handlePlayerSelectChange() {
+      updateRowSelection(this);
+      updateSelectAllState();
     }
 
     function updateRowSelection(checkbox) {
@@ -653,10 +648,10 @@
     }
 
     function updateSelectAllState() {
-      const allCheckboxes = $('.player-select');
-      const checkedBoxes = $('.player-select:checked');
-      const selectAllBox = byId('selectAllPlayers');
-      const statusSpan = byId('selectionCount');
+      const allCheckboxes = document.querySelectorAll('.player-select');
+      const checkedBoxes = document.querySelectorAll('.player-select:checked');
+      const selectAllBox = document.getElementById('selectAllPlayers');
+      const statusSpan = document.getElementById('selectionCount');
       
       // Update selection count
       statusSpan.textContent = `${checkedBoxes.length} player${checkedBoxes.length !== 1 ? 's' : ''} selected`;
@@ -672,35 +667,23 @@
         selectAllBox.indeterminate = true;
         selectAllBox.checked = false;
       }
-      
-      // Enable/disable bulk operations
-      const bulkPosition = byId('bulkPosition');
-      const applyBtn = byId('applyBulkPosition');
-      const clearBtn = byId('clearSelected');
-      
-      const hasSelection = checkedBoxes.length > 0;
-      bulkPosition.disabled = !hasSelection;
-      applyBtn.disabled = !hasSelection;
-      clearBtn.disabled = !hasSelection;
-      
-      if (!hasSelection) {
-        bulkPosition.value = '';
-      }
     }
 
     function toggleSelectAll() {
-      const selectAll = byId('selectAllPlayers');
-      const checkboxes = $$('.player-select');
+      const selectAll = document.getElementById('selectAllPlayers');
+      const checkboxes = document.querySelectorAll('.player-select');
       
       checkboxes.forEach(checkbox => {
         checkbox.checked = selectAll.checked;
         updateRowSelection(checkbox);
       });
+      
+      updateSelectAllState();
     }
 
     function applyBulkPosition() {
-      const selectedPosition = byId('bulkPosition').value;
-      const selectedCheckboxes = $('.player-select:checked');
+      const selectedPosition = document.getElementById('bulkPosition').value;
+      const selectedCheckboxes = document.querySelectorAll('.player-select:checked');
       
       if (selectedCheckboxes.length === 0) {
         alert('Please select at least one player first.');
@@ -721,12 +704,12 @@
       });
       
       // Reset bulk controls
-      byId('bulkPosition').value = '';
+      document.getElementById('bulkPosition').value = '';
       flashOk(`Applied ${selectedPosition} position to ${selectedCheckboxes.length} player(s).`);
     }
 
     function clearSelected() {
-      $$('.player-select:checked').forEach(checkbox => {
+      document.querySelectorAll('.player-select:checked').forEach(checkbox => {
         checkbox.checked = false;
         updateRowSelection(checkbox);
       });
@@ -736,7 +719,7 @@
     // === Duplicate jersey detection ===
     let dupTimer;
     function hookDuplicateListeners() {
-      $$('input[name*="_jersey"]').forEach(inp => {
+      document.querySelectorAll('input[name*="_jersey"]').forEach(inp => {
         inp.removeEventListener('input', dupHandler);
         inp.addEventListener('input', dupHandler);
       });
@@ -748,22 +731,33 @@
     }
 
     function checkDuplicates() {
-      const jerseys = $$('input[name*="_jersey"]').map(i => i.value.trim()).filter(Boolean);
+      const jerseys = Array.from(document.querySelectorAll('input[name*="_jersey"]')).map(i => i.value.trim()).filter(Boolean);
       const counts = jerseys.reduce((m, v) => (m[v] = (m[v]||0)+1, m), {});
       let hasDup = false;
-      $$('input[name*="_jersey"]').forEach(i => {
+      
+      document.querySelectorAll('input[name*="_jersey"]').forEach(i => {
         const v = i.value.trim();
-        if (v && counts[v] > 1) { i.classList.add('duplicate'); hasDup = true; }
-        else { i.classList.remove('duplicate'); }
+        if (v && counts[v] > 1) { 
+          i.classList.add('duplicate'); 
+          hasDup = true; 
+        } else { 
+          i.classList.remove('duplicate'); 
+        }
       });
-      const warn = byId('dupWarn');
-      if (hasDup) { warn.style.display = 'block'; warn.textContent = '⚠️ Duplicate jersey numbers detected. Each player must have a unique number.'; }
-      else { warn.style.display = 'none'; warn.textContent = ''; }
+      
+      const warn = document.getElementById('dupWarn');
+      if (hasDup) { 
+        warn.style.display = 'block'; 
+        warn.textContent = '⚠️ Duplicate jersey numbers detected. Each player must have a unique number.'; 
+      } else { 
+        warn.style.display = 'none'; 
+        warn.textContent = ''; 
+      }
     }
 
     // === Local draft save/restore ===
     function saveDraft() {
-      const data = new FormData(byId('rosterForm'));
+      const data = new FormData(document.getElementById('rosterForm'));
       const obj = { currentStep };
       for (const [k, v] of data.entries()) obj[k] = v;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
@@ -772,7 +766,11 @@
 
     function restoreDraft() {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) { flashWarn('No draft found.'); return; }
+      if (!raw) { 
+        alert('No draft found.'); 
+        return; 
+      }
+      
       const obj = JSON.parse(raw);
       
       // Restore step
@@ -790,6 +788,7 @@
         const el = document.querySelector(`[name="${CSS.escape(k)}"]`);
         if (el) el.value = obj[k];
       }
+      
       bumpRowCount();
       checkDuplicates();
       flashOk('Draft restored.');
@@ -797,21 +796,15 @@
 
     // === Messaging ===
     function flashOk(msg) { 
-      const el = byId('okMsg'); 
+      const el = document.getElementById('okMsg'); 
       el.textContent = `✅ ${msg}`; 
       el.style.display = 'block'; 
       setTimeout(() => el.style.display = 'none', 3000); 
     }
 
-    function flashWarn(msg) { 
-      const el = byId('dupWarn'); 
-      el.textContent = `⚠️ ${msg}`; 
-      el.style.display = 'block'; 
-    }
-
     // === Validation helpers ===
     function requireAtLeastOneCompletePlayer() {
-      const rows = $$('#playersTable tr').length;
+      const rows = document.querySelectorAll('#playersTable tr').length;
       for (let i = 1; i <= rows; i++) {
         const jersey = document.querySelector(`input[name="player${i}_jersey"]`)?.value;
         const first = document.querySelector(`input[name="player${i}_first"]`)?.value;
@@ -823,7 +816,7 @@
     }
 
     function validatePlayersCompleteness() {
-      const rows = $$('#playersTable tr').length;
+      const rows = document.querySelectorAll('#playersTable tr').length;
       for (let i = 1; i <= rows; i++) {
         const jersey = document.querySelector(`input[name="player${i}_jersey"]`)?.value;
         const first = document.querySelector(`input[name="player${i}_first"]`)?.value;
@@ -846,7 +839,7 @@
 
       const roster = { teamName, league, leagueEnglish: leagueToEnglish(league), submitterName, submitterEmail, season, players: [], staff: [] };
 
-      const rows = $$('#playersTable tr').length;
+      const rows = document.querySelectorAll('#playersTable tr').length;
       for (let i = 1; i <= rows; i++) {
         const jersey = fd.get(`player${i}_jersey`);
         const first = fd.get(`player${i}_first`);
@@ -865,6 +858,7 @@
         { key: 'asst3', label: 'Assistant Coach 3' },
         { key: 'gm', label: 'General Manager' }
       ];
+      
       for (const role of staffRoles) {
         const f = fd.get(`${role.key}_first`);
         const l = fd.get(`${role.key}_last`);
@@ -924,7 +918,10 @@
       const a = document.createElement('a');
       a.href = url;
       a.download = `ibba_${roster.teamName.replace(/[^a-z0-9\u0590-\u05FF]/gi, '_').toLowerCase()}_${roster.season}_roster_v${APP_VERSION}.csv`;
-      document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+      document.body.appendChild(a); 
+      a.click(); 
+      document.body.removeChild(a); 
+      URL.revokeObjectURL(url);
     }
 
     // === Email (EmailJS REST) ===
@@ -967,59 +964,78 @@
 
     // === Initialize ===
     document.addEventListener('DOMContentLoaded', () => {
-      const vb = byId('versionBadge'); if (vb) vb.textContent = `Version ${APP_VERSION}`;
+      document.getElementById('versionBadge').textContent = `Version ${APP_VERSION}`;
 
       populateSeasonSelect();
       ensureRows(DEFAULT_PLAYER_ROWS);
       updateProgress();
       
       // Navigation event listeners
-      byId('nextBtn').addEventListener('click', nextStep);
-      byId('prevBtn').addEventListener('click', prevStep);
+      document.getElementById('nextBtn').addEventListener('click', nextStep);
+      document.getElementById('prevBtn').addEventListener('click', prevStep);
       
       // Player table controls
-      byId('addRowBtn').addEventListener('click', addRow);
-      byId('removeRowBtn').addEventListener('click', removeRow);
+      document.getElementById('addRowBtn').addEventListener('click', addRow);
+      document.getElementById('removeRowBtn').addEventListener('click', removeRow);
       
       // Bulk operations
-      byId('selectAllPlayers').addEventListener('change', toggleSelectAll);
-      byId('applyBulkPosition').addEventListener('click', applyBulkPosition);
-      byId('clearSelected').addEventListener('click', clearSelected);
+      document.getElementById('selectAllPlayers').addEventListener('change', toggleSelectAll);
+      document.getElementById('applyBulkPosition').addEventListener('click', applyBulkPosition);
+      document.getElementById('clearSelected').addEventListener('click', clearSelected);
 
       // Other controls
-      byId('clearBtn').addEventListener('click', () => {
+      document.getElementById('clearBtn').addEventListener('click', () => {
         if (!confirm('Clear all data (except your name/email if present)?')) return;
-        const keepName = byId('submitterName').value; const keepEmail = byId('submitterEmail').value;
-        byId('rosterForm').reset(); ensureRows(DEFAULT_PLAYER_ROWS); populateSeasonSelect();
-        byId('submitterName').value = keepName; byId('submitterEmail').value = keepEmail;
-        byId('dupWarn').style.display = 'none'; byId('okMsg').style.display = 'none'; byId('newBtn').style.display = 'none';
-        currentStep = 1; showStep(currentStep); updateProgress();
+        const keepName = document.getElementById('submitterName').value; 
+        const keepEmail = document.getElementById('submitterEmail').value;
+        document.getElementById('rosterForm').reset(); 
+        ensureRows(DEFAULT_PLAYER_ROWS); 
+        populateSeasonSelect();
+        document.getElementById('submitterName').value = keepName; 
+        document.getElementById('submitterEmail').value = keepEmail;
+        document.getElementById('dupWarn').style.display = 'none'; 
+        document.getElementById('okMsg').style.display = 'none'; 
+        document.getElementById('newBtn').style.display = 'none';
+        currentStep = 1; 
+        showStep(currentStep); 
+        updateProgress();
       });
       
-      byId('newBtn').addEventListener('click', () => {
-        const keepName = byId('submitterName').value; const keepEmail = byId('submitterEmail').value;
-        byId('rosterForm').reset(); ensureRows(DEFAULT_PLAYER_ROWS); populateSeasonSelect();
-        byId('submitterName').value = keepName; byId('submitterEmail').value = keepEmail;
-        byId('dupWarn').style.display = 'none'; byId('okMsg').style.display = 'none'; byId('newBtn').style.display = 'none';
-        currentStep = 1; showStep(currentStep); updateProgress();
+      document.getElementById('newBtn').addEventListener('click', () => {
+        const keepName = document.getElementById('submitterName').value; 
+        const keepEmail = document.getElementById('submitterEmail').value;
+        document.getElementById('rosterForm').reset(); 
+        ensureRows(DEFAULT_PLAYER_ROWS); 
+        populateSeasonSelect();
+        document.getElementById('submitterName').value = keepName; 
+        document.getElementById('submitterEmail').value = keepEmail;
+        document.getElementById('dupWarn').style.display = 'none'; 
+        document.getElementById('okMsg').style.display = 'none'; 
+        document.getElementById('newBtn').style.display = 'none';
+        currentStep = 1; 
+        showStep(currentStep); 
+        updateProgress();
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
 
-      byId('saveBtn').addEventListener('click', saveDraft);
-      byId('restoreBtn').addEventListener('click', restoreDraft);
+      document.getElementById('saveBtn').addEventListener('click', saveDraft);
+      document.getElementById('restoreBtn').addEventListener('click', restoreDraft);
 
       // Form submission
-      byId('rosterForm').addEventListener('submit', async (e) => {
+      document.getElementById('rosterForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const form = e.currentTarget;
-        const submitBtn = byId('submitBtn');
-        const loading = byId('loading');
-        const ok = byId('okMsg');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const ok = document.getElementById('okMsg');
         ok.style.display = 'none';
 
         const fd = new FormData(form);
         const submitEmail = fd.get('submitterEmail')?.trim();
-        if (!emailValid(submitEmail)) { alert('Please enter a valid email address.'); return; }
+        if (!emailValid(submitEmail)) { 
+          alert('Please enter a valid email address.'); 
+          return; 
+        }
 
         const roster = buildRoster(fd);
         const params = {
@@ -1031,11 +1047,15 @@
           roster_data: rosterSummary(roster)
         };
 
-        submitBtn.disabled = true; loading.style.display = 'block';
+        submitBtn.disabled = true; 
+        loading.style.display = 'block';
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 15000);
 
-        const sinkPromise = sendToSheet(roster).catch(err => { console.warn('Data sink error:', err); return false; });
+        const sinkPromise = sendToSheet(roster).catch(err => { 
+          console.warn('Data sink error:', err); 
+          return false; 
+        });
 
         try {
           await sendEmailViaAPI(params, { signal: controller.signal });
@@ -1043,17 +1063,18 @@
           downloadCSV(roster);
           ok.textContent = '✅ Roster submitted successfully! Email sent, data logged, and CSV downloaded.';
           ok.style.display = 'block';
-          byId('newBtn').style.display = 'inline-block';
+          document.getElementById('newBtn').style.display = 'inline-block';
         } catch (err) {
           console.error('Email API error:', err);
           alert('Email sending failed. A CSV file will be downloaded instead. Please email it to pixellotibba@gmail.com.');
           downloadCSV(roster);
           ok.textContent = '⚠️ Email failed. CSV downloaded as fallback. Data sink may or may not have succeeded.';
           ok.style.display = 'block';
-          byId('newBtn').style.display = 'inline-block';
+          document.getElementById('newBtn').style.display = 'inline-block';
         } finally {
           clearTimeout(timeout);
-          submitBtn.disabled = false; loading.style.display = 'none';
+          submitBtn.disabled = false; 
+          loading.style.display = 'none';
         }
       });
     });
