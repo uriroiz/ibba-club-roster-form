@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>IBBA Team Roster Submission Form – Pixellot Advantage</title>
-  <meta name="description" content="IBBA roster submission with accessibility, validation, season tracking (2025/26 + auto 2026/27), local save, CSV/Email export, and staff phone fields." />
+  <meta name="description" content="IBBA roster submission with accessibility, validation, season tracking (2025/26 + auto 2026/27), local save, CSV/Email export, staff phone fields, and Google Sheet data sink." />
 
   <style>
     :root {
@@ -36,7 +36,7 @@
     .roster-section h2::after { content: ""; position: absolute; bottom: -6px; left: 0; width: 90px; height: 3px; background: var(--brand); }
 
     table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; border: 1px solid var(--brd); }
-    th { background: #f8fafc; color: var(--ink-2); padding: 12px 10px; text-align: left; font-size: .8rem; text-transform: uppercase; letter-spacing: .4px; border-bottom: 2px solid #e5e7eb; }
+    th { background: #f8fafc; color: #374151; padding: 12px 10px; text-align: left; font-size: .8rem; text-transform: uppercase; letter-spacing: .4px; border-bottom: 2px solid #e5e7eb; }
     td { padding: 8px 10px; border-bottom: 1px solid #f3f4f6; }
     tr:hover { background: #f9fafb; } tr:nth-child(even) { background: #fbfcff; }
     .staff-row { background: #f0f9ff !important; }
@@ -71,7 +71,7 @@
     <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
 
     <div class="version-info" aria-live="polite">
-      <span id="versionBadge" class="version">Version 3.9.1</span>
+      <span id="versionBadge" class="version">Version 3.9.2</span>
       <span class="date">Updated: August 2025</span>
     </div>
 
@@ -223,13 +223,11 @@
       templateId: "template_6o8secn"
     });
 
-    // Data sink (Google Apps Script Web App)
-    // 1) Deploy the Apps Script as a Web App and paste its URL below.
-    // 2) Set DATA_SINK_KEY to the same secret you use in Apps Script.
-    const DATA_SINK_URL = '<<PASTE_WEB_APP_URL_HERE>>';
-    const DATA_SINK_KEY = 'CHANGE_ME_SECRET';
+    // Google Apps Script data sink (wired to your deployment)
+    const DATA_SINK_URL = 'https://script.google.com/macros/s/AKfycbxchgyxazvH9t4N0prpLTboqeAlb6kRz6xUj-klQ1HIYtrZjs9qeKxWVqTttVJKdREj/exec';
+    const DATA_SINK_KEY = 'Pixellot2@25';
 
-    const APP_VERSION = '3.9.1';
+    const APP_VERSION = '3.9.2';
     const BUILD_DATE = new Date().toISOString().slice(0,10);
 
     // Season configuration: default 2025/26; auto-expose 2026/27 on Aug 1, 2026
@@ -240,7 +238,7 @@
 
     const DEFAULT_PLAYER_ROWS = 16; // initial rows
     const HARD_MAX_PLAYERS = 40;    // allow more than 16 as requested
-    const STORAGE_KEY = "ibbaRosterDraft_v390";
+    const STORAGE_KEY = "ibbaRosterDraft_v392";
 
     // === Utilities ===
     const $ = (sel, ctx=document) => ctx.querySelector(sel);
@@ -415,10 +413,24 @@
       document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
     }
 
+    // === Email (EmailJS REST) ===
+    async function sendEmailViaAPI(params, { signal } = {}) {
+      const url = 'https://api.emailjs.com/api/v1.0/email/send';
+      const payload = {
+        service_id: EmailJSConfig.serviceId,
+        template_id: EmailJSConfig.templateId,
+        user_id: EmailJSConfig.publicKey,
+        template_params: params
+      };
+      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal });
+      if (!res.ok) throw new Error(`Email API responded ${res.status}`);
+      return res;
+    }
+
     // === Data sink (Google Sheet) ===
     function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
     async function sendToSheet(roster) {
-      if (!DATA_SINK_URL || DATA_SINK_URL.startsWith('<<')) return true; // disabled until configured
+      if (!DATA_SINK_URL) return true;
       const url = `${DATA_SINK_URL}?key=${encodeURIComponent(DATA_SINK_KEY)}`;
       const payload = {
         app_version: APP_VERSION,
@@ -432,10 +444,166 @@
         players: roster.players,
         staff: roster.staff
       };
-      // Use no-cors to avoid preflight with Apps Script; server parses JSON from text/plain
       const fetchOnce = () => fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload) });
-      // Basic retry (fire-and-forget semantics due to no-cors response opacity)
       for (let attempt = 1; attempt <= 3; attempt++) {
+        try { await fetchOnce(); return true; }
+        catch (e) { if (attempt === 3) throw e; await sleep(400 * attempt); }
+      }
+    }
+
+    // === Validation helpers ===
+    function requireAtLeastOneCompletePlayer(fd) {
+      const rows = $$('#playersTable tr').length;
+      for (let i = 1; i <= rows; i++) {
+        const jersey = fd.get(`player${i}_jersey`);
+        const first = fd.get(`player${i}_first`);
+        const last = fd.get(`player${i}_last`);
+        const pos = fd.get(`player${i}_position`);
+        if (jersey && first && last && pos) return true;
+      }
+      return false;
+    }
+    function validatePlayersCompleteness(fd) {
+      const rows = $$('#playersTable tr').length;
+      for (let i = 1; i <= rows; i++) {
+        const jersey = fd.get(`player${i}_jersey`);
+        const first = fd.get(`player${i}_first`);
+        const last = fd.get(`player${i}_last`);
+        const pos = fd.get(`player${i}_position`);
+        const any = jersey || first || last || pos;
+        const all = jersey && first && last && pos;
+        if (any && !all) return i;
+      }
+      return 0;
+    }
+
+    // === Build roster ===
+    function buildRoster(fd) {
+      const teamName = fd.get('teamName').trim();
+      const league = fd.get('league');
+      const season = fd.get('season'); // canonical "2025-2026"
+      const submitterName = ucWords(fd.get('submitterName').trim());
+      const submitterEmail = fd.get('submitterEmail').trim();
+
+      const roster = { teamName, league, leagueEnglish: leagueToEnglish(league), submitterName, submitterEmail, season, players: [], staff: [] };
+
+      const rows = $$('#playersTable tr').length;
+      for (let i = 1; i <= rows; i++) {
+        const jersey = fd.get(`player${i}_jersey`);
+        const first = fd.get(`player${i}_first`);
+        const last = fd.get(`player${i}_last`);
+        const pos = fd.get(`player${i}_position`);
+        const email = fd.get(`player${i}_email`);
+        if (jersey && first && last && pos) {
+          roster.players.push({ number: i, jersey, firstName: ucWords(first), lastName: ucWords(last), position: pos, email });
+        }
+      }
+
+      const staffRoles = [
+        { key: 'coach', label: 'Head Coach' },
+        { key: 'asst1', label: 'Assistant Coach 1' },
+        { key: 'asst2', label: 'Assistant Coach 2' },
+        { key: 'asst3', label: 'Assistant Coach 3' },
+        { key: 'gm', label: 'General Manager' }
+      ];
+      for (const role of staffRoles) {
+        const f = fd.get(`${role.key}_first`);
+        const l = fd.get(`${role.key}_last`);
+        const e = fd.get(`${role.key}_email`);
+        const p = fd.get(`${role.key}_phone`);
+        if (f || l) roster.staff.push({ role: role.label, firstName: ucWords(f||''), lastName: ucWords(l||''), email: e||'', phone: (p||'').trim() });
+      }
+
+      return roster;
+    }
+
+    function rosterSummary(roster) {
+      let out = '';
+      out += 'IBBA TEAM ROSTER SUBMISSION\n';
+      out += '==============================\n';
+      out += `Team: ${roster.teamName}\n`;
+      out += `League: ${roster.league} (${roster.leagueEnglish})\n`;
+      out += `Season: ${roster.season}\n`;
+      out += `Submitted by: ${roster.submitterName}\n`;
+      out += `Email: ${roster.submitterEmail}\n`;
+      out += `Date: ${new Date().toLocaleString()}\n`;
+      out += `Version: ${APP_VERSION}\n\n`;
+      out += 'CSV FORMAT FOR COPYING:\n';
+      out += '=======================\n';
+      roster.players.forEach(p => { out += `${p.jersey},${p.firstName},${p.lastName},${p.email||''},${p.position||''}\n`; });
+      out += `\nPLAYERS (${roster.players.length}):\n`;
+      out += '------------------------\n';
+      roster.players.forEach(p => { out += `#${p.jersey} - ${p.firstName} ${p.lastName}${p.position?` (${p.position})`:''}${p.email?` - ${p.email}`:''}\n`; });
+      out += `\nCOACHING STAFF (${roster.staff.length}):\n`;
+      out += '----------------------------\n';
+      roster.staff.forEach(s => { out += `${s.role}: ${s.firstName} ${s.lastName}${s.email?` - ${s.email}`:''}${s.phone?` | ${s.phone}`:''}\n`; });
+      return out;
+    }
+
+    // === Submit wiring ===
+    document.addEventListener('DOMContentLoaded', () => {
+      const vb = byId('versionBadge'); if (vb) vb.textContent = `Version ${APP_VERSION}`;
+
+      populateSeasonSelect();
+      ensureRows(DEFAULT_PLAYER_ROWS);
+      byId('addRowBtn').addEventListener('click', addRow);
+      byId('removeRowBtn').addEventListener('click', removeRow);
+
+      byId('clearBtn').addEventListener('click', () => {
+        if (!confirm('Clear all data (except your name/email if present)?')) return;
+        const keepName = byId('submitterName').value; const keepEmail = byId('submitterEmail').value;
+        byId('rosterForm').reset(); ensureRows(DEFAULT_PLAYER_ROWS); populateSeasonSelect();
+        byId('submitterName').value = keepName; byId('submitterEmail').value = keepEmail;
+        byId('dupWarn').style.display = 'none'; byId('okMsg').style.display = 'none'; byId('newBtn').style.display = 'none';
+      });
+      byId('newBtn').addEventListener('click', () => {
+        const keepName = byId('submitterName').value; const keepEmail = byId('submitterEmail').value;
+        byId('rosterForm').reset(); ensureRows(DEFAULT_PLAYER_ROWS); populateSeasonSelect();
+        byId('submitterName').value = keepName; byId('submitterEmail').value = keepEmail;
+        byId('dupWarn').style.display = 'none'; byId('okMsg').style.display = 'none'; byId('newBtn').style.display = 'none';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      byId('saveBtn').addEventListener('click', saveDraft);
+      byId('restoreBtn').addEventListener('click', restoreDraft);
+
+      byId('rosterForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.currentTarget;
+        const submitBtn = byId('submitBtn');
+        const loading = byId('loading');
+        const ok = byId('okMsg');
+        ok.style.display = 'none';
+
+        if (!form.reportValidity()) return;
+        const fd = new FormData(form);
+
+        if (!requireAtLeastOneCompletePlayer(fd)) { alert('Please add at least one complete player (jersey, first, last, position).'); return; }
+        const badRow = validatePlayersCompleteness(fd);
+        if (badRow) { alert(`Player #${badRow} is incomplete. Jersey, First, Last, and Position are all required when adding a player.`); return; }
+
+        const submitEmail = fd.get('submitterEmail')?.trim();
+        if (!emailValid(submitEmail)) { alert('Please enter a valid email address.'); return; }
+
+        checkDuplicates();
+        if (byId('dupWarn').style.display === 'block') { alert('Resolve duplicate jersey numbers before submitting.'); return; }
+
+        const roster = buildRoster(fd);
+        const params = {
+          team_name: roster.teamName,
+          league: roster.leagueEnglish,
+          submitter_name: roster.submitterName,
+          submitter_email: roster.submitterEmail,
+          season: roster.season,
+          roster_data: rosterSummary(roster)
+        };
+
+        submitBtn.disabled = true; loading.style.display = 'block';
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000);
+
+        const sinkPromise = sendToSheet(roster).catch(err => { console.warn('Data sink error:', err); return false; });
+
         try {
           await sendEmailViaAPI(params, { signal: controller.signal });
           await sinkPromise;
