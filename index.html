@@ -126,7 +126,7 @@
     <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
 
     <div class="version-info" aria-live="polite">
-      <span id="versionBadge" class="version">Version 3.11.0</span>
+      <span id="versionBadge" class="version">Version 3.11.1</span>
       <span class="date">Updated: August 2025</span>
     </div>
 
@@ -377,7 +377,7 @@
     const DATA_SINK_URL = 'https://script.google.com/macros/s/AKfycbxchgyxazvH9t4N0prpLTboqeAlb6kRz6xUj-klQ1HIYtrZjs9qeKxWVqTttVJKdREj/exec';
     const DATA_SINK_KEY = 'Pixellot2@25';
 
-    const APP_VERSION = '3.11.0';
+    const APP_VERSION = '3.11.1';
     const BUILD_DATE = new Date().toISOString().slice(0,10);
 
     const CURRENT_SEASON_START_YEAR = 2025;
@@ -387,7 +387,7 @@
 
     const DEFAULT_PLAYER_ROWS = 16;
     const HARD_MAX_PLAYERS = 40;
-    const STORAGE_KEY = "ibbaRosterDraft_v3110";
+    const STORAGE_KEY = "ibbaRosterDraft_v3111";
 
     // === Multi-Step Navigation ===
     let currentStep = 1;
@@ -700,14 +700,15 @@
 
     function applyBulkPosition() {
       const selectedPosition = byId('bulkPosition').value;
-      if (!selectedPosition) {
-        alert('Please select a position to apply.');
+      const selectedCheckboxes = $('.player-select:checked');
+      
+      if (selectedCheckboxes.length === 0) {
+        alert('Please select at least one player first.');
         return;
       }
       
-      const selectedCheckboxes = $$('.player-select:checked');
-      if (selectedCheckboxes.length === 0) {
-        alert('Please select at least one player.');
+      if (!selectedPosition) {
+        alert('Please select a position to apply.');
         return;
       }
       
@@ -971,9 +972,6 @@
       populateSeasonSelect();
       ensureRows(DEFAULT_PLAYER_ROWS);
       updateProgress();
-      
-      // Initialize bulk operations state
-      setTimeout(() => updateSelectAllState(), 100);
       
       // Navigation event listeners
       byId('nextBtn').addEventListener('click', nextStep);
