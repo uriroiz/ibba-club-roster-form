@@ -252,7 +252,7 @@
     <p class="subtitle">Submit rosters for multiple teams from your club • Powered by Pixellot Advantage</p>
 
     <div class="version-info" aria-live="polite">
-      <span id="versionBadge" class="version">Version 4.8.0</span>
+      <span id="versionBadge" class="version">Version 4.9.0</span>
       <span class="date">Updated: August 2025</span>
     </div>
 
@@ -549,7 +549,7 @@
     const DATA_SINK_URL = 'https://script.google.com/macros/s/AKfycbxchgyxazvH9t4N0prpLTboqeAlb6kRz6xUj-klQ1HIYtrZjs9qeKxWVqTttVJKdREj/exec';
     const DATA_SINK_KEY = 'Pixellot2@25';
 
-    const APP_VERSION = '4.8.0';
+    const APP_VERSION = '4.9.0';
     const BUILD_DATE = new Date().toISOString().slice(0,10);
 
     const CURRENT_SEASON_START_YEAR = 2025;
@@ -2098,15 +2098,21 @@
       try {
         const submissionData = buildSubmissionData();
         
-        // Prepare email parameters
+        // Prepare email parameters for multi-team submission
         const emailParams = {
-          club_name: submissionData.clubName,
-          season: submissionData.season,
+          // Updated for multi-team
+          team_name: submissionData.clubName, // Club name instead of single team
+          league: `Multi-Team Submission (${submissionData.teams.length} teams)`, // Multiple teams
           submitter_name: submissionData.submitterName,
           submitter_email: submissionData.submitterEmail,
+          season: submissionData.season,
+          
+          // Additional multi-team specific data
           total_teams: submissionData.teams.length,
           total_players: submissionData.teams.reduce((sum, team) => sum + team.players.length, 0),
-          submission_data: buildSubmissionSummary(submissionData)
+          
+          // Full roster data as before
+          roster_data: buildSubmissionSummary(submissionData)
         };
         
         // Set up timeout controller
