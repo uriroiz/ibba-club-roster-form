@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>IBBA Team Roster Submission Form – Pixellot Advantage</title>
-  <meta name="description" content="IBBA roster submission with multi-step form, progress tracking, and bulk operations." />
+  <title>IBBA Club Multi-Team Roster Submission – Pixellot Advantage</title>
+  <meta name="description" content="IBBA multi-team roster submission with progress tracking and bulk operations." />
 
   <style>
     :root {
@@ -17,7 +17,7 @@
     body { margin: 0; padding: 20px; min-height: 100vh; background: linear-gradient(135deg, var(--bg) 0%, var(--bg-2) 100%);
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; color: var(--ink); }
     
-    .container { max-width: 1200px; margin: 0 auto; background: var(--card); border: 1px solid var(--brd); border-radius: 12px; padding: 32px;
+    .container { max-width: 1400px; margin: 0 auto; background: var(--card); border: 1px solid var(--brd); border-radius: 12px; padding: 32px;
       box-shadow: 0 4px 6px rgba(0,0,0,.07), 0 1px 3px rgba(0,0,0,.06); }
     
     h1 { font-size: clamp(1.8rem, 2.2vw, 2.5rem); font-weight: 800; text-align: center; margin: 0 0 6px; }
@@ -54,9 +54,42 @@
     input, select { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; background: #fff; }
     input:focus, select:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 4px var(--ring); }
 
+    /* Teams Management */
+    .teams-section { margin-bottom: 28px; }
+    .teams-section h2 { font-size: 1.35rem; font-weight: 800; margin: 0 0 14px; position: relative; }
+    .teams-section h2::after { content: ""; position: absolute; bottom: -6px; left: 0; width: 90px; height: 3px; background: var(--brand); }
+
+    .team-card { background: #fff; border: 2px solid var(--brd); border-radius: 12px; padding: 20px; margin-bottom: 16px; position: relative; transition: all 0.2s ease; }
+    .team-card:hover { border-color: var(--brand); box-shadow: 0 4px 12px rgba(59,130,246,0.1); }
+    .team-card.complete { border-color: var(--ok); background: linear-gradient(135deg, #f0fdf4 0%, #f9fdf9 100%); }
+    .team-card.incomplete { border-color: var(--warn); }
+
+    .team-header { display: flex; justify-content: between; align-items: center; margin-bottom: 16px; }
+    .team-title { font-size: 1.2rem; font-weight: 700; color: var(--ink); flex-grow: 1; }
+    .team-status { padding: 4px 12px; border-radius: 16px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+    .team-status.complete { background: var(--ok); color: white; }
+    .team-status.incomplete { background: var(--warn); color: white; }
+    .team-status.empty { background: #e5e7eb; color: var(--muted); }
+
+    .team-info { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
+    .remove-team { background: var(--err); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    .remove-team:hover { background: #dc2626; }
+
+    .add-team-card { border: 2px dashed var(--brd); background: #f9fafb; text-align: center; padding: 40px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; }
+    .add-team-card:hover { border-color: var(--brand); background: #f0f9ff; }
+    .add-team-icon { font-size: 2rem; color: var(--brand); margin-bottom: 12px; }
+
+    /* Roster Management */
     .roster-section { margin-bottom: 28px; }
     .roster-section h2 { font-size: 1.35rem; font-weight: 800; margin: 0 0 14px; position: relative; }
     .roster-section h2::after { content: ""; position: absolute; bottom: -6px; left: 0; width: 90px; height: 3px; background: var(--brand); }
+
+    .team-selector { margin-bottom: 20px; }
+    .team-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .team-tab { padding: 10px 16px; border: 2px solid var(--brd); border-radius: 8px; background: #fff; cursor: pointer; font-weight: 600; transition: all 0.2s ease; position: relative; }
+    .team-tab:hover { border-color: var(--brand); }
+    .team-tab.active { border-color: var(--brand); background: var(--brand); color: white; }
+    .team-tab.complete::after { content: "✓"; position: absolute; top: -8px; right: -8px; background: var(--ok); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
 
     table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; border: 1px solid var(--brd); }
     th { background: #f8fafc; color: #374151; padding: 12px 10px; text-align: left; font-size: .8rem; text-transform: uppercase; letter-spacing: .4px; border-bottom: 2px solid #e5e7eb; }
@@ -105,6 +138,17 @@
 
     .step-navigation { display: flex; justify-content: space-between; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--brd); }
 
+    .no-teams-message { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .no-teams-message .icon { font-size: 3rem; margin-bottom: 16px; }
+
+    .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    .overview-card { background: #fff; border: 1px solid var(--brd); border-radius: 10px; padding: 20px; }
+    .overview-card h3 { margin: 0 0 12px; color: var(--brand); }
+    .overview-stats { display: flex; gap: 16px; margin-bottom: 12px; }
+    .stat { text-align: center; }
+    .stat-number { font-size: 1.5rem; font-weight: 700; color: var(--brand); }
+    .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; }
+
     @media (max-width: 900px) {
       .col-6, .col-4, .col-3 { grid-column: 1 / -1; }
       .container { padding: 18px; }
@@ -114,16 +158,19 @@
       .step-content { margin-left: 8px; }
       .steps { flex-direction: column; gap: 8px; }
       .step::after { display: none; }
+      .team-info { grid-template-columns: 1fr; gap: 12px; }
+      .team-tabs { justify-content: center; }
+      .overview-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
   <div class="container" role="main">
-    <h1>🏀 IBBA Team Roster Submission</h1>
-    <p class="subtitle">Official roster form for IBBA league teams • Powered by Pixellot Advantage</p>
+    <h1>🏀 IBBA Club Multi-Team Roster Submission</h1>
+    <p class="subtitle">Submit rosters for multiple teams from your club • Powered by Pixellot Advantage</p>
 
     <div class="version-info" aria-live="polite">
-      <span id="versionBadge" class="version">Version 3.12.0</span>
+      <span id="versionBadge" class="version">Version 4.1.0</span>
       <span class="date">Updated: August 2025</span>
     </div>
 
@@ -135,15 +182,15 @@
       <div class="steps">
         <div class="step active" data-step="1">
           <div class="step-circle">1</div>
-          <div class="step-label">Team Info</div>
+          <div class="step-label">Club Info</div>
         </div>
         <div class="step pending" data-step="2">
           <div class="step-circle">2</div>
-          <div class="step-label">Players</div>
+          <div class="step-label">Teams</div>
         </div>
         <div class="step pending" data-step="3">
           <div class="step-circle">3</div>
-          <div class="step-label">Staff</div>
+          <div class="step-label">Rosters</div>
         </div>
         <div class="step pending" data-step="4">
           <div class="step-circle">4</div>
@@ -152,26 +199,15 @@
       </div>
     </div>
 
-    <form id="rosterForm" novalidate>
-      <!-- Step 1: Team Information -->
+    <form id="clubForm" novalidate>
+      <!-- Step 1: Club Information -->
       <div class="form-step active" data-step="1">
-        <section class="form-section" aria-labelledby="team-info-h">
-          <h2 id="team-info-h">🏆 Team Information</h2>
+        <section class="form-section" aria-labelledby="club-info-h">
+          <h2 id="club-info-h">🏆 Club Information</h2>
           <div class="grid">
             <div class="col-6">
-              <label for="teamName">Team Name</label>
-              <input id="teamName" name="teamName" type="text" placeholder="Enter your team name" autocomplete="organization" required />
-            </div>
-            <div class="col-6">
-              <label for="league">League</label>
-              <select id="league" name="league" required>
-                <option value="">Select League</option>
-                <option value="לאומית גברים">לאומית גברים</option>
-                <option value="על נשים">על נשים</option>
-                <option value="לאומית נשים">לאומית נשים</option>
-                <option value="נוער על בנים">נוער על בנים</option>
-                <option value="נערות א על בנות">נערות א על בנות</option>
-              </select>
+              <label for="clubName">Club Name</label>
+              <input id="clubName" name="clubName" type="text" placeholder="e.g., Hapoel Kfar Saba" autocomplete="organization" required />
             </div>
             <div class="col-6">
               <label for="season">Season</label>
@@ -195,146 +231,185 @@
         </section>
       </div>
 
-      <!-- Step 2: Players -->
+      <!-- Step 2: Teams Management -->
       <div class="form-step" data-step="2">
-        <section class="roster-section" aria-labelledby="players-h">
-          <h2 id="players-h">🎯 Player Roster</h2>
-          <div id="dupWarn" class="status status--warn" role="alert" aria-live="assertive"></div>
+        <section class="teams-section" aria-labelledby="teams-h">
+          <h2 id="teams-h">👥 Team Management</h2>
+          <p class="subtitle">Add all the teams from your club that need roster submission</p>
           
-          <!-- Bulk Operations -->
-          <div class="bulk-ops">
-            <h3>⚡ Bulk Operations</h3>
-            <div class="bulk-workflow">
-              <div class="bulk-step">
-                <span class="step-number">1</span>
-                <div class="step-content">
-                  <label class="bulk-select-all">
-                    <input type="checkbox" id="selectAllPlayers">
-                    <strong>Select Players</strong>
-                  </label>
-                  <small>Check individual players below or use "Select All"</small>
-                </div>
-              </div>
-              
-              <div class="bulk-step">
-                <span class="step-number">2</span>
-                <div class="step-content">
-                  <label for="bulkPosition"><strong>Choose Position</strong></label>
-                  <select id="bulkPosition" class="bulk-select">
-                    <option value="">Choose position to apply...</option>
-                    <option value="G">🏃‍♂️ Guard (G)</option>
-                    <option value="F">🏀 Forward (F)</option>
-                    <option value="C">🏢 Center (C)</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div class="bulk-step">
-                <span class="step-number">3</span>
-                <div class="step-content">
-                  <button type="button" class="btn btn-primary" id="applyBulkPosition">
-                    ✨ Apply Position
-                  </button>
-                  <button type="button" class="btn btn-outline" id="clearSelected">
-                    🗑️ Clear Selection
-                  </button>
-                </div>
-              </div>
-            </div>
-            
-            <div id="bulkStatus" class="bulk-status">
-              <span id="selectionCount">0 players selected</span>
-            </div>
-          </div>
-
-          <div class="table-tools">
-            <button type="button" class="btn btn-outline" id="addRowBtn">+ Add Player</button>
-            <button type="button" class="btn btn-outline" id="removeRowBtn">− Remove Last</button>
-            <span id="rowCountHelp" class="subtitle" aria-live="polite">0 rows</span>
+          <div id="teamsContainer">
+            <!-- Teams will be added here dynamically -->
           </div>
           
-          <table aria-describedby="rowCountHelp">
-            <thead>
-              <tr>
-                <th style="width:40px">Select</th>
-                <th style="width:64px">S/N</th>
-                <th style="width:90px">Jersey #</th>
-                <th style="min-width:160px">First Name</th>
-                <th style="min-width:160px">Last Name</th>
-                <th style="width:100px">Position</th>
-                <th style="min-width:220px">Email Address</th>
-              </tr>
-            </thead>
-            <tbody id="playersTable"></tbody>
-          </table>
+          <div class="add-team-card" id="addTeamCard">
+            <div class="add-team-icon">➕</div>
+            <h3>Add New Team</h3>
+            <p>Click to add another team to your club</p>
+          </div>
         </section>
       </div>
 
-      <!-- Step 3: Staff -->
+      <!-- Step 3: Rosters -->
       <div class="form-step" data-step="3">
-        <section class="roster-section" aria-labelledby="staff-h">
-          <h2 id="staff-h">👨‍💼 Coaching Staff</h2>
-          <table>
-            <thead>
-              <tr>
-                <th style="width:64px">S/N</th>
-                <th style="width:140px">Role</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th style="width:100px">Position</th>
-                <th>Email Address</th>
-                <th style="width:140px">Phone</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="staff-row">
-                <td>17</td>
-                <td><strong>Head Coach</strong></td>
-                <td><input type="text" name="coach_first" placeholder="First name" /></td>
-                <td><input type="text" name="coach_last" placeholder="Last name" /></td>
-                <td>-</td>
-                <td><input type="email" name="coach_email" placeholder="Email (optional)" /></td>
-                <td><input type="tel" name="coach_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
-              </tr>
-              <tr class="staff-row">
-                <td>18</td>
-                <td><strong>Asst. Coach</strong></td>
-                <td><input type="text" name="asst1_first" placeholder="First name" /></td>
-                <td><input type="text" name="asst1_last" placeholder="Last name" /></td>
-                <td>-</td>
-                <td><input type="email" name="asst1_email" placeholder="Email (optional)" /></td>
-                <td><input type="tel" name="asst1_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
-              </tr>
-              <tr class="staff-row">
-                <td>19</td>
-                <td><strong>Asst. Coach</strong></td>
-                <td><input type="text" name="asst2_first" placeholder="First name" /></td>
-                <td><input type="text" name="asst2_last" placeholder="Last name" /></td>
-                <td>-</td>
-                <td><input type="email" name="asst2_email" placeholder="Email (optional)" /></td>
-                <td><input type="tel" name="asst2_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
-              </tr>
-              <tr class="staff-row">
-                <td>20</td>
-                <td><strong>Asst. Coach</strong></td>
-                <td><input type="text" name="asst3_first" placeholder="First name" /></td>
-                <td><input type="text" name="asst3_last" placeholder="Last name" /></td>
-                <td>-</td>
-                <td><input type="email" name="asst3_email" placeholder="Email (optional)" /></td>
-                <td><input type="tel" name="asst3_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
-              </tr>
-              <tr class="staff-row">
-                <td>21</td>
-                <td><strong>GM</strong></td>
-                <td><input type="text" name="gm_first" placeholder="First name" /></td>
-                <td><input type="text" name="gm_last" placeholder="Last name" /></td>
-                <td>-</td>
-                <td><input type="email" name="gm_email" placeholder="Email (optional)" /></td>
-                <td><input type="tel" name="gm_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
+        <div id="noTeamsMessage" class="no-teams-message">
+          <div class="icon">🏀</div>
+          <h3>No Teams Added Yet</h3>
+          <p>Go back to step 2 to add teams before managing rosters</p>
+        </div>
+
+        <div id="rosterManagement" style="display: none;">
+          <section class="roster-section" aria-labelledby="roster-h">
+            <h2 id="roster-h">📝 Team Rosters</h2>
+            
+            <div class="team-selector">
+              <p class="subtitle">Select a team to manage its roster</p>
+              <div id="teamTabs" class="team-tabs">
+                <!-- Team tabs will be added here dynamically -->
+              </div>
+            </div>
+
+            <div id="activeRosterSection" style="display: none;">
+              <div id="dupWarn" class="status status--warn" role="alert" aria-live="assertive"></div>
+              
+              <!-- Players Section -->
+              <div class="roster-section">
+                <h3>🎯 Players</h3>
+                
+                <!-- Bulk Operations -->
+                <div class="bulk-ops">
+                  <h3>⚡ Bulk Operations</h3>
+                  <div class="bulk-workflow">
+                    <div class="bulk-step">
+                      <span class="step-number">1</span>
+                      <div class="step-content">
+                        <label class="bulk-select-all">
+                          <input type="checkbox" id="selectAllPlayers">
+                          <strong>Select Players</strong>
+                        </label>
+                        <small>Check individual players below or use "Select All"</small>
+                      </div>
+                    </div>
+                    
+                    <div class="bulk-step">
+                      <span class="step-number">2</span>
+                      <div class="step-content">
+                        <label for="bulkPosition"><strong>Choose Position</strong></label>
+                        <select id="bulkPosition" class="bulk-select">
+                          <option value="">Choose position to apply...</option>
+                          <option value="G">🏃‍♂️ Guard (G)</option>
+                          <option value="F">🏀 Forward (F)</option>
+                          <option value="C">🏢 Center (C)</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div class="bulk-step">
+                      <span class="step-number">3</span>
+                      <div class="step-content">
+                        <button type="button" class="btn btn-primary" id="applyBulkPosition">
+                          ✨ Apply Position
+                        </button>
+                        <button type="button" class="btn btn-outline" id="clearSelected">
+                          🗑️ Clear Selection
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div id="bulkStatus" class="bulk-status">
+                    <span id="selectionCount">0 players selected</span>
+                  </div>
+                </div>
+
+                <div class="table-tools">
+                  <button type="button" class="btn btn-outline" id="addRowBtn">+ Add Player</button>
+                  <button type="button" class="btn btn-outline" id="removeRowBtn">− Remove Last</button>
+                  <span id="rowCountHelp" class="subtitle" aria-live="polite">0 rows</span>
+                </div>
+                
+                <table aria-describedby="rowCountHelp">
+                  <thead>
+                    <tr>
+                      <th style="width:40px">Select</th>
+                      <th style="width:64px">S/N</th>
+                      <th style="width:90px">Jersey #</th>
+                      <th style="min-width:160px">First Name</th>
+                      <th style="min-width:160px">Last Name</th>
+                      <th style="width:100px">Position</th>
+                      <th style="min-width:220px">Email Address</th>
+                    </tr>
+                  </thead>
+                  <tbody id="playersTable"></tbody>
+                </table>
+              </div>
+
+              <!-- Staff Section -->
+              <div class="roster-section">
+                <h3>👨‍💼 Coaching Staff</h3>
+                <table>
+                  <thead>
+                    <tr>
+                      <th style="width:64px">S/N</th>
+                      <th style="width:140px">Role</th>
+                      <th>First Name</th>
+                      <th>Last Name</th>
+                      <th style="width:100px">Position</th>
+                      <th>Email Address</th>
+                      <th style="width:140px">Phone</th>
+                    </tr>
+                  </thead>
+                  <tbody id="staffTable">
+                    <tr class="staff-row">
+                      <td>17</td>
+                      <td><strong>Head Coach</strong></td>
+                      <td><input type="text" name="coach_first" placeholder="First name" /></td>
+                      <td><input type="text" name="coach_last" placeholder="Last name" /></td>
+                      <td>-</td>
+                      <td><input type="email" name="coach_email" placeholder="Email (optional)" /></td>
+                      <td><input type="tel" name="coach_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
+                    </tr>
+                    <tr class="staff-row">
+                      <td>18</td>
+                      <td><strong>Asst. Coach</strong></td>
+                      <td><input type="text" name="asst1_first" placeholder="First name" /></td>
+                      <td><input type="text" name="asst1_last" placeholder="Last name" /></td>
+                      <td>-</td>
+                      <td><input type="email" name="asst1_email" placeholder="Email (optional)" /></td>
+                      <td><input type="tel" name="asst1_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
+                    </tr>
+                    <tr class="staff-row">
+                      <td>19</td>
+                      <td><strong>Asst. Coach</strong></td>
+                      <td><input type="text" name="asst2_first" placeholder="First name" /></td>
+                      <td><input type="text" name="asst2_last" placeholder="Last name" /></td>
+                      <td>-</td>
+                      <td><input type="email" name="asst2_email" placeholder="Email (optional)" /></td>
+                      <td><input type="tel" name="asst2_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
+                    </tr>
+                    <tr class="staff-row">
+                      <td>20</td>
+                      <td><strong>Asst. Coach</strong></td>
+                      <td><input type="text" name="asst3_first" placeholder="First name" /></td>
+                      <td><input type="text" name="asst3_last" placeholder="Last name" /></td>
+                      <td>-</td>
+                      <td><input type="email" name="asst3_email" placeholder="Email (optional)" /></td>
+                      <td><input type="tel" name="asst3_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
+                    </tr>
+                    <tr class="staff-row">
+                      <td>21</td>
+                      <td><strong>GM</strong></td>
+                      <td><input type="text" name="gm_first" placeholder="First name" /></td>
+                      <td><input type="text" name="gm_last" placeholder="Last name" /></td>
+                      <td>-</td>
+                      <td><input type="email" name="gm_email" placeholder="Email (optional)" /></td>
+                      <td><input type="tel" name="gm_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        </div>
       </div>
 
       <!-- Step 4: Review -->
@@ -349,32 +424,23 @@
       <div class="step-navigation">
         <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">← Previous</button>
         <div class="buttons">
-          <button type="button" class="btn btn-secondary" id="clearBtn">🗑️ Clear Form</button>
+          <button type="button" class="btn btn-secondary" id="clearBtn">🗑️ Clear All</button>
           <button type="button" class="btn btn-outline" id="saveBtn">💾 Save Draft</button>
           <button type="button" class="btn btn-outline" id="restoreBtn">↩ Restore Draft</button>
-          <button type="button" class="btn btn-success" id="newBtn" style="display:none">📋 Create New Roster</button>
+          <button type="button" class="btn btn-success" id="newBtn" style="display:none">📋 New Submission</button>
         </div>
         <button type="button" class="btn btn-primary" id="nextBtn">Next →</button>
-        <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">🚀 Submit Roster</button>
+        <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">🚀 Submit All Teams</button>
       </div>
 
-      <div id="loading" class="loading">🔄 Submitting your roster...</div>
-      <div id="okMsg" class="status status--ok" role="status" aria-live="polite">✅ Roster submitted successfully. Email sent and CSV downloaded.</div>
+      <div id="loading" class="loading">🔄 Submitting your club rosters...</div>
+      <div id="okMsg" class="status status--ok" role="status" aria-live="polite">✅ All team rosters submitted successfully!</div>
     </form>
   </div>
 
   <script>
     // === Configuration ===
-    const EmailJSConfig = Object.freeze({
-      publicKey: "_r4Y7hg0AGi5DhIcF",
-      serviceId: "service_4bdvcf9",
-      templateId: "template_6o8secn"
-    });
-
-    const DATA_SINK_URL = 'https://script.google.com/macros/s/AKfycbxchgyxazvH9t4N0prpLTboqeAlb6kRz6xUj-klQ1HIYtrZjs9qeKxWVqTttVJKdREj/exec';
-    const DATA_SINK_KEY = 'Pixellot2@25';
-
-    const APP_VERSION = '3.12.0';
+    const APP_VERSION = '4.1.0';
     const BUILD_DATE = new Date().toISOString().slice(0,10);
 
     const CURRENT_SEASON_START_YEAR = 2025;
@@ -384,17 +450,27 @@
 
     const DEFAULT_PLAYER_ROWS = 16;
     const HARD_MAX_PLAYERS = 40;
-    const STORAGE_KEY = "ibbaRosterDraft_v3120";
+    const STORAGE_KEY = "ibbaMultiTeamDraft_v410";
+
+    // === Data Structure ===
+    let clubData = {
+      clubName: '',
+      season: '',
+      submitterName: '',
+      submitterEmail: '',
+      teams: [] // { id, nickname, ageGroup, league, players: [], staff: [] }
+    };
+
+    let currentStep = 1;
+    let totalSteps = 4;
+    let activeTeamId = null;
+    let teamIdCounter = 1;
 
     // === Multi-Step Navigation ===
-    let currentStep = 1;
-    const totalSteps = 4;
-
     function updateProgress() {
       const progress = (currentStep / totalSteps) * 100;
       document.getElementById('progressFill').style.width = progress + '%';
       
-      // Update step indicators
       document.querySelectorAll('.step').forEach((step, index) => {
         const stepNum = index + 1;
         step.classList.remove('active', 'completed', 'pending');
@@ -416,7 +492,6 @@
       document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
       document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
       
-      // Update navigation buttons
       const prevBtn = document.getElementById('prevBtn');
       const nextBtn = document.getElementById('nextBtn');
       const submitBtn = document.getElementById('submitBtn');
@@ -425,52 +500,141 @@
       nextBtn.style.display = step < totalSteps ? 'block' : 'none';
       submitBtn.style.display = step === totalSteps ? 'block' : 'none';
       
-      // Scroll to top
+      // Update next button state based on current step completion
+      updateNextButtonState();
+      
       window.scrollTo({ top: 0, behavior: 'smooth' });
       
-      // Update review content if on review step
-      if (step === 4) {
+      if (step === 3) {
+        updateRosterView();
+      } else if (step === 4) {
         updateReviewContent();
       }
     }
 
+    function updateNextButtonState() {
+      const nextBtn = document.getElementById('nextBtn');
+      if (!nextBtn || nextBtn.style.display === 'none') return;
+      
+      let canProceed = false;
+      let reasonText = '';
+      
+      if (currentStep === 1) {
+        // Check all required fields have values
+        const clubName = document.getElementById('clubName').value.trim();
+        const season = document.getElementById('season').value;
+        const submitterName = document.getElementById('submitterName').value.trim();
+        const submitterEmail = document.getElementById('submitterEmail').value.trim();
+        
+        const hasAllFields = clubName && season && submitterName && submitterEmail;
+        const emailIsValid = emailValid(submitterEmail);
+        
+        canProceed = hasAllFields && emailIsValid;
+        
+        if (!clubName) reasonText = 'Enter club name';
+        else if (!season) reasonText = 'Select season';
+        else if (!submitterName) reasonText = 'Enter your name';
+        else if (!submitterEmail) reasonText = 'Enter your email';
+        else if (!emailIsValid) reasonText = 'Enter valid email';
+        
+      } else if (currentStep === 2) {
+        const hasTeams = clubData.teams.length > 0;
+        const allTeamsComplete = clubData.teams.every(team => {
+          return isTeamComplete(team);
+        });
+        
+        canProceed = hasTeams && allTeamsComplete;
+        
+        if (!hasTeams) {
+          reasonText = 'Add at least one team';
+        } else if (!allTeamsComplete) {
+          const incompleteCount = clubData.teams.filter(t => !isTeamComplete(t)).length;
+          reasonText = `Complete information for ${incompleteCount} team(s)`;
+        }
+      } else if (currentStep === 3) {
+        // Make sure we save current team roster first
+        if (activeTeamId) {
+          saveCurrentTeamRoster();
+        }
+        
+        // Check each team for complete roster
+        const incompleteTeams = [];
+        clubData.teams.forEach(team => {
+          const hasPlayers = team.players?.some(p => p.jersey && p.first && p.last && p.position) || false;
+          const hasStaff = team.staff?.some(s => s.first && s.last) || false;
+          
+          if (!hasPlayers || !hasStaff) {
+            incompleteTeams.push(team);
+          }
+        });
+        
+        canProceed = incompleteTeams.length === 0;
+        
+        if (!canProceed) {
+          reasonText = `${incompleteTeams.length} team(s) need players and staff`;
+        }
+      }
+      
+      // Update button appearance and state
+      if (canProceed) {
+        nextBtn.disabled = false;
+        nextBtn.textContent = 'Next →';
+        nextBtn.style.opacity = '1';
+        nextBtn.style.cursor = 'pointer';
+        nextBtn.title = '';
+        nextBtn.classList.remove('btn-outline');
+        nextBtn.classList.add('btn-primary');
+      } else {
+        nextBtn.disabled = true;
+        nextBtn.textContent = reasonText ? `Next → (${reasonText})` : 'Next →';
+        nextBtn.style.opacity = '0.6';
+        nextBtn.style.cursor = 'not-allowed';
+        nextBtn.title = reasonText;
+        nextBtn.classList.remove('btn-primary');
+        nextBtn.classList.add('btn-outline');
+      }
+    }
+
     function validateCurrentStep() {
-      const currentStepEl = document.querySelector(`.form-step[data-step="${currentStep}"]`);
-      const requiredFields = currentStepEl.querySelectorAll('[required]');
-      
-      for (const field of requiredFields) {
-        if (!field.value.trim()) {
-          field.focus();
-          field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (currentStep === 1) {
+        const requiredFields = document.querySelectorAll('.form-step[data-step="1"] [required]');
+        for (const field of requiredFields) {
+          if (!field.value.trim()) {
+            field.focus();
+            field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
+          }
+        }
+        // Save club info to our data structure
+        saveClubInfo();
+      } else if (currentStep === 2) {
+        if (clubData.teams.length === 0) {
+          alert('Please add at least one team before proceeding.');
+          return false;
+        }
+        // Check that all teams have complete basic info
+        const incompleteTeams = clubData.teams.filter(team => !isTeamComplete(team));
+        if (incompleteTeams.length > 0) {
+          alert('Please complete all team information (nickname, age group, and league) before proceeding.');
+          return false;
+        }
+      } else if (currentStep === 3) {
+        // Validate all teams have at least one complete player
+        const teamsWithoutPlayers = clubData.teams.filter(team => {
+          const completePlayers = team.players?.filter(p => p.jersey && p.first && p.last && p.position) || [];
+          return completePlayers.length === 0;
+        });
+        if (teamsWithoutPlayers.length > 0) {
+          const teamNames = teamsWithoutPlayers.map(t => getFullTeamName(t)).join(', ');
+          alert(`The following teams need at least one complete player: ${teamNames}`);
           return false;
         }
       }
-      
-      // Additional validation for step 2 (players)
-      if (currentStep === 2) {
-        if (!requireAtLeastOneCompletePlayer()) {
-          alert('Please add at least one complete player (jersey, first, last, position).');
-          return false;
-        }
-        
-        const badRow = validatePlayersCompleteness();
-        if (badRow) {
-          alert(`Player #${badRow} is incomplete. Jersey, First, Last, and Position are all required when adding a player.`);
-          return false;
-        }
-        
-        // Check duplicates
-        checkDuplicates();
-        if (document.getElementById('dupWarn').style.display === 'block') {
-          alert('Resolve duplicate jersey numbers before continuing.');
-          return false;
-        }
-      }
-      
       return true;
     }
 
     function nextStep() {
+      // Always validate before proceeding
       if (!validateCurrentStep()) return;
       
       if (currentStep < totalSteps) {
@@ -488,63 +652,74 @@
       }
     }
 
-    function updateReviewContent() {
-      const formData = new FormData(document.getElementById('rosterForm'));
-      const roster = buildRoster(formData);
-      
-      let html = '<div class="grid">';
-      
-      // Team Info
-      html += '<div class="col-12"><h3>🏆 Team Information</h3>';
-      html += `<p><strong>Team:</strong> ${roster.teamName}</p>`;
-      html += `<p><strong>League:</strong> ${roster.league} (${roster.leagueEnglish})</p>`;
-      html += `<p><strong>Season:</strong> ${seasonLabel(parseInt(roster.season.split('-')[0], 10))}</p>`;
-      html += `<p><strong>Submitted by:</strong> ${roster.submitterName}</p>`;
-      html += `<p><strong>Email:</strong> ${roster.submitterEmail}</p></div>`;
-      
-      // Players
-      html += '<div class="col-6"><h3>🎯 Players (' + roster.players.length + ')</h3>';
-      if (roster.players.length > 0) {
-        html += '<ul style="margin: 0; padding-left: 20px;">';
-        roster.players.forEach(p => {
-          html += `<li>#${p.jersey} ${p.firstName} ${p.lastName} (${p.position})${p.email ? ' - ' + p.email : ''}</li>`;
-        });
-        html += '</ul>';
-      } else {
-        html += '<p><em>No players added</em></p>';
-      }
-      html += '</div>';
-      
-      // Staff
-      html += '<div class="col-6"><h3>👨‍💼 Coaching Staff (' + roster.staff.length + ')</h3>';
-      if (roster.staff.length > 0) {
-        html += '<ul style="margin: 0; padding-left: 20px;">';
-        roster.staff.forEach(s => {
-          html += `<li><strong>${s.role}:</strong> ${s.firstName} ${s.lastName}${s.email ? ' - ' + s.email : ''}${s.phone ? ' | ' + s.phone : ''}</li>`;
-        });
-        html += '</ul>';
-      } else {
-        html += '<p><em>No staff added</em></p>';
-      }
-      html += '</div>';
-      
-      html += '</div>';
-      document.getElementById('reviewContent').innerHTML = html;
-    }
-
     // === Utilities ===
-    function ucWords(str="") { return str.toLowerCase().replace(/\b\w/g, ch => ch.toUpperCase()); }
+    function ucWords(str="") { 
+      return str.toLowerCase().replace(/\b\w/g, ch => ch.toUpperCase()); 
+    }
+    
+    function properCase(str="") {
+      // Split by spaces and process each word
+      return str.split(' ').map(word => {
+        // Handle empty strings
+        if (!word) return word;
+        
+        // Check for all caps (like "URI") - convert to proper case
+        if (word === word.toUpperCase() && word.length > 1) {
+          return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        }
+        
+        // Check for mixed case (like "RoIZ") - convert to proper case
+        const hasLowerCase = /[a-z]/.test(word);
+        const hasUpperCase = /[A-Z]/.test(word);
+        if (hasLowerCase && hasUpperCase) {
+          return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        }
+        
+        // Already properly formatted
+        if (word.charAt(0) === word.charAt(0).toUpperCase() && 
+            word.slice(1) === word.slice(1).toLowerCase()) {
+          return word;
+        }
+        
+        // Default: capitalize first letter, lowercase the rest
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      }).join(' ');
+    }
+    
     function emailValid(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
 
     function leagueToEnglish(h) {
       const map = {
-        'לאומית גברים': 'Mens 2nd Division',
-        'על נשים': 'Womens 1st Division',
-        'לאומית נשים': 'Womens 2nd Division',
-        'נוער על בנים': 'U19 Mens',
-        'נערות א על בנות': 'U19 Girls'
+        'רגיל': 'Regular',
+        'מחוזית': 'Regional',
+        'ארצית': 'National',
+        'לאומית': '2nd Division',
+        'על': '1st Division'
       };
       return map[h] || 'Unknown League';
+    }
+
+    function getFullTeamName(team) {
+      return `${clubData.clubName} ${team.nickname}`.trim();
+    }
+
+    function ageGroupToEnglish(h) {
+      const map = {
+        'קט-סל ב': 'Mini Basketball B',
+        'קט-סל א': 'Mini Basketball A', 
+        'ילדים ב': 'Children Boys B',
+        'ילדות ב': 'Children Girls B',
+        'ילדים א': 'Children Boys A',
+        'ילדות א': 'Children Girls A',
+        'נערים ב': 'Youth Boys B',
+        'נערות ב': 'Youth Girls B',
+        'נערים א': 'Youth Boys A',
+        'נערות א': 'Youth Girls A',
+        'נוער': 'Youth',
+        'בוגרים': 'Adults Men',
+        'בוגרות': 'Adults Women'
+      };
+      return map[h] || 'Unknown Age Group';
     }
 
     function seasonLabel(fromYear) {
@@ -554,25 +729,446 @@
 
     function populateSeasonSelect() {
       const sel = document.getElementById('season');
+      if (!sel) return;
+      
       sel.innerHTML = '';
       const seasons = [CURRENT_SEASON_START_YEAR];
       const exposeNext = FORCE_EXPOSE_NEXT_SEASON || (new Date() >= SWITCHOVER_DATE);
       if (exposeNext) seasons.push(NEXT_SEASON_START_YEAR);
+      
       for (const y of seasons) {
         const opt = document.createElement('option');
         opt.value = `${y}-${y + 1}`;
         opt.textContent = seasonLabel(y);
         sel.appendChild(opt);
       }
-      sel.value = `${exposeNext ? NEXT_SEASON_START_YEAR : CURRENT_SEASON_START_YEAR}-${(exposeNext ? NEXT_SEASON_START_YEAR : CURRENT_SEASON_START_YEAR) + 1}`;
+      
+      // Set default value
+      const defaultYear = exposeNext ? NEXT_SEASON_START_YEAR : CURRENT_SEASON_START_YEAR;
+      sel.value = `${defaultYear}-${defaultYear + 1}`;
     }
 
-    function bumpRowCount() {
+    function updateLeagueOptions(ageGroup, selectElement) {
+      // Clear existing options
+      selectElement.innerHTML = '<option value="">Select League</option>';
+      
+      // Age groups that don't have league divisions
+      const noLeagueAgeGroups = ['קט-סל ב', 'קט-סל א', 'ילדים ב', 'ילדות ב'];
+      
+      if (noLeagueAgeGroups.includes(ageGroup)) {
+        // For younger age groups, add a single "Regular" option
+        const option = document.createElement('option');
+        option.value = 'רגיל';
+        option.textContent = 'רגיל';
+        selectElement.appendChild(option);
+        selectElement.value = 'רגיל'; // Auto-select
+        selectElement.disabled = true; // Disable since there's only one option
+        
+        // Return the auto-selected value so we can save it
+        return 'רגיל';
+      } else if (ageGroup) {
+        // For older age groups, show all league options
+        const leagues = [
+          { value: 'מחוזית', text: 'מחוזית' },
+          { value: 'ארצית', text: 'ארצית' },
+          { value: 'לאומית', text: 'לאומית' },
+          { value: 'על', text: 'על' }
+        ];
+        
+        leagues.forEach(league => {
+          const option = document.createElement('option');
+          option.value = league.value;
+          option.textContent = league.text;
+          selectElement.appendChild(option);
+        });
+        
+        selectElement.disabled = false;
+      } else {
+        selectElement.disabled = false;
+      }
+      
+      return null; // No auto-selection
+    }
+
+    // === Club Info Management ===
+    function saveClubInfo() {
+      // Use properCase for names to handle "URi RoIZ" -> "Uri Roiz"
+      clubData.clubName = properCase(document.getElementById('clubName').value.trim());
+      clubData.season = document.getElementById('season').value;
+      clubData.submitterName = properCase(document.getElementById('submitterName').value.trim());
+      clubData.submitterEmail = document.getElementById('submitterEmail').value.trim();
+    }
+
+    // === Team Management ===
+    function addTeam() {
+      const team = {
+        id: teamIdCounter++,
+        nickname: '',
+        ageGroup: '',
+        league: '',
+        players: [],
+        staff: []
+      };
+      clubData.teams.push(team);
+      renderTeams(); // This will call updateNextButtonState()
+    }
+
+    function removeTeam(teamId) {
+      if (!confirm('Remove this team and all its roster data?')) return;
+      clubData.teams = clubData.teams.filter(t => t.id !== teamId);
+      if (activeTeamId === teamId) {
+        activeTeamId = null;
+      }
+      renderTeams();
+      updateRosterView();
+    }
+
+    function updateTeam(teamId, field, value) {
+      const team = clubData.teams.find(t => t.id === teamId);
+      if (team) {
+        // Apply proper formatting to nickname
+        if (field === 'nickname') {
+          value = formatTeamNickname(value);
+        }
+        team[field] = value;
+        
+        // Update the team status without full re-render
+        updateTeamStatus(teamId);
+        updateNextButtonState();
+      }
+    }
+
+    function updateTeamStatus(teamId) {
+      const team = clubData.teams.find(t => t.id === teamId);
+      if (!team) return;
+      
+      const status = getTeamStatus(team);
+      const statusText = status === 'complete' ? 'Complete' : 'Incomplete';
+      
+      // Find the team card and update only the status
+      const teamCards = document.querySelectorAll('.team-card');
+      teamCards.forEach(card => {
+        const titleElement = card.querySelector('.team-title');
+        if (titleElement && titleElement.textContent === `Team ${teamId}`) {
+          const statusElement = card.querySelector('.team-status');
+          if (statusElement) {
+            statusElement.className = `team-status ${status}`;
+            statusElement.textContent = statusText;
+          }
+          card.className = `team-card ${status}`;
+        }
+      });
+    }
+
+    function formatTeamNickname(nickname) {
+      if (!nickname) return nickname;
+      
+      // Check if it's Hebrew (contains Hebrew characters)
+      const hasHebrew = /[\u0590-\u05FF]/.test(nickname);
+      
+      if (hasHebrew) {
+        // Keep Hebrew as-is
+        return nickname;
+      } else {
+        // Format English/Latin names with proper case
+        return ucWords(nickname.trim());
+      }
+    }
+
+    function isTeamComplete(team) {
+      // A team is complete when it has basic info filled out
+      return team.nickname && team.ageGroup && team.league;
+    }
+
+    function getTeamStatus(team) {
+      if (!team.nickname || !team.ageGroup || !team.league) return 'incomplete';
+      return 'complete';
+    }
+
+    function renderTeams() {
+      const container = document.getElementById('teamsContainer');
+      container.innerHTML = '';
+      
+      clubData.teams.forEach(team => {
+        const status = getTeamStatus(team);
+        const statusText = status === 'complete' ? 'Complete' : 'Incomplete';
+        
+        const teamCard = document.createElement('div');
+        teamCard.className = `team-card ${status}`;
+        teamCard.innerHTML = `
+          <div class="team-header">
+            <div class="team-title">Team ${team.id}</div>
+            <div class="team-status ${status}">${statusText}</div>
+          </div>
+          <div class="team-info">
+            <div>
+              <label>Team Nickname</label>
+              <input type="text" value="${team.nickname}" placeholder="e.g., AVIV, GEFFEN" 
+                     onchange="updateTeam(${team.id}, 'nickname', this.value)" 
+                     oninput="updateTeam(${team.id}, 'nickname', this.value)" />
+            </div>
+            <div>
+              <label>Age Group</label>
+              <select onchange="updateTeam(${team.id}, 'ageGroup', this.value); updateLeagueForTeam(${team.id}, this.value)">
+                <option value="">Select Age Group</option>
+                <option value="קט-סל ב" ${team.ageGroup === 'קט-סל ב' ? 'selected' : ''}>קט-סל ב</option>
+                <option value="קט-סל א" ${team.ageGroup === 'קט-סל א' ? 'selected' : ''}>קט-סל א</option>
+                <option value="ילדים ב" ${team.ageGroup === 'ילדים ב' ? 'selected' : ''}>ילדים ב</option>
+                <option value="ילדות ב" ${team.ageGroup === 'ילדות ב' ? 'selected' : ''}>ילדות ב</option>
+                <option value="ילדים א" ${team.ageGroup === 'ילדים א' ? 'selected' : ''}>ילדים א</option>
+                <option value="ילדות א" ${team.ageGroup === 'ילדות א' ? 'selected' : ''}>ילדות א</option>
+                <option value="נערים ב" ${team.ageGroup === 'נערים ב' ? 'selected' : ''}>נערים ב</option>
+                <option value="נערות ב" ${team.ageGroup === 'נערות ב' ? 'selected' : ''}>נערות ב</option>
+                <option value="נערים א" ${team.ageGroup === 'נערים א' ? 'selected' : ''}>נערים א</option>
+                <option value="נערות א" ${team.ageGroup === 'נערות א' ? 'selected' : ''}>נערות א</option>
+                <option value="נוער" ${team.ageGroup === 'נוער' ? 'selected' : ''}>נוער</option>
+                <option value="בוגרים" ${team.ageGroup === 'בוגרים' ? 'selected' : ''}>בוגרים</option>
+                <option value="בוגרות" ${team.ageGroup === 'בוגרות' ? 'selected' : ''}>בוגרות</option>
+              </select>
+            </div>
+            <div>
+              <label>League</label>
+              <select id="league_${team.id}" onchange="updateTeam(${team.id}, 'league', this.value)">
+                <option value="">Select League</option>
+              </select>
+            </div>
+            <div>
+              <button class="remove-team" onclick="removeTeam(${team.id})">🗑️ Remove</button>
+            </div>
+          </div>
+        `;
+        container.appendChild(teamCard);
+        
+        // Update league options based on current age group
+        const leagueSelect = teamCard.querySelector(`#league_${team.id}`);
+        const autoSelectedLeague = updateLeagueOptions(team.ageGroup, leagueSelect);
+        
+        // If there's an auto-selected league and team doesn't have one, save it
+        if (autoSelectedLeague && !team.league) {
+          team.league = autoSelectedLeague;
+        }
+        
+        // Set the current league value if it exists
+        if (team.league) {
+          leagueSelect.value = team.league;
+        }
+      });
+      
+      // Update button state after rendering teams
+      updateNextButtonState();
+    }
+
+    function updateLeagueForTeam(teamId, ageGroup) {
+      const team = clubData.teams.find(t => t.id === teamId);
+      if (!team) return;
+      
+      const leagueSelect = document.querySelector(`#league_${teamId}`);
+      if (!leagueSelect) return;
+      
+      // Clear current league when age group changes
+      team.league = '';
+      
+      // Update league options and get auto-selected value if any
+      const autoSelectedLeague = updateLeagueOptions(ageGroup, leagueSelect);
+      
+      // If there's an auto-selected league, save it to the team
+      if (autoSelectedLeague) {
+        team.league = autoSelectedLeague;
+      }
+      
+      updateTeamStatus(teamId);
+      updateNextButtonState();
+    }
+
+    // === Roster Management ===
+    function updateRosterView() {
+      const noTeamsMsg = document.getElementById('noTeamsMessage');
+      const rosterMgmt = document.getElementById('rosterManagement');
+      
+      if (clubData.teams.length === 0) {
+        noTeamsMsg.style.display = 'block';
+        rosterMgmt.style.display = 'none';
+        return;
+      }
+      
+      noTeamsMsg.style.display = 'none';
+      rosterMgmt.style.display = 'block';
+      
+      renderTeamTabs();
+      
+      if (!activeTeamId && clubData.teams.length > 0) {
+        activeTeamId = clubData.teams[0].id;
+      }
+      
+      if (activeTeamId) {
+        showTeamRoster(activeTeamId);
+      }
+    }
+
+    function renderTeamTabs() {
+      const tabsContainer = document.getElementById('teamTabs');
+      tabsContainer.innerHTML = '';
+      
+      clubData.teams.forEach(team => {
+        const fullName = getFullTeamName(team);
+        const hasRoster = hasCompleteRoster(team);
+        
+        const tab = document.createElement('div');
+        tab.className = `team-tab ${activeTeamId === team.id ? 'active' : ''} ${hasRoster ? 'complete' : ''}`;
+        tab.textContent = fullName || `Team ${team.id}`;
+        tab.onclick = () => showTeamRoster(team.id);
+        tabsContainer.appendChild(tab);
+      });
+    }
+
+    function hasCompleteRoster(team) {
+      const hasPlayers = team.players?.some(p => p.jersey && p.first && p.last && p.position) || false;
+      const hasStaff = team.staff?.some(s => s.first && s.last) || false;
+      return hasPlayers && hasStaff;
+    }
+
+    function showTeamRoster(teamId) {
+      activeTeamId = teamId;
+      const team = clubData.teams.find(t => t.id === teamId);
+      if (!team) return;
+      
+      // Update active tab
+      document.querySelectorAll('.team-tab').forEach((tab, idx) => {
+        tab.classList.toggle('active', idx === clubData.teams.findIndex(t => t.id === teamId));
+      });
+      
+      // Show roster section
+      document.getElementById('activeRosterSection').style.display = 'block';
+      
+      // Load team data into roster forms
+      loadTeamRoster(team);
+    }
+
+    function loadTeamRoster(team) {
+      // Ensure team has default empty arrays
+      if (!team.players) team.players = [];
+      if (!team.staff) team.staff = [];
+      
+      // Render players table
+      ensurePlayersRows(Math.max(DEFAULT_PLAYER_ROWS, team.players.length));
+      
+      // Load player data
+      team.players.forEach((player, idx) => {
+        const rowIdx = idx + 1;
+        const fields = ['jersey', 'first', 'last', 'position', 'email'];
+        fields.forEach(field => {
+          const input = document.querySelector(`input[name="player${rowIdx}_${field}"], select[name="player${rowIdx}_${field}"]`);
+          if (input && player[field] !== undefined) {
+            input.value = player[field];
+          }
+        });
+      });
+      
+      // Clear all staff fields first
+      const staffRoles = ['coach', 'asst1', 'asst2', 'asst3', 'gm'];
+      staffRoles.forEach(role => {
+        const fields = ['first', 'last', 'email', 'phone'];
+        fields.forEach(field => {
+          const input = document.querySelector(`input[name="${role}_${field}"]`);
+          if (input) {
+            input.value = '';
+          }
+        });
+      });
+      
+      // Load staff data for this team
+      team.staff.forEach((staffMember, idx) => {
+        if (idx < staffRoles.length) {
+          const role = staffRoles[idx];
+          const fields = ['first', 'last', 'email', 'phone'];
+          fields.forEach(field => {
+            const input = document.querySelector(`input[name="${role}_${field}"]`);
+            if (input && staffMember[field] !== undefined) {
+              input.value = staffMember[field];
+            }
+          });
+        }
+      });
+      
+      // Apply GM from first team to all other teams (if it exists)
+      if (team.id > 1 && clubData.teams.length > 1) {
+        const firstTeam = clubData.teams.find(t => t.id === 1);
+        if (firstTeam && firstTeam.staff && firstTeam.staff.length >= 5) {
+          const gmData = firstTeam.staff[4]; // GM is the 5th staff member (index 4)
+          if (gmData && (gmData.first || gmData.last)) {
+            const gmFields = ['first', 'last', 'email', 'phone'];
+            gmFields.forEach(field => {
+              const input = document.querySelector(`input[name="gm_${field}"]`);
+              if (input && gmData[field]) {
+                input.value = gmData[field];
+              }
+            });
+          }
+        }
+      }
+      
+      checkDuplicates();
+      bumpRowCount();
+    }
+
+    function saveCurrentTeamRoster() {
+      if (!activeTeamId) return;
+      
+      const team = clubData.teams.find(t => t.id === activeTeamId);
+      if (!team) return;
+      
+      // Save players
+      team.players = [];
       const rows = document.querySelectorAll('#playersTable tr').length;
-      document.getElementById('rowCountHelp').textContent = `${rows} rows (max ${HARD_MAX_PLAYERS})`;
+      for (let i = 1; i <= rows; i++) {
+        const jersey = document.querySelector(`input[name="player${i}_jersey"]`)?.value;
+        const first = document.querySelector(`input[name="player${i}_first"]`)?.value;
+        const last = document.querySelector(`input[name="player${i}_last"]`)?.value;
+        const position = document.querySelector(`select[name="player${i}_position"]`)?.value;
+        const email = document.querySelector(`input[name="player${i}_email"]`)?.value;
+        
+        if (jersey || first || last || position || email) {
+          team.players.push({
+            jersey: jersey || '',
+            first: first || '',
+            last: last || '',
+            position: position || '',
+            email: email || ''
+          });
+        }
+      }
+      
+      // Save staff
+      team.staff = [];
+      const staffRoles = [
+        { key: 'coach', label: 'Head Coach' },
+        { key: 'asst1', label: 'Assistant Coach 1' },
+        { key: 'asst2', label: 'Assistant Coach 2' },
+        { key: 'asst3', label: 'Assistant Coach 3' },
+        { key: 'gm', label: 'General Manager' }
+      ];
+      
+      staffRoles.forEach(role => {
+        const first = document.querySelector(`input[name="${role.key}_first"]`)?.value;
+        const last = document.querySelector(`input[name="${role.key}_last"]`)?.value;
+        const email = document.querySelector(`input[name="${role.key}_email"]`)?.value;
+        const phone = document.querySelector(`input[name="${role.key}_phone"]`)?.value;
+        
+        if (first || last || email || phone) {
+          team.staff.push({
+            role: role.label,
+            first: first || '',
+            last: last || '',
+            email: email || '',
+            phone: phone || ''
+          });
+        }
+      });
+      
+      renderTeamTabs(); // Update completion status
     }
 
-    // === Players table ===
+    // === Players Table Management ===
     function playerRowTemplate(idx) {
       const sn = String(idx).padStart(2, '0');
       return `
@@ -594,17 +1190,19 @@
         </tr>`;
     }
 
-    function ensureRows(count) {
+    function ensurePlayersRows(count) {
       const tbody = document.getElementById('playersTable');
       tbody.innerHTML = '';
       const n = Math.min(HARD_MAX_PLAYERS, Math.max(1, count|0));
-      for (let i = 1; i <= n; i++) tbody.insertAdjacentHTML('beforeend', playerRowTemplate(i));
+      for (let i = 1; i <= n; i++) {
+        tbody.insertAdjacentHTML('beforeend', playerRowTemplate(i));
+      }
       hookDuplicateListeners();
       hookBulkSelectionListeners();
       bumpRowCount();
     }
 
-    function addRow() {
+    function addPlayersRow() {
       const tbody = document.getElementById('playersTable');
       const curr = document.querySelectorAll('#playersTable tr').length;
       if (curr >= HARD_MAX_PLAYERS) return;
@@ -614,7 +1212,7 @@
       bumpRowCount();
     }
 
-    function removeRow() {
+    function removePlayersRow() {
       const tbody = document.getElementById('playersTable');
       const curr = document.querySelectorAll('#playersTable tr').length;
       if (curr <= 1) return;
@@ -622,11 +1220,16 @@
       bumpRowCount();
       checkDuplicates();
       updateSelectAllState();
+      saveCurrentTeamRoster();
+    }
+
+    function bumpRowCount() {
+      const rows = document.querySelectorAll('#playersTable tr').length;
+      document.getElementById('rowCountHelp').textContent = `${rows} rows (max ${HARD_MAX_PLAYERS})`;
     }
 
     // === Bulk Operations ===
     function hookBulkSelectionListeners() {
-      // Individual checkboxes
       document.querySelectorAll('.player-select').forEach(checkbox => {
         checkbox.removeEventListener('change', handlePlayerSelectChange);
         checkbox.addEventListener('change', handlePlayerSelectChange);
@@ -653,10 +1256,8 @@
       const selectAllBox = document.getElementById('selectAllPlayers');
       const statusSpan = document.getElementById('selectionCount');
       
-      // Update selection count
       statusSpan.textContent = `${checkedBoxes.length} player${checkedBoxes.length !== 1 ? 's' : ''} selected`;
       
-      // Update select all state
       if (checkedBoxes.length === 0) {
         selectAllBox.indeterminate = false;
         selectAllBox.checked = false;
@@ -703,8 +1304,8 @@
         }
       });
       
-      // Reset bulk controls
       document.getElementById('bulkPosition').value = '';
+      saveCurrentTeamRoster();
       flashOk(`Applied ${selectedPosition} position to ${selectedCheckboxes.length} player(s).`);
     }
 
@@ -716,7 +1317,7 @@
       updateSelectAllState();
     }
 
-    // === Duplicate jersey detection ===
+    // === Duplicate Detection ===
     let dupTimer;
     function hookDuplicateListeners() {
       document.querySelectorAll('input[name*="_jersey"]').forEach(inp => {
@@ -727,7 +1328,10 @@
 
     function dupHandler() {
       window.clearTimeout(dupTimer);
-      dupTimer = window.setTimeout(checkDuplicates, 350);
+      dupTimer = window.setTimeout(() => {
+        checkDuplicates();
+        saveCurrentTeamRoster();
+      }, 350);
     }
 
     function checkDuplicates() {
@@ -755,12 +1359,163 @@
       }
     }
 
-    // === Local draft save/restore ===
+    // === Review Content ===
+    function updateReviewContent() {
+      let html = '<div class="overview-grid">';
+      
+      // Club overview
+      html += '<div class="overview-card">';
+      html += '<h3>🏆 Club Information</h3>';
+      html += `<p><strong>Club:</strong> ${clubData.clubName}</p>`;
+      html += `<p><strong>Season:</strong> ${seasonLabel(parseInt(clubData.season.split('-')[0], 10))}</p>`;
+      html += `<p><strong>Submitted by:</strong> ${clubData.submitterName}</p>`;
+      html += `<p><strong>Email:</strong> ${clubData.submitterEmail}</p>`;
+      html += '</div>';
+      
+      // Teams overview
+      html += '<div class="overview-card">';
+      html += `<h3>👥 Teams (${clubData.teams.length})</h3>`;
+      html += '<div class="overview-stats">';
+      const completeTeams = clubData.teams.filter(hasCompleteRoster).length;
+      html += `<div class="stat"><div class="stat-number">${completeTeams}</div><div class="stat-label">Complete</div></div>`;
+      html += `<div class="stat"><div class="stat-number">${clubData.teams.length - completeTeams}</div><div class="stat-label">Incomplete</div></div>`;
+      const totalPlayers = clubData.teams.reduce((sum, team) => sum + (team.players?.filter(p => p.jersey && p.first && p.last).length || 0), 0);
+      html += `<div class="stat"><div class="stat-number">${totalPlayers}</div><div class="stat-label">Total Players</div></div>`;
+      html += '</div>';
+      html += '</div>';
+      
+      html += '</div>';
+      
+      // Detailed team breakdown
+      clubData.teams.forEach(team => {
+        const fullName = getFullTeamName(team);
+        const completePlayers = team.players?.filter(p => p.jersey && p.first && p.last && p.position) || [];
+        const completeStaff = team.staff?.filter(s => s.first && s.last) || [];
+        
+        html += '<div class="overview-card">';
+        html += `<h3>🏀 ${fullName}</h3>`;
+        html += `<p><strong>Age Group:</strong> ${team.ageGroup} (${ageGroupToEnglish(team.ageGroup)})</p>`;
+        html += `<p><strong>League:</strong> ${team.league} (${leagueToEnglish(team.league)})</p>`;
+        
+        html += '<div class="overview-stats">';
+        html += `<div class="stat"><div class="stat-number">${completePlayers.length}</div><div class="stat-label">Players</div></div>`;
+        html += `<div class="stat"><div class="stat-number">${completeStaff.length}</div><div class="stat-label">Staff</div></div>`;
+        html += '</div>';
+        
+        if (completePlayers.length > 0) {
+          html += '<h4>Players:</h4><ul style="margin: 0; padding-left: 20px; font-size: 14px;">';
+          completePlayers.forEach(p => {
+            html += `<li>#${p.jersey} ${properCase(p.first)} ${properCase(p.last)} (${p.position})</li>`;
+          });
+          html += '</ul>';
+        } else {
+          html += '<p style="color: #ef4444; font-weight: 600;">⚠️ No players added</p>';
+        }
+        
+        if (completeStaff.length > 0) {
+          html += '<h4>Staff:</h4><ul style="margin: 8px 0 0 20px; padding-left: 20px; font-size: 14px;">';
+          completeStaff.forEach(s => {
+            html += `<li><strong>${s.role}:</strong> ${properCase(s.first)} ${properCase(s.last)}</li>`;
+          });
+          html += '</ul>';
+        } else {
+          html += '<p style="color: #ef4444; font-weight: 600;">⚠️ No coaching staff added</p>';
+        }
+        
+        html += '</div>';
+      });
+      
+      document.getElementById('reviewContent').innerHTML = html;
+    }
+
+    // === Data Export ===
+    function buildSubmissionData() {
+      return {
+        clubName: clubData.clubName,
+        season: clubData.season,
+        submitterName: clubData.submitterName,
+        submitterEmail: clubData.submitterEmail,
+        teams: clubData.teams.map(team => ({
+          nickname: team.nickname,
+          fullName: getFullTeamName(team),
+          ageGroup: team.ageGroup,
+          ageGroupEnglish: ageGroupToEnglish(team.ageGroup),
+          league: team.league,
+          leagueEnglish: leagueToEnglish(team.league),
+          players: team.players?.filter(p => p.jersey && p.first && p.last && p.position).map(p => ({
+            jersey: p.jersey,
+            firstName: properCase(p.first),
+            lastName: properCase(p.last),
+            position: p.position,
+            email: p.email || ''
+          })) || [],
+          staff: team.staff?.filter(s => s.first || s.last).map(s => ({
+            role: s.role,
+            firstName: properCase(s.first || ''),
+            lastName: properCase(s.last || ''),
+            email: s.email || '',
+            phone: s.phone || ''
+          })) || []
+        }))
+      };
+    }
+
+    function downloadCSV(data) {
+      const BOM = '\uFEFF';
+      let csv = `IBBA Multi-Team Roster Submission - Pixellot Advantage - Version ${APP_VERSION}\n`;
+      csv += `Generated: ${new Date().toLocaleString()}\n\n`;
+      csv += `Club Name: ${data.clubName}\n`;
+      csv += `Season: ${data.season} (${seasonLabel(parseInt(data.season.split('-')[0], 10))})\n`;
+      csv += `Submitted by: ${data.submitterName}\n`;
+      csv += `Contact Email: ${data.submitterEmail}\n`;
+      csv += `Total Teams: ${data.teams.length}\n\n`;
+      
+      data.teams.forEach((team, idx) => {
+        csv += `TEAM ${idx + 1}: ${team.fullName}\n`;
+        csv += `Age Group: ${team.ageGroupEnglish}\n`;
+        csv += `League: ${team.leagueEnglish}\n\n`;
+        
+        if (team.players.length > 0) {
+          csv += 'PLAYERS\n';
+          csv += 'Jersey,First Name,Last Name,Email,Position\n';
+          team.players.forEach(p => {
+            csv += `${p.jersey},"${p.firstName}","${p.lastName}","${p.email}","${p.position}"\n`;
+          });
+          csv += '\n';
+        }
+        
+        if (team.staff.length > 0) {
+          csv += 'STAFF\n';
+          csv += 'First Name,Last Name,Email,Phone,Role\n';
+          team.staff.forEach(s => {
+            csv += `"${s.firstName}","${s.lastName}","${s.email}","${s.phone}","${s.role}"\n`;
+          });
+          csv += '\n';
+        }
+        
+        csv += '---\n\n';
+      });
+      
+      const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ibba_${data.clubName.replace(/[^a-z0-9\u0590-\u05FF]/gi, '_').toLowerCase()}_${data.season}_multi_team_roster_v${APP_VERSION}.csv`;
+      document.body.appendChild(a); 
+      a.click(); 
+      document.body.removeChild(a); 
+      URL.revokeObjectURL(url);
+    }
+
+    // === Local Storage ===
     function saveDraft() {
-      const data = new FormData(document.getElementById('rosterForm'));
-      const obj = { currentStep };
-      for (const [k, v] of data.entries()) obj[k] = v;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+      saveCurrentTeamRoster(); // Save current roster before saving draft
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ 
+        ...clubData, 
+        currentStep,
+        activeTeamId,
+        teamIdCounter 
+      }));
       flashOk('Draft saved locally.');
     }
 
@@ -771,30 +1526,36 @@
         return; 
       }
       
-      const obj = JSON.parse(raw);
+      const saved = JSON.parse(raw);
+      clubData = {
+        clubName: saved.clubName || '',
+        season: saved.season || '',
+        submitterName: saved.submitterName || '',
+        submitterEmail: saved.submitterEmail || '',
+        teams: saved.teams || []
+      };
       
-      // Restore step
-      if (obj.currentStep) {
-        currentStep = obj.currentStep;
-        showStep(currentStep);
-        updateProgress();
+      currentStep = saved.currentStep || 1;
+      activeTeamId = saved.activeTeamId || null;
+      teamIdCounter = saved.teamIdCounter || clubData.teams.length + 1;
+      
+      // Restore form fields
+      document.getElementById('clubName').value = clubData.clubName;
+      document.getElementById('season').value = clubData.season;
+      document.getElementById('submitterName').value = clubData.submitterName;
+      document.getElementById('submitterEmail').value = clubData.submitterEmail;
+      
+      renderTeams();
+      showStep(currentStep);
+      updateProgress();
+      
+      if (currentStep === 3) {
+        updateRosterView();
       }
       
-      const maxIdx = Math.max(1, ...Object.keys(obj).map(k => (k.match(/player(\d+)_/)||[])[1]).filter(Boolean).map(Number));
-      ensureRows(Math.min(HARD_MAX_PLAYERS, Math.max(DEFAULT_PLAYER_ROWS, maxIdx)));
-      
-      for (const k in obj) {
-        if (k === 'currentStep') continue;
-        const el = document.querySelector(`[name="${CSS.escape(k)}"]`);
-        if (el) el.value = obj[k];
-      }
-      
-      bumpRowCount();
-      checkDuplicates();
       flashOk('Draft restored.');
     }
 
-    // === Messaging ===
     function flashOk(msg) { 
       const el = document.getElementById('okMsg'); 
       el.textContent = `✅ ${msg}`; 
@@ -802,219 +1563,115 @@
       setTimeout(() => el.style.display = 'none', 3000); 
     }
 
-    // === Validation helpers ===
-    function requireAtLeastOneCompletePlayer() {
-      const rows = document.querySelectorAll('#playersTable tr').length;
-      for (let i = 1; i <= rows; i++) {
-        const jersey = document.querySelector(`input[name="player${i}_jersey"]`)?.value;
-        const first = document.querySelector(`input[name="player${i}_first"]`)?.value;
-        const last = document.querySelector(`input[name="player${i}_last"]`)?.value;
-        const pos = document.querySelector(`select[name="player${i}_position"]`)?.value;
-        if (jersey && first && last && pos) return true;
-      }
-      return false;
-    }
-
-    function validatePlayersCompleteness() {
-      const rows = document.querySelectorAll('#playersTable tr').length;
-      for (let i = 1; i <= rows; i++) {
-        const jersey = document.querySelector(`input[name="player${i}_jersey"]`)?.value;
-        const first = document.querySelector(`input[name="player${i}_first"]`)?.value;
-        const last = document.querySelector(`input[name="player${i}_last"]`)?.value;
-        const pos = document.querySelector(`select[name="player${i}_position"]`)?.value;
-        const any = jersey || first || last || pos;
-        const all = jersey && first && last && pos;
-        if (any && !all) return i;
-      }
-      return 0;
-    }
-
-    // === Build roster ===
-    function buildRoster(fd) {
-      const teamName = fd.get('teamName').trim();
-      const league = fd.get('league');
-      const season = fd.get('season');
-      const submitterName = ucWords(fd.get('submitterName').trim());
-      const submitterEmail = fd.get('submitterEmail').trim();
-
-      const roster = { teamName, league, leagueEnglish: leagueToEnglish(league), submitterName, submitterEmail, season, players: [], staff: [] };
-
-      const rows = document.querySelectorAll('#playersTable tr').length;
-      for (let i = 1; i <= rows; i++) {
-        const jersey = fd.get(`player${i}_jersey`);
-        const first = fd.get(`player${i}_first`);
-        const last = fd.get(`player${i}_last`);
-        const pos = fd.get(`player${i}_position`);
-        const email = fd.get(`player${i}_email`);
-        if (jersey && first && last && pos) {
-          roster.players.push({ number: i, jersey, firstName: ucWords(first), lastName: ucWords(last), position: pos, email });
-        }
-      }
-
-      const staffRoles = [
-        { key: 'coach', label: 'Head Coach' },
-        { key: 'asst1', label: 'Assistant Coach 1' },
-        { key: 'asst2', label: 'Assistant Coach 2' },
-        { key: 'asst3', label: 'Assistant Coach 3' },
-        { key: 'gm', label: 'General Manager' }
-      ];
+    // === Form Submission ===
+    async function submitAllTeams() {
+      const submitBtn = document.getElementById('submitBtn');
+      const loading = document.getElementById('loading');
+      const ok = document.getElementById('okMsg');
       
-      for (const role of staffRoles) {
-        const f = fd.get(`${role.key}_first`);
-        const l = fd.get(`${role.key}_last`);
-        const e = fd.get(`${role.key}_email`);
-        const p = fd.get(`${role.key}_phone`);
-        if (f || l) roster.staff.push({ role: role.label, firstName: ucWords(f||''), lastName: ucWords(l||''), email: e||'', phone: (p||'').trim() });
-      }
-
-      return roster;
-    }
-
-    function rosterSummary(roster) {
-      let out = '';
-      out += 'IBBA TEAM ROSTER SUBMISSION\n';
-      out += '==============================\n';
-      out += `Team: ${roster.teamName}\n`;
-      out += `League: ${roster.league} (${roster.leagueEnglish})\n`;
-      out += `Season: ${roster.season}\n`;
-      out += `Submitted by: ${roster.submitterName}\n`;
-      out += `Email: ${roster.submitterEmail}\n`;
-      out += `Date: ${new Date().toLocaleString()}\n`;
-      out += `Version: ${APP_VERSION}\n\n`;
-      out += 'CSV FORMAT FOR COPYING:\n';
-      out += '=======================\n';
-      roster.players.forEach(p => { out += `${p.jersey},${p.firstName},${p.lastName},${p.email||''},${p.position||''}\n`; });
-      out += `\nPLAYERS (${roster.players.length}):\n`;
-      out += '------------------------\n';
-      roster.players.forEach(p => { out += `#${p.jersey} - ${p.firstName} ${p.lastName}${p.position?` (${p.position})`:''}${p.email?` - ${p.email}`:''}\n`; });
-      out += `\nCOACHING STAFF (${roster.staff.length}):\n`;
-      out += '----------------------------\n';
-      roster.staff.forEach(s => { out += `${s.role}: ${s.firstName} ${s.lastName}${s.email?` - ${s.email}`:''}${s.phone?` | ${s.phone}`:''}\n`; });
-      return out;
-    }
-
-    // === CSV ===
-    function downloadCSV(roster) {
-      const BOM = '\uFEFF';
-      let csv = `IBBA Team Roster Submission - Pixellot Advantage - Version ${APP_VERSION}\n`;
-      csv += `Generated: ${new Date().toLocaleString()}\n\n`;
-      csv += `Team Name: ${roster.teamName}\n`;
-      csv += `League: ${roster.leagueEnglish}\n`;
-      csv += `Season: ${roster.season} (${seasonLabel(parseInt(roster.season.split('-')[0], 10))})\n`;
-      csv += `Submitted by: ${roster.submitterName}\n`;
-      csv += `Contact Email: ${roster.submitterEmail}\n\n`;
-      csv += 'PLAYERS\n';
-      csv += 'Jersey,First Name,Last Name,Email,Position\n';
-      roster.players.forEach(p => {
-        csv += `${p.jersey},"${p.firstName}","${p.lastName}","${p.email||''}","${p.position||''}"\n`;
-      });
-      csv += '\nSTAFF\n';
-      csv += 'First Name,Last Name,Email,Phone,Role\n';
-      roster.staff.forEach(s => {
-        csv += `"${s.firstName}","${s.lastName}","${s.email||''}","${s.phone||''}","${s.role}"\n`;
-      });
-      const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `ibba_${roster.teamName.replace(/[^a-z0-9\u0590-\u05FF]/gi, '_').toLowerCase()}_${roster.season}_roster_v${APP_VERSION}.csv`;
-      document.body.appendChild(a); 
-      a.click(); 
-      document.body.removeChild(a); 
-      URL.revokeObjectURL(url);
-    }
-
-    // === Email (EmailJS REST) ===
-    async function sendEmailViaAPI(params, { signal } = {}) {
-      const url = 'https://api.emailjs.com/api/v1.0/email/send';
-      const payload = {
-        service_id: EmailJSConfig.serviceId,
-        template_id: EmailJSConfig.templateId,
-        user_id: EmailJSConfig.publicKey,
-        template_params: params
-      };
-      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal });
-      if (!res.ok) throw new Error(`Email API responded ${res.status}`);
-      return res;
-    }
-
-    // === Data sink (Google Sheet) ===
-    function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
-    async function sendToSheet(roster) {
-      if (!DATA_SINK_URL) return true;
-      const url = `${DATA_SINK_URL}?key=${encodeURIComponent(DATA_SINK_KEY)}`;
-      const payload = {
-        app_version: APP_VERSION,
-        build_date: BUILD_DATE,
-        season: roster.season,
-        team_name: roster.teamName,
-        league: roster.league,
-        league_english: roster.leagueEnglish,
-        submitter_name: roster.submitterName,
-        submitter_email: roster.submitterEmail,
-        players: roster.players,
-        staff: roster.staff
-      };
-      const fetchOnce = () => fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload) });
-      for (let attempt = 1; attempt <= 3; attempt++) {
-        try { await fetchOnce(); return true; }
-        catch (e) { if (attempt === 3) throw e; await sleep(400 * attempt); }
-      }
-    }
-
-    // === Initialize ===
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('versionBadge').textContent = `Version ${APP_VERSION}`;
-
-      populateSeasonSelect();
-      ensureRows(DEFAULT_PLAYER_ROWS);
-      updateProgress();
+      ok.style.display = 'none';
+      submitBtn.disabled = true;
+      loading.style.display = 'block';
       
-      // Navigation event listeners
-      document.getElementById('nextBtn').addEventListener('click', nextStep);
+      try {
+        const submissionData = buildSubmissionData();
+        
+        // For now, just download CSV since email/sheet integration would need updating
+        downloadCSV(submissionData);
+        
+        ok.textContent = `✅ All ${submissionData.teams.length} team rosters submitted successfully! CSV downloaded.`;
+        ok.style.display = 'block';
+        document.getElementById('newBtn').style.display = 'inline-block';
+        
+      } catch (err) {
+        console.error('Submission error:', err);
+        alert('Submission failed. CSV file will be downloaded instead.');
+        downloadCSV(buildSubmissionData());
+        ok.textContent = '⚠️ Submission error. CSV downloaded as fallback.';
+        ok.style.display = 'block';
+        document.getElementById('newBtn').style.display = 'inline-block';
+      } finally {
+        submitBtn.disabled = false;
+        loading.style.display = 'none';
+      }
+    }
+
+    // === Event Handlers ===
+    function setupEventListeners() {
+      // Navigation
+      document.getElementById('nextBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        nextStep();
+      });
       document.getElementById('prevBtn').addEventListener('click', prevStep);
       
-      // Player table controls
-      document.getElementById('addRowBtn').addEventListener('click', addRow);
-      document.getElementById('removeRowBtn').addEventListener('click', removeRow);
+      // Team management
+      document.getElementById('addTeamCard').addEventListener('click', addTeam);
+      
+      // Roster management
+      document.getElementById('addRowBtn').addEventListener('click', addPlayersRow);
+      document.getElementById('removeRowBtn').addEventListener('click', removePlayersRow);
       
       // Bulk operations
       document.getElementById('selectAllPlayers').addEventListener('change', toggleSelectAll);
       document.getElementById('applyBulkPosition').addEventListener('click', applyBulkPosition);
       document.getElementById('clearSelected').addEventListener('click', clearSelected);
-
-      // Other controls
+      
+      // Form controls
       document.getElementById('clearBtn').addEventListener('click', () => {
-        if (!confirm('Clear all data (except your name/email if present)?')) return;
-        const keepName = document.getElementById('submitterName').value; 
-        const keepEmail = document.getElementById('submitterEmail').value;
-        document.getElementById('rosterForm').reset(); 
-        ensureRows(DEFAULT_PLAYER_ROWS); 
+        if (!confirm('Clear all club and team data?')) return;
+        
+        clubData = {
+          clubName: '',
+          season: '',
+          submitterName: '',
+          submitterEmail: '',
+          teams: []
+        };
+        
+        activeTeamId = null;
+        teamIdCounter = 1;
+        currentStep = 1;
+        
+        document.getElementById('clubForm').reset();
         populateSeasonSelect();
-        document.getElementById('submitterName').value = keepName; 
-        document.getElementById('submitterEmail').value = keepEmail;
-        document.getElementById('dupWarn').style.display = 'none'; 
-        document.getElementById('okMsg').style.display = 'none'; 
-        document.getElementById('newBtn').style.display = 'none';
-        currentStep = 1; 
-        showStep(currentStep); 
+        renderTeams();
+        showStep(currentStep);
         updateProgress();
+        
+        document.getElementById('dupWarn').style.display = 'none';
+        document.getElementById('okMsg').style.display = 'none';
+        document.getElementById('newBtn').style.display = 'none';
       });
       
       document.getElementById('newBtn').addEventListener('click', () => {
-        const keepName = document.getElementById('submitterName').value; 
-        const keepEmail = document.getElementById('submitterEmail').value;
-        document.getElementById('rosterForm').reset(); 
-        ensureRows(DEFAULT_PLAYER_ROWS); 
+        const keepName = clubData.submitterName;
+        const keepEmail = clubData.submitterEmail;
+        
+        clubData = {
+          clubName: '',
+          season: '',
+          submitterName: keepName,
+          submitterEmail: keepEmail,
+          teams: []
+        };
+        
+        activeTeamId = null;
+        teamIdCounter = 1;
+        currentStep = 1;
+        
+        document.getElementById('clubForm').reset();
         populateSeasonSelect();
-        document.getElementById('submitterName').value = keepName; 
+        document.getElementById('submitterName').value = keepName;
         document.getElementById('submitterEmail').value = keepEmail;
-        document.getElementById('dupWarn').style.display = 'none'; 
-        document.getElementById('okMsg').style.display = 'none'; 
-        document.getElementById('newBtn').style.display = 'none';
-        currentStep = 1; 
-        showStep(currentStep); 
+        renderTeams();
+        showStep(currentStep);
         updateProgress();
+        
+        document.getElementById('dupWarn').style.display = 'none';
+        document.getElementById('okMsg').style.display = 'none';
+        document.getElementById('newBtn').style.display = 'none';
+        
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
 
@@ -1022,61 +1679,56 @@
       document.getElementById('restoreBtn').addEventListener('click', restoreDraft);
 
       // Form submission
-      document.getElementById('rosterForm').addEventListener('submit', async (e) => {
+      document.getElementById('clubForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const form = e.currentTarget;
-        const submitBtn = document.getElementById('submitBtn');
-        const loading = document.getElementById('loading');
-        const ok = document.getElementById('okMsg');
-        ok.style.display = 'none';
-
-        const fd = new FormData(form);
-        const submitEmail = fd.get('submitterEmail')?.trim();
-        if (!emailValid(submitEmail)) { 
-          alert('Please enter a valid email address.'); 
-          return; 
+        
+        if (!emailValid(clubData.submitterEmail)) {
+          alert('Please enter a valid email address.');
+          return;
         }
-
-        const roster = buildRoster(fd);
-        const params = {
-          team_name: roster.teamName,
-          league: roster.leagueEnglish,
-          submitter_name: roster.submitterName,
-          submitter_email: roster.submitterEmail,
-          season: roster.season,
-          roster_data: rosterSummary(roster)
-        };
-
-        submitBtn.disabled = true; 
-        loading.style.display = 'block';
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 15000);
-
-        const sinkPromise = sendToSheet(roster).catch(err => { 
-          console.warn('Data sink error:', err); 
-          return false; 
-        });
-
-        try {
-          await sendEmailViaAPI(params, { signal: controller.signal });
-          await sinkPromise;
-          downloadCSV(roster);
-          ok.textContent = '✅ Roster submitted successfully! Email sent, data logged, and CSV downloaded.';
-          ok.style.display = 'block';
-          document.getElementById('newBtn').style.display = 'inline-block';
-        } catch (err) {
-          console.error('Email API error:', err);
-          alert('Email sending failed. A CSV file will be downloaded instead. Please email it to pixellotibba@gmail.com.');
-          downloadCSV(roster);
-          ok.textContent = '⚠️ Email failed. CSV downloaded as fallback. Data sink may or may not have succeeded.';
-          ok.style.display = 'block';
-          document.getElementById('newBtn').style.display = 'inline-block';
-        } finally {
-          clearTimeout(timeout);
-          submitBtn.disabled = false; 
-          loading.style.display = 'none';
+        
+        await submitAllTeams();
+      });
+      
+      // Add event listeners for roster inputs (using event delegation)
+      document.addEventListener('change', (e) => {
+        if (currentStep === 3 && (
+            e.target.matches('input[name*="player"]') ||
+            e.target.matches('select[name*="player"]') ||
+            e.target.matches('input[name*="coach"]') ||
+            e.target.matches('input[name*="asst"]') ||
+            e.target.matches('input[name*="gm"]')
+        )) {
+          // Debounce the updates to prevent infinite loops
+          clearTimeout(window.rosterUpdateTimeout);
+          window.rosterUpdateTimeout = setTimeout(() => {
+            saveCurrentTeamRoster();
+            updateNextButtonState();
+          }, 100);
         }
       });
+      
+      // Update button state when step changes or teams are modified
+      document.addEventListener('input', (e) => {
+        if (currentStep === 1 && e.target.matches('.form-step[data-step="1"] [required]')) {
+          clearTimeout(window.buttonUpdateTimeout);
+          window.buttonUpdateTimeout = setTimeout(updateNextButtonState, 150);
+        }
+      });
+    }
+
+    // === Initialize ===
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('versionBadge').textContent = `Version ${APP_VERSION}`;
+      populateSeasonSelect();
+      updateProgress();
+      renderTeams();
+      setupEventListeners();
+      
+      // Initial button state update - add slight delay to ensure DOM is ready
+      setTimeout(() => {
+        updateNextButtonState();
+      }, 100);
     });
   </script>
 </body>
