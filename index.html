@@ -149,7 +149,77 @@
     .stat-number { font-size: 1.5rem; font-weight: 700; color: var(--brand); }
     .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; }
 
+    /* Mandatory field indicator */
+    .required::after {
+      content: " *";
+      color: var(--err);
+      font-weight: bold;
+    }
+
+    /* Tooltip styles */
+    .tooltip {
+      position: relative;
+      cursor: help;
+    }
+
+    .tooltip::before {
+      content: "ℹ️";
+      position: absolute;
+      right: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      opacity: 0.7;
+    }
+
+    .tooltip:hover::before {
+      opacity: 1;
+    }
+
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 280px;
+      background-color: #333;
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 8px 12px;
+      position: absolute;
+      z-index: 1000;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -140px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 14px;
+      line-height: 1.4;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .tooltip .tooltiptext::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #333 transparent transparent transparent;
+    }
+
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Mobile tooltip adjustment */
     @media (max-width: 900px) {
+      .tooltip .tooltiptext {
+        width: 240px;
+        margin-left: -120px;
+        font-size: 13px;
+      }
+    }
       .col-6, .col-4, .col-3 { grid-column: 1 / -1; }
       .container { padding: 18px; }
       table { display: block; overflow-x: auto; white-space: nowrap; }
@@ -170,7 +240,7 @@
     <p class="subtitle">Submit rosters for multiple teams from your club • Powered by Pixellot Advantage</p>
 
     <div class="version-info" aria-live="polite">
-      <span id="versionBadge" class="version">Version 4.2.0</span>
+      <span id="versionBadge" class="version">Version 4.5.0</span>
       <span class="date">Updated: August 2025</span>
     </div>
 
@@ -206,11 +276,15 @@
           <h2 id="club-info-h">🏆 Club Information</h2>
           <div class="grid">
             <div class="col-6">
-              <label for="clubName">Club Name</label>
+              <label for="clubName" class="required tooltip">Club Name
+                <span class="tooltiptext">Enter your basketball club's official name (e.g., "Hapoel Kfar Saba", "Maccabi Tel Aviv")</span>
+              </label>
               <input id="clubName" name="clubName" type="text" placeholder="e.g., Hapoel Kfar Saba" autocomplete="organization" required />
             </div>
             <div class="col-6">
-              <label for="season">Season</label>
+              <label for="season" class="required tooltip">Season
+                <span class="tooltiptext">Select the basketball season year for this roster submission</span>
+              </label>
               <select id="season" name="season" required></select>
             </div>
           </div>
@@ -220,11 +294,15 @@
           <h2 id="contact-h">📝 Contact Information</h2>
           <div class="grid">
             <div class="col-6">
-              <label for="submitterName">Your Name</label>
+              <label for="submitterName" class="required tooltip">Your Name
+                <span class="tooltiptext">Enter your full name as the person submitting this roster (coach, manager, or club official)</span>
+              </label>
               <input id="submitterName" name="submitterName" type="text" placeholder="Enter your full name" autocomplete="name" required />
             </div>
             <div class="col-6">
-              <label for="submitterEmail">Your Email</label>
+              <label for="submitterEmail" class="required tooltip">Your Email
+                <span class="tooltiptext">Enter your email address - we'll send confirmation and updates to this email</span>
+              </label>
               <input id="submitterEmail" name="submitterEmail" type="email" placeholder="Enter your email address" autocomplete="email" inputmode="email" required />
             </div>
           </div>
@@ -351,11 +429,19 @@
                     <tr>
                       <th style="width:64px">S/N</th>
                       <th style="width:140px">Role</th>
-                      <th>First Name</th>
-                      <th>Last Name</th>
+                      <th class="required tooltip">First Name
+                        <span class="tooltiptext">Required: Staff member's first name</span>
+                      </th>
+                      <th class="required tooltip">Last Name
+                        <span class="tooltiptext">Required: Staff member's last name</span>
+                      </th>
                       <th style="width:100px">Position</th>
-                      <th>Email Address</th>
-                      <th style="width:140px">Phone</th>
+                      <th class="tooltip">Email Address
+                        <span class="tooltiptext">Optional: Staff member's email for communication</span>
+                      </th>
+                      <th class="tooltip" style="width:140px">Phone
+                        <span class="tooltiptext">Optional: Staff member's phone number</span>
+                      </th>
                     </tr>
                   </thead>
                   <tbody id="staffTable">
@@ -451,7 +537,7 @@
     const DATA_SINK_URL = 'https://script.google.com/macros/s/AKfycbxchgyxazvH9t4N0prpLTboqeAlb6kRz6xUj-klQ1HIYtrZjs9qeKxWVqTttVJKdREj/exec';
     const DATA_SINK_KEY = 'Pixellot2@25';
 
-    const APP_VERSION = '4.2.0';
+    const APP_VERSION = '4.5.0';
     const BUILD_DATE = new Date().toISOString().slice(0,10);
 
     const CURRENT_SEASON_START_YEAR = 2025;
@@ -560,7 +646,7 @@
           reasonText = 'Add at least one team';
         } else if (!allTeamsComplete) {
           const incompleteCount = clubData.teams.filter(t => !isTeamComplete(t)).length;
-          reasonText = `Complete information for ${incompleteCount} team(s)`;
+          reasonText = `Complete age group and league for ${incompleteCount} team(s)`;
         }
       } else if (currentStep === 3) {
         // Make sure we save current team roster first
@@ -626,7 +712,7 @@
         // Check that all teams have complete basic info
         const incompleteTeams = clubData.teams.filter(team => !isTeamComplete(team));
         if (incompleteTeams.length > 0) {
-          alert('Please complete all team information (nickname, age group, and league) before proceeding.');
+          alert('Please complete all team information (age group and league are required) before proceeding.');
           return false;
         }
       } else if (currentStep === 3) {
@@ -711,22 +797,28 @@
     }
 
     function getFullTeamName(team) {
-      return `${clubData.clubName} ${team.nickname}`.trim();
+      const ageGroupEnglish = ageGroupToEnglish(team.ageGroup);
+      if (team.nickname && team.nickname.trim()) {
+        return `${clubData.clubName} ${team.nickname} (${ageGroupEnglish})`.trim();
+      } else {
+        // If no nickname, use age group as the main identifier
+        return `${clubData.clubName} ${ageGroupEnglish}`.trim();
+      }
     }
 
     function ageGroupToEnglish(h) {
       const map = {
-        'קט-סל ב': 'Mini Basketball B',
-        'קט-סל א': 'Mini Basketball A', 
-        'ילדים ב': 'Children Boys B',
-        'ילדות ב': 'Children Girls B',
-        'ילדים א': 'Children Boys A',
-        'ילדות א': 'Children Girls A',
-        'נערים ב': 'Youth Boys B',
-        'נערות ב': 'Youth Girls B',
-        'נערים א': 'Youth Boys A',
-        'נערות א': 'Youth Girls A',
-        'נוער': 'Youth',
+        'קט-סל ב': 'U11',
+        'קט-סל א': 'U12', 
+        'ילדים ב': 'U13 Boys',
+        'ילדות ב': 'U13 Girls',
+        'ילדים א': 'U14 Boys',
+        'ילדות א': 'U14 Girls',
+        'נערים ב': 'U15 Boys',
+        'נערות ב': 'U16 Girls',
+        'נערים א': 'U16 Boys',
+        'נערות א': 'U18 Girls',
+        'נוער': 'U18 Boys',
         'בוגרים': 'Adults Men',
         'בוגרות': 'Adults Women'
       };
@@ -887,12 +979,12 @@
     }
 
     function isTeamComplete(team) {
-      // A team is complete when it has basic info filled out
-      return team.nickname && team.ageGroup && team.league;
+      // A team is complete when it has basic info filled out (nickname is now optional)
+      return team.ageGroup && team.league;
     }
 
     function getTeamStatus(team) {
-      if (!team.nickname || !team.ageGroup || !team.league) return 'incomplete';
+      if (!team.ageGroup || !team.league) return 'incomplete';
       return 'complete';
     }
 
@@ -913,32 +1005,38 @@
           </div>
           <div class="team-info">
             <div>
-              <label>Team Nickname</label>
-              <input type="text" value="${team.nickname}" placeholder="e.g., AVIV, GEFFEN" 
+              <label class="tooltip">Team Nickname
+                <span class="tooltiptext">Optional: Add a team nickname like "EAGLES" or coach name. If left empty, team will be called by age group only.</span>
+              </label>
+              <input type="text" value="${team.nickname}" placeholder="e.g., EAGLES, COACH_SMITH (optional)" 
                      onchange="updateTeam(${team.id}, 'nickname', this.value)" 
                      oninput="updateTeam(${team.id}, 'nickname', this.value)" />
             </div>
             <div>
-              <label>Age Group</label>
+              <label class="required tooltip">Age Group
+                <span class="tooltiptext">Required: Select the age category for this team (e.g., U16 Boys, U13 Girls, Adults)</span>
+              </label>
               <select onchange="updateTeam(${team.id}, 'ageGroup', this.value); updateLeagueForTeam(${team.id}, this.value)">
                 <option value="">Select Age Group</option>
-                <option value="קט-סל ב" ${team.ageGroup === 'קט-סל ב' ? 'selected' : ''}>קט-סל ב</option>
-                <option value="קט-סל א" ${team.ageGroup === 'קט-סל א' ? 'selected' : ''}>קט-סל א</option>
-                <option value="ילדים ב" ${team.ageGroup === 'ילדים ב' ? 'selected' : ''}>ילדים ב</option>
-                <option value="ילדות ב" ${team.ageGroup === 'ילדות ב' ? 'selected' : ''}>ילדות ב</option>
-                <option value="ילדים א" ${team.ageGroup === 'ילדים א' ? 'selected' : ''}>ילדים א</option>
-                <option value="ילדות א" ${team.ageGroup === 'ילדות א' ? 'selected' : ''}>ילדות א</option>
-                <option value="נערים ב" ${team.ageGroup === 'נערים ב' ? 'selected' : ''}>נערים ב</option>
-                <option value="נערות ב" ${team.ageGroup === 'נערות ב' ? 'selected' : ''}>נערות ב</option>
-                <option value="נערים א" ${team.ageGroup === 'נערים א' ? 'selected' : ''}>נערים א</option>
-                <option value="נערות א" ${team.ageGroup === 'נערות א' ? 'selected' : ''}>נערות א</option>
-                <option value="נוער" ${team.ageGroup === 'נוער' ? 'selected' : ''}>נוער</option>
-                <option value="בוגרים" ${team.ageGroup === 'בוגרים' ? 'selected' : ''}>בוגרים</option>
-                <option value="בוגרות" ${team.ageGroup === 'בוגרות' ? 'selected' : ''}>בוגרות</option>
+                <option value="קט-סל ב" ${team.ageGroup === 'קט-סל ב' ? 'selected' : ''}>קט-סל ב (U11)</option>
+                <option value="קט-סל א" ${team.ageGroup === 'קט-סל א' ? 'selected' : ''}>קט-סל א (U12)</option>
+                <option value="ילדים ב" ${team.ageGroup === 'ילדים ב' ? 'selected' : ''}>ילדים ב (U13 Boys)</option>
+                <option value="ילדות ב" ${team.ageGroup === 'ילדות ב' ? 'selected' : ''}>ילדות ב (U13 Girls)</option>
+                <option value="ילדים א" ${team.ageGroup === 'ילדים א' ? 'selected' : ''}>ילדים א (U14 Boys)</option>
+                <option value="ילדות א" ${team.ageGroup === 'ילדות א' ? 'selected' : ''}>ילדות א (U14 Girls)</option>
+                <option value="נערים ב" ${team.ageGroup === 'נערים ב' ? 'selected' : ''}>נערים ב (U15 Boys)</option>
+                <option value="נערות ב" ${team.ageGroup === 'נערות ב' ? 'selected' : ''}>נערות ב (U16 Girls)</option>
+                <option value="נערים א" ${team.ageGroup === 'נערים א' ? 'selected' : ''}>נערים א (U16 Boys)</option>
+                <option value="נערות א" ${team.ageGroup === 'נערות א' ? 'selected' : ''}>נערות א (U18 Girls)</option>
+                <option value="נוער" ${team.ageGroup === 'נוער' ? 'selected' : ''}>נוער (U18 Boys)</option>
+                <option value="בוגרים" ${team.ageGroup === 'בוגרים' ? 'selected' : ''}>בוגרים (Adults Men)</option>
+                <option value="בוגרות" ${team.ageGroup === 'בוגרות' ? 'selected' : ''}>בוגרות (Adults Women)</option>
               </select>
             </div>
             <div>
-              <label>League</label>
+              <label class="required tooltip">League
+                <span class="tooltiptext">Required: Select the competition level. Some age groups automatically assign "Regular" league.</span>
+              </label>
               <select id="league_${team.id}" onchange="updateTeam(${team.id}, 'league', this.value)">
                 <option value="">Select League</option>
               </select>
@@ -1026,6 +1124,7 @@
         
         const tab = document.createElement('div');
         tab.className = `team-tab ${activeTeamId === team.id ? 'active' : ''} ${hasRoster ? 'complete' : ''}`;
+        // Always show full name with age group
         tab.textContent = fullName || `Team ${team.id}`;
         tab.onclick = () => showTeamRoster(team.id);
         tabsContainer.appendChild(tab);
@@ -1405,6 +1504,9 @@
         
         html += '<div class="overview-card">';
         html += `<h3>🏀 ${fullName}</h3>`;
+        if (team.nickname && team.nickname.trim()) {
+          html += `<p><strong>Nickname:</strong> ${team.nickname}</p>`;
+        }
         html += `<p><strong>Age Group:</strong> ${team.ageGroup} (${ageGroupToEnglish(team.ageGroup)})</p>`;
         html += `<p><strong>League:</strong> ${team.league} (${leagueToEnglish(team.league)})</p>`;
         
@@ -1518,6 +1620,9 @@
       
       data.teams.forEach((team, idx) => {
         summary += `TEAM ${idx + 1}: ${team.fullName}\n`;
+        if (team.nickname && team.nickname.trim()) {
+          summary += `Nickname: ${team.nickname}\n`;
+        }
         summary += `Age Group: ${team.ageGroupEnglish}\n`;
         summary += `League: ${team.leagueEnglish}\n`;
         summary += `Players: ${team.players.length}\n`;
@@ -1545,60 +1650,291 @@
       return summary;
     }
 
-    // === Auto Fill for Testing ===
-    function autoFillTestData() {
-      // Fill club info
-      document.getElementById('clubName').value = 'Hapoel Test Club';
-      document.getElementById('submitterName').value = 'Test Manager';
-      document.getElementById('submitterEmail').value = 'test@example.com';
+    // === Clear All Functionality ===
+    function clearAllData() {
+      console.log('=== CLEAR ALL STARTED ===');
+      console.log('Before clear - clubData:', clubData);
+      console.log('Before clear - teams count:', clubData.teams.length);
       
-      // Save club info
-      saveClubInfo();
-      
-      // Add 2 test teams
-      addTeam(); // Team 1
-      setTimeout(() => {
-        // Fill first team
-        const team1 = clubData.teams[0];
-        team1.nickname = 'EAGLES';
-        team1.ageGroup = 'נערים א';
-        team1.league = 'ארצית';
+      try {
+        // Step 1: Reset all global variables
+        clubData = {
+          clubName: '',
+          season: '',
+          submitterName: '',
+          submitterEmail: '',
+          teams: []
+        };
         
-        addTeam(); // Team 2
-        setTimeout(() => {
-          // Fill second team
-          const team2 = clubData.teams[1];
-          team2.nickname = 'TIGERS';
-          team2.ageGroup = 'נערות א';
-          team2.league = 'מחוזית';
+        activeTeamId = null;
+        teamIdCounter = 1;
+        currentStep = 1;
+        
+        console.log('✅ Global variables reset');
+        console.log('After reset - clubData:', clubData);
+        
+        // Step 2: Clear all form inputs
+        const clubNameEl = document.getElementById('clubName');
+        const submitterNameEl = document.getElementById('submitterName');
+        const submitterEmailEl = document.getElementById('submitterEmail');
+        
+        if (clubNameEl) clubNameEl.value = '';
+        if (submitterNameEl) submitterNameEl.value = '';
+        if (submitterEmailEl) submitterEmailEl.value = '';
+        
+        console.log('✅ Form fields cleared');
+        
+        // Step 3: Reset form completely
+        const form = document.getElementById('clubForm');
+        if (form) {
+          form.reset();
+        }
+        
+        console.log('✅ Form reset called');
+        
+        // Step 4: Re-populate season select
+        populateSeasonSelect();
+        console.log('✅ Season select repopulated');
+        
+        // Step 5: Re-render teams (should show empty)
+        renderTeams();
+        console.log('✅ Teams re-rendered');
+        
+        // Step 6: Reset to step 1
+        currentStep = 1;
+        showStep(1);
+        updateProgress();
+        console.log('✅ Reset to step 1');
+        
+        // Step 7: Hide all status messages
+        const dupWarn = document.getElementById('dupWarn');
+        const okMsg = document.getElementById('okMsg');
+        const newBtn = document.getElementById('newBtn');
+        
+        if (dupWarn) dupWarn.style.display = 'none';
+        if (okMsg) okMsg.style.display = 'none';
+        if (newBtn) newBtn.style.display = 'none';
+        
+        console.log('✅ Status messages hidden');
+        
+        // Step 8: Update validation
+        updateNextButtonState();
+        console.log('✅ Button state updated');
+        
+        console.log('=== CLEAR ALL COMPLETED SUCCESSFULLY ===');
+        return true;
+        
+      } catch (error) {
+        console.error('❌ Clear all failed:', error);
+        alert('Clear failed: ' + error.message);
+        return false;
+      }
+    }
+    function autoFillTestData() {
+      try {
+        console.log('Starting auto-fill with 10 teams...');
+        
+        // Step 1: Fill basic club info
+        const clubNameEl = document.getElementById('clubName');
+        const submitterNameEl = document.getElementById('submitterName');
+        const submitterEmailEl = document.getElementById('submitterEmail');
+        
+        if (!clubNameEl || !submitterNameEl || !submitterEmailEl) {
+          console.error('Could not find required form elements');
+          alert('Error: Could not find form elements. Make sure you\'re on step 1.');
+          return;
+        }
+        
+        clubNameEl.value = 'Hapoel Load Test Club';
+        submitterNameEl.value = 'Load Test Manager';
+        submitterEmailEl.value = 'loadtest@example.com';
+        
+        console.log('Filled basic info');
+        
+        // Save club info to our data structure
+        saveClubInfo();
+        console.log('Saved club info:', clubData);
+        
+        // Step 2: Clear existing teams and reset counters
+        clubData.teams = [];
+        teamIdCounter = 1;
+        
+        // Create 10 test teams with variety
+        console.log('Creating 10 test teams...');
+        
+        const testTeams = [
+          {
+            nickname: 'EAGLES',
+            ageGroup: 'נערים א',
+            league: 'ארצית',
+            playerCount: 12,
+            staffCount: 3
+          },
+          {
+            nickname: 'TIGERS',
+            ageGroup: 'נערות א',
+            league: 'מחוזית',
+            playerCount: 10,
+            staffCount: 2
+          },
+          {
+            nickname: '', // No nickname
+            ageGroup: 'ילדים א',
+            league: 'רגיל',
+            playerCount: 8,
+            staffCount: 2
+          },
+          {
+            nickname: 'LIONS',
+            ageGroup: 'בוגרים',
+            league: 'לאומית',
+            playerCount: 15,
+            staffCount: 4
+          },
+          {
+            nickname: 'HAWKS',
+            ageGroup: 'נערים ב',
+            league: 'ארצית',
+            playerCount: 11,
+            staffCount: 2
+          },
+          {
+            nickname: '', // No nickname
+            ageGroup: 'נערות ב',
+            league: 'מחוזית',
+            playerCount: 9,
+            staffCount: 3
+          },
+          {
+            nickname: 'WOLVES',
+            ageGroup: 'בוגרות',
+            league: 'על',
+            playerCount: 13,
+            staffCount: 4
+          },
+          {
+            nickname: 'SHARKS',
+            ageGroup: 'נוער',
+            league: 'לאומית',
+            playerCount: 14,
+            staffCount: 3
+          },
+          {
+            nickname: '', // No nickname
+            ageGroup: 'קט-סל א',
+            league: 'רגיל',
+            playerCount: 6,
+            staffCount: 1
+          },
+          {
+            nickname: 'PHOENIX',
+            ageGroup: 'ילדות א',
+            league: 'רגיל',
+            playerCount: 7,
+            staffCount: 2
+          }
+        ];
+        
+        // Player names pool
+        const firstNames = ['John', 'Mike', 'David', 'Alex', 'Chris', 'Sarah', 'Emma', 'Olivia', 'Sophia', 'Isabella', 
+                           'Tommy', 'Billy', 'Danny', 'Jamie', 'Casey', 'Jordan', 'Taylor', 'Riley', 'Morgan', 'Avery',
+                           'Noah', 'Liam', 'Mason', 'Jacob', 'William', 'Ethan', 'James', 'Alexander', 'Michael', 'Benjamin'];
+        const lastNames = ['Smith', 'Johnson', 'Brown', 'Wilson', 'Davis', 'Anderson', 'Taylor', 'Thomas', 'Jackson', 'White',
+                          'Harris', 'Martin', 'Thompson', 'Garcia', 'Martinez', 'Robinson', 'Clark', 'Rodriguez', 'Lewis', 'Lee',
+                          'Walker', 'Hall', 'Allen', 'Young', 'Hernandez', 'King', 'Wright', 'Lopez', 'Hill', 'Scott'];
+        const positions = ['G', 'F', 'C'];
+        const coachNames = ['Wilson', 'Taylor', 'Anderson', 'Roberts', 'Miller', 'Davis', 'Garcia', 'Rodriguez', 'Martinez', 'Hernandez'];
+        
+        testTeams.forEach((teamConfig, index) => {
+          const team = {
+            id: teamIdCounter++,
+            nickname: teamConfig.nickname,
+            ageGroup: teamConfig.ageGroup,
+            league: teamConfig.league,
+            players: [],
+            staff: []
+          };
           
-          renderTeams();
+          // Generate players
+          for (let p = 0; p < teamConfig.playerCount; p++) {
+            const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+            const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+            const position = positions[Math.floor(Math.random() * positions.length)];
+            const jersey = (p + 1 + (index * 20)).toString(); // Ensure unique jersey numbers
+            
+            team.players.push({
+              jersey: jersey,
+              first: firstName,
+              last: lastName,
+              position: position,
+              email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}${index + 1}@test.com`
+            });
+          }
           
-          // Add some sample players to first team
-          activeTeamId = team1.id;
-          team1.players = [
-            { jersey: '1', first: 'John', last: 'Smith', position: 'G', email: 'john@test.com' },
-            { jersey: '2', first: 'Mike', last: 'Johnson', position: 'F', email: 'mike@test.com' },
-            { jersey: '3', first: 'David', last: 'Brown', position: 'C', email: 'david@test.com' }
-          ];
+          // Generate staff
+          const coachLastName = coachNames[index % coachNames.length];
+          team.staff.push({
+            role: 'Head Coach',
+            first: 'Coach',
+            last: coachLastName,
+            email: `coach.${coachLastName.toLowerCase()}@test.com`,
+            phone: `555-${(1000 + index).toString().padStart(4, '0')}`
+          });
           
-          team1.staff = [
-            { role: 'Head Coach', first: 'Coach', last: 'Wilson', email: 'coach@test.com', phone: '555-0123' }
-          ];
+          if (teamConfig.staffCount > 1) {
+            team.staff.push({
+              role: 'Assistant Coach 1',
+              first: 'Assistant',
+              last: `${coachLastName}Jr`,
+              email: `assist.${coachLastName.toLowerCase()}@test.com`,
+              phone: `555-${(2000 + index).toString().padStart(4, '0')}`
+            });
+          }
           
-          // Add some sample players to second team
-          team2.players = [
-            { jersey: '4', first: 'Sarah', last: 'Davis', position: 'G', email: 'sarah@test.com' },
-            { jersey: '5', first: 'Emma', last: 'Wilson', position: 'F', email: 'emma@test.com' }
-          ];
+          if (teamConfig.staffCount > 2) {
+            team.staff.push({
+              role: 'Assistant Coach 2',
+              first: 'Second',
+              last: 'Assistant',
+              email: `second.assist${index + 1}@test.com`,
+              phone: `555-${(3000 + index).toString().padStart(4, '0')}`
+            });
+          }
           
-          team2.staff = [
-            { role: 'Head Coach', first: 'Coach', last: 'Taylor', email: 'coach2@test.com', phone: '555-0456' }
-          ];
+          if (teamConfig.staffCount > 3) {
+            team.staff.push({
+              role: 'General Manager',
+              first: 'GM',
+              last: `Manager${index + 1}`,
+              email: `gm.manager${index + 1}@test.com`,
+              phone: `555-${(4000 + index).toString().padStart(4, '0')}`
+            });
+          }
           
-          flashOk('Test data filled! You can now navigate through the steps.');
-        }, 100);
-      }, 100);
+          clubData.teams.push(team);
+        });
+        
+        console.log(`Created ${clubData.teams.length} teams with ${clubData.teams.reduce((sum, t) => sum + t.players.length, 0)} total players`);
+        
+        // Re-render teams in UI
+        renderTeams();
+        console.log('Rendered teams');
+        
+        // Update validation state
+        updateNextButtonState();
+        console.log('Updated button state');
+        
+        // Flash success message with stats
+        const totalPlayers = clubData.teams.reduce((sum, team) => sum + team.players.length, 0);
+        const totalStaff = clubData.teams.reduce((sum, team) => sum + team.staff.length, 0);
+        flashOk(`✅ Load test data created! ${clubData.teams.length} teams, ${totalPlayers} players, ${totalStaff} staff members. Ready for full workflow testing.`);
+        
+        console.log('Auto-fill completed successfully');
+        
+      } catch (error) {
+        console.error('Auto-fill error:', error);
+        alert('Auto-fill failed: ' + error.message);
+      }
     }
     function buildSubmissionData() {
       return {
@@ -1607,7 +1943,7 @@
         submitterName: clubData.submitterName,
         submitterEmail: clubData.submitterEmail,
         teams: clubData.teams.map(team => ({
-          nickname: team.nickname,
+          nickname: team.nickname || '', // Now optional
           fullName: getFullTeamName(team),
           ageGroup: team.ageGroup,
           ageGroupEnglish: ageGroupToEnglish(team.ageGroup),
@@ -1643,6 +1979,9 @@
       
       data.teams.forEach((team, idx) => {
         csv += `TEAM ${idx + 1}: ${team.fullName}\n`;
+        if (team.nickname && team.nickname.trim()) {
+          csv += `Nickname: ${team.nickname}\n`;
+        }
         csv += `Age Group: ${team.ageGroupEnglish}\n`;
         csv += `League: ${team.leagueEnglish}\n\n`;
         
@@ -1836,29 +2175,16 @@
       
       // Form controls
       document.getElementById('clearBtn').addEventListener('click', () => {
-        if (!confirm('Clear all club and team data?')) return;
-        
-        clubData = {
-          clubName: '',
-          season: '',
-          submitterName: '',
-          submitterEmail: '',
-          teams: []
-        };
-        
-        activeTeamId = null;
-        teamIdCounter = 1;
-        currentStep = 1;
-        
-        document.getElementById('clubForm').reset();
-        populateSeasonSelect();
-        renderTeams();
-        showStep(currentStep);
-        updateProgress();
-        
-        document.getElementById('dupWarn').style.display = 'none';
-        document.getElementById('okMsg').style.display = 'none';
-        document.getElementById('newBtn').style.display = 'none';
+        console.log('Clear button clicked');
+        if (confirm('Clear all club and team data? This cannot be undone.')) {
+          console.log('User confirmed clear');
+          const success = clearAllData();
+          if (success) {
+            flashOk('✅ All data cleared successfully! Form is now empty.');
+          }
+        } else {
+          console.log('User cancelled clear');
+        }
       });
       
       document.getElementById('newBtn').addEventListener('click', () => {
@@ -1897,9 +2223,8 @@
       
       // Auto fill for testing
       document.getElementById('autoFillBtn').addEventListener('click', () => {
-        if (confirm('This will fill the form with test data. Continue?')) {
-          autoFillTestData();
-        }
+        console.log('Auto Fill button clicked - running immediately');
+        autoFillTestData();
       });
 
       // Form submission
