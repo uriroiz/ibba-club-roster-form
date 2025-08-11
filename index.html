@@ -252,7 +252,7 @@
     <p class="subtitle">Submit rosters for multiple teams from your club • Powered by Pixellot Advantage</p>
 
     <div class="version-info" aria-live="polite">
-      <span id="versionBadge" class="version">Version 4.9.0</span>
+      <span id="versionBadge" class="version">Version 5.1.0</span>
       <span class="date">Updated: August 2025</span>
     </div>
 
@@ -549,7 +549,7 @@
     const DATA_SINK_URL = 'https://script.google.com/macros/s/AKfycbxchgyxazvH9t4N0prpLTboqeAlb6kRz6xUj-klQ1HIYtrZjs9qeKxWVqTttVJKdREj/exec';
     const DATA_SINK_KEY = 'Pixellot2@25';
 
-    const APP_VERSION = '5.0.0';
+    const APP_VERSION = '5.1.0';
     const BUILD_DATE = new Date().toISOString().slice(0,10);
 
     const CURRENT_SEASON_START_YEAR = 2025;
@@ -1641,7 +1641,19 @@
         summary += `Staff: ${team.staff.length}\n\n`;
         
         if (team.players.length > 0) {
+          // Add CSV format for copying - this is the important part!
+          summary += 'CSV FORMAT FOR COPYING:\n';
+          summary += '=======================\n';
+          team.players.forEach(p => {
+            // Format: jersey,firstName,lastName,email,position
+            const email = p.email || '';  // Empty string if no email
+            summary += `${p.jersey},${p.firstName},${p.lastName},${email},${p.position}\n`;
+          });
+          summary += '\n';
+          
+          // Then add human-readable format
           summary += 'PLAYERS:\n';
+          summary += '------------------------\n';
           team.players.forEach(p => {
             summary += `#${p.jersey} - ${p.firstName} ${p.lastName} (${p.position})${p.email ? ' - ' + p.email : ''}\n`;
           });
@@ -1649,7 +1661,8 @@
         }
         
         if (team.staff.length > 0) {
-          summary += 'STAFF:\n';
+          summary += 'COACHING STAFF:\n';
+          summary += '----------------------------\n';
           team.staff.forEach(s => {
             summary += `${s.role}: ${s.firstName} ${s.lastName}${s.email ? ' - ' + s.email : ''}${s.phone ? ' | ' + s.phone : ''}\n`;
           });
@@ -1658,6 +1671,13 @@
         
         summary += '---\n\n';
       });
+      
+      // Debug: Log the summary to console
+      console.log('=== EMAIL SUMMARY GENERATED ===');
+      console.log('Summary length:', summary.length);
+      console.log('Contains CSV FORMAT:', summary.includes('CSV FORMAT FOR COPYING'));
+      console.log('First 500 chars:', summary.substring(0, 500));
+      console.log('=== END EMAIL SUMMARY ===');
       
       return summary;
     }
