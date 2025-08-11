@@ -30,8 +30,20 @@
     .progress-bar { width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; margin-bottom: 16px; }
     .progress-fill { height: 100%; background: linear-gradient(90deg, var(--brand), var(--brand-600)); transition: width 0.3s ease; border-radius: 4px; }
     
-    .steps { display: flex; justify-content: space-between; margin-bottom: 16px; gap: 16px; }
-    .step { display: flex; align-items: center; flex: 1; justify-content: center; }
+    .steps { 
+      display: flex; 
+      flex-direction: row !important; 
+      justify-content: space-between; 
+      margin-bottom: 16px; 
+      gap: 16px; 
+    }
+    .step { 
+      display: flex; 
+      flex-direction: row !important;
+      align-items: center; 
+      flex: 1; 
+      justify-content: center; 
+    }
     .step-circle { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; margin-right: 8px; position: relative; z-index: 1; }
     .step.pending .step-circle { background: #e5e7eb; color: var(--muted); }
     .step.active .step-circle { background: var(--brand); color: white; }
@@ -240,7 +252,7 @@
     <p class="subtitle">Submit rosters for multiple teams from your club • Powered by Pixellot Advantage</p>
 
     <div class="version-info" aria-live="polite">
-      <span id="versionBadge" class="version">Version 4.5.0</span>
+      <span id="versionBadge" class="version">Version 4.8.0</span>
       <span class="date">Updated: August 2025</span>
     </div>
 
@@ -301,7 +313,7 @@
             </div>
             <div class="col-6">
               <label for="submitterEmail" class="required tooltip">Your Email
-                <span class="tooltiptext">Enter your email address - we'll send confirmation and updates to this email</span>
+                <span class="tooltiptext">Enter your email address - this will be included in the CSV file for contact purposes</span>
               </label>
               <input id="submitterEmail" name="submitterEmail" type="email" placeholder="Enter your email address" autocomplete="email" inputmode="email" required />
             </div>
@@ -537,7 +549,7 @@
     const DATA_SINK_URL = 'https://script.google.com/macros/s/AKfycbxchgyxazvH9t4N0prpLTboqeAlb6kRz6xUj-klQ1HIYtrZjs9qeKxWVqTttVJKdREj/exec';
     const DATA_SINK_KEY = 'Pixellot2@25';
 
-    const APP_VERSION = '4.5.0';
+    const APP_VERSION = '4.8.0';
     const BUILD_DATE = new Date().toISOString().slice(0,10);
 
     const CURRENT_SEASON_START_YEAR = 2025;
@@ -2174,16 +2186,19 @@
       document.getElementById('clearSelected').addEventListener('click', clearSelected);
       
       // Form controls
-      document.getElementById('clearBtn').addEventListener('click', () => {
+      document.getElementById('clearBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
         console.log('Clear button clicked');
-        if (confirm('Clear all club and team data? This cannot be undone.')) {
-          console.log('User confirmed clear');
-          const success = clearAllData();
-          if (success) {
-            flashOk('✅ All data cleared successfully! Form is now empty.');
-          }
+        
+        // Call clearAllData directly without confirmation for testing
+        console.log('Calling clearAllData directly...');
+        const success = clearAllData();
+        if (success) {
+          flashOk('✅ All data cleared successfully! Form is now empty.');
         } else {
-          console.log('User cancelled clear');
+          alert('❌ Clear failed - check console for details');
         }
       });
       
