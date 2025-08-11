@@ -252,7 +252,7 @@
     <p class="subtitle">Submit rosters for multiple teams from your club • Powered by Pixellot Advantage</p>
 
     <div class="version-info" aria-live="polite">
-      <span id="versionBadge" class="version">Version 5.1.0</span>
+      <span id="versionBadge" class="version">Version 5.3.0 - PRODUCTION</span>
       <span class="date">Updated: August 2025</span>
     </div>
 
@@ -525,7 +525,8 @@
           <button type="button" class="btn btn-secondary" id="clearBtn">🗑️ Clear All</button>
           <button type="button" class="btn btn-outline" id="saveBtn">💾 Save Draft</button>
           <button type="button" class="btn btn-outline" id="restoreBtn">↩ Restore Draft</button>
-          <button type="button" class="btn btn-outline" id="autoFillBtn" style="background: #fbbf24; color: white;">🎯 Auto Fill (Test)</button>
+          <!-- Auto Fill button hidden in production -->
+          <!-- <button type="button" class="btn btn-outline" id="autoFillBtn" style="background: #fbbf24; color: white;">🎯 Auto Fill (Test)</button> -->
           <button type="button" class="btn btn-success" id="newBtn" style="display:none">📋 New Submission</button>
         </div>
         <button type="button" class="btn btn-primary" id="nextBtn">Next →</button>
@@ -549,7 +550,7 @@
     const DATA_SINK_URL = 'https://script.google.com/macros/s/AKfycbxchgyxazvH9t4N0prpLTboqeAlb6kRz6xUj-klQ1HIYtrZjs9qeKxWVqTttVJKdREj/exec';
     const DATA_SINK_KEY = 'Pixellot2@25';
 
-    const APP_VERSION = '5.1.0';
+    const APP_VERSION = '5.3.0 - PRODUCTION';
     const BUILD_DATE = new Date().toISOString().slice(0,10);
 
     const CURRENT_SEASON_START_YEAR = 2025;
@@ -2121,7 +2122,7 @@
         // Prepare email parameters for multi-team submission
         const emailParams = {
           // Updated for multi-team
-          team_name: submissionData.clubName, // Club name instead of single team
+          team_name: `${submissionData.clubName} (v${APP_VERSION})`, // Add version to subject
           league: `Multi-Team Submission (${submissionData.teams.length} teams)`, // Multiple teams
           submitter_name: submissionData.submitterName,
           submitter_email: submissionData.submitterEmail,
@@ -2134,6 +2135,14 @@
           // Full roster data as before
           roster_data: buildSubmissionSummary(submissionData)
         };
+        
+        // Debug: Log the email parameters
+        console.log('=== EMAIL PARAMETERS ===');
+        console.log('team_name:', emailParams.team_name);
+        console.log('league:', emailParams.league);
+        console.log('roster_data length:', emailParams.roster_data.length);
+        console.log('roster_data contains CSV:', emailParams.roster_data.includes('CSV FORMAT FOR COPYING'));
+        console.log('=== END EMAIL PARAMETERS ===');
         
         // Set up timeout controller
         const controller = new AbortController();
@@ -2262,11 +2271,9 @@
       document.getElementById('saveBtn').addEventListener('click', saveDraft);
       document.getElementById('restoreBtn').addEventListener('click', restoreDraft);
       
-      // Auto fill for testing
-      document.getElementById('autoFillBtn').addEventListener('click', () => {
-        console.log('Auto Fill button clicked - running immediately');
-        autoFillTestData();
-      });
+      // Auto fill for testing - DISABLED IN PRODUCTION
+      // Uncomment the line below for development/testing:
+      // document.getElementById('autoFillBtn').addEventListener('click', () => { autoFillTestData(); });
 
       // Form submission
       document.getElementById('clubForm').addEventListener('submit', async (e) => {
