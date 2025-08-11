@@ -170,7 +170,7 @@
     <p class="subtitle">Submit rosters for multiple teams from your club • Powered by Pixellot Advantage</p>
 
     <div class="version-info" aria-live="polite">
-      <span id="versionBadge" class="version">Version 4.1.0</span>
+      <span id="versionBadge" class="version">Version 4.2.0</span>
       <span class="date">Updated: August 2025</span>
     </div>
 
@@ -427,6 +427,7 @@
           <button type="button" class="btn btn-secondary" id="clearBtn">🗑️ Clear All</button>
           <button type="button" class="btn btn-outline" id="saveBtn">💾 Save Draft</button>
           <button type="button" class="btn btn-outline" id="restoreBtn">↩ Restore Draft</button>
+          <button type="button" class="btn btn-outline" id="autoFillBtn" style="background: #fbbf24; color: white;">🎯 Auto Fill (Test)</button>
           <button type="button" class="btn btn-success" id="newBtn" style="display:none">📋 New Submission</button>
         </div>
         <button type="button" class="btn btn-primary" id="nextBtn">Next →</button>
@@ -440,7 +441,17 @@
 
   <script>
     // === Configuration ===
-    const APP_VERSION = '4.1.0';
+    // === EmailJS Configuration ===
+    const EmailJSConfig = Object.freeze({
+      publicKey: "_r4Y7hg0AGi5DhIcF",
+      serviceId: "service_4bdvcf9",
+      templateId: "template_6o8secn"
+    });
+
+    const DATA_SINK_URL = 'https://script.google.com/macros/s/AKfycbxchgyxazvH9t4N0prpLTboqeAlb6kRz6xUj-klQ1HIYtrZjs9qeKxWVqTttVJKdREj/exec';
+    const DATA_SINK_KEY = 'Pixellot2@25';
+
+    const APP_VERSION = '4.2.0';
     const BUILD_DATE = new Date().toISOString().slice(0,10);
 
     const CURRENT_SEASON_START_YEAR = 2025;
@@ -1428,7 +1439,167 @@
       document.getElementById('reviewContent').innerHTML = html;
     }
 
-    // === Data Export ===
+    // === EmailJS Integration ===
+    function sleep(ms) { 
+      return new Promise(resolve => setTimeout(resolve, ms)); 
+    }
+
+    async function sendEmailViaAPI(params, { signal } = {}) {
+      const url = 'https://api.emailjs.com/api/v1.0/email/send';
+      const payload = {
+        service_id: EmailJSConfig.serviceId,
+        template_id: EmailJSConfig.templateId,
+        user_id: EmailJSConfig.publicKey,
+        template_params: params
+      };
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Email API responded ${response.status}`);
+      }
+      
+      return response;
+    }
+
+    async function sendToSheet(submissionData) {
+      if (!DATA_SINK_URL) return true;
+      
+      const url = `${DATA_SINK_URL}?key=${encodeURIComponent(DATA_SINK_KEY)}`;
+      const payload = {
+        app_version: APP_VERSION,
+        build_date: BUILD_DATE,
+        club_name: submissionData.clubName,
+        season: submissionData.season,
+        submitter_name: submissionData.submitterName,
+        submitter_email: submissionData.submitterEmail,
+        teams: submissionData.teams,
+        total_teams: submissionData.teams.length,
+        total_players: submissionData.teams.reduce((sum, team) => sum + team.players.length, 0),
+        submission_type: 'multi_team'
+      };
+      
+      const fetchOnce = () => fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(payload)
+      });
+      
+      // Retry logic
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          await fetchOnce();
+          return true;
+        } catch (error) {
+          if (attempt === 3) throw error;
+          await sleep(400 * attempt);
+        }
+      }
+    }
+
+    function buildSubmissionSummary(data) {
+      let summary = '';
+      summary += 'IBBA MULTI-TEAM ROSTER SUBMISSION\n';
+      summary += '===================================\n\n';
+      summary += `Club: ${data.clubName}\n`;
+      summary += `Season: ${data.season}\n`;
+      summary += `Submitted by: ${data.submitterName}\n`;
+      summary += `Email: ${data.submitterEmail}\n`;
+      summary += `Date: ${new Date().toLocaleString()}\n`;
+      summary += `Version: ${APP_VERSION}\n`;
+      summary += `Total Teams: ${data.teams.length}\n`;
+      summary += `Total Players: ${data.teams.reduce((sum, team) => sum + team.players.length, 0)}\n\n`;
+      
+      data.teams.forEach((team, idx) => {
+        summary += `TEAM ${idx + 1}: ${team.fullName}\n`;
+        summary += `Age Group: ${team.ageGroupEnglish}\n`;
+        summary += `League: ${team.leagueEnglish}\n`;
+        summary += `Players: ${team.players.length}\n`;
+        summary += `Staff: ${team.staff.length}\n\n`;
+        
+        if (team.players.length > 0) {
+          summary += 'PLAYERS:\n';
+          team.players.forEach(p => {
+            summary += `#${p.jersey} - ${p.firstName} ${p.lastName} (${p.position})${p.email ? ' - ' + p.email : ''}\n`;
+          });
+          summary += '\n';
+        }
+        
+        if (team.staff.length > 0) {
+          summary += 'STAFF:\n';
+          team.staff.forEach(s => {
+            summary += `${s.role}: ${s.firstName} ${s.lastName}${s.email ? ' - ' + s.email : ''}${s.phone ? ' | ' + s.phone : ''}\n`;
+          });
+          summary += '\n';
+        }
+        
+        summary += '---\n\n';
+      });
+      
+      return summary;
+    }
+
+    // === Auto Fill for Testing ===
+    function autoFillTestData() {
+      // Fill club info
+      document.getElementById('clubName').value = 'Hapoel Test Club';
+      document.getElementById('submitterName').value = 'Test Manager';
+      document.getElementById('submitterEmail').value = 'test@example.com';
+      
+      // Save club info
+      saveClubInfo();
+      
+      // Add 2 test teams
+      addTeam(); // Team 1
+      setTimeout(() => {
+        // Fill first team
+        const team1 = clubData.teams[0];
+        team1.nickname = 'EAGLES';
+        team1.ageGroup = 'נערים א';
+        team1.league = 'ארצית';
+        
+        addTeam(); // Team 2
+        setTimeout(() => {
+          // Fill second team
+          const team2 = clubData.teams[1];
+          team2.nickname = 'TIGERS';
+          team2.ageGroup = 'נערות א';
+          team2.league = 'מחוזית';
+          
+          renderTeams();
+          
+          // Add some sample players to first team
+          activeTeamId = team1.id;
+          team1.players = [
+            { jersey: '1', first: 'John', last: 'Smith', position: 'G', email: 'john@test.com' },
+            { jersey: '2', first: 'Mike', last: 'Johnson', position: 'F', email: 'mike@test.com' },
+            { jersey: '3', first: 'David', last: 'Brown', position: 'C', email: 'david@test.com' }
+          ];
+          
+          team1.staff = [
+            { role: 'Head Coach', first: 'Coach', last: 'Wilson', email: 'coach@test.com', phone: '555-0123' }
+          ];
+          
+          // Add some sample players to second team
+          team2.players = [
+            { jersey: '4', first: 'Sarah', last: 'Davis', position: 'G', email: 'sarah@test.com' },
+            { jersey: '5', first: 'Emma', last: 'Wilson', position: 'F', email: 'emma@test.com' }
+          ];
+          
+          team2.staff = [
+            { role: 'Head Coach', first: 'Coach', last: 'Taylor', email: 'coach2@test.com', phone: '555-0456' }
+          ];
+          
+          flashOk('Test data filled! You can now navigate through the steps.');
+        }, 100);
+      }, 100);
+    }
     function buildSubmissionData() {
       return {
         clubName: clubData.clubName,
@@ -1576,17 +1747,63 @@
       try {
         const submissionData = buildSubmissionData();
         
-        // For now, just download CSV since email/sheet integration would need updating
-        downloadCSV(submissionData);
+        // Prepare email parameters
+        const emailParams = {
+          club_name: submissionData.clubName,
+          season: submissionData.season,
+          submitter_name: submissionData.submitterName,
+          submitter_email: submissionData.submitterEmail,
+          total_teams: submissionData.teams.length,
+          total_players: submissionData.teams.reduce((sum, team) => sum + team.players.length, 0),
+          submission_data: buildSubmissionSummary(submissionData)
+        };
         
-        ok.textContent = `✅ All ${submissionData.teams.length} team rosters submitted successfully! CSV downloaded.`;
-        ok.style.display = 'block';
-        document.getElementById('newBtn').style.display = 'inline-block';
+        // Set up timeout controller
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000);
+        
+        // Send to Google Sheet (best effort, don't fail on error)
+        const sheetPromise = sendToSheet(submissionData).catch(err => {
+          console.warn('Google Sheet error:', err);
+          return false;
+        });
+        
+        try {
+          // Send email
+          await sendEmailViaAPI(emailParams, { signal: controller.signal });
+          
+          // Wait for sheet submission (but don't fail if it errors)
+          await sheetPromise;
+          
+          // Download CSV
+          downloadCSV(submissionData);
+          
+          ok.textContent = `✅ All ${submissionData.teams.length} team rosters submitted successfully! Email sent, data logged, and CSV downloaded.`;
+          ok.style.display = 'block';
+          document.getElementById('newBtn').style.display = 'inline-block';
+          
+        } catch (emailError) {
+          console.error('Email sending failed:', emailError);
+          
+          // Still try sheet submission
+          await sheetPromise;
+          
+          // Download CSV as fallback
+          downloadCSV(submissionData);
+          
+          alert('Email sending failed. CSV file downloaded instead. Please email it to pixellotibba@gmail.com.');
+          ok.textContent = `⚠️ Email failed but ${submissionData.teams.length} team rosters processed. CSV downloaded as fallback.`;
+          ok.style.display = 'block';
+          document.getElementById('newBtn').style.display = 'inline-block';
+        }
+        
+        clearTimeout(timeout);
         
       } catch (err) {
         console.error('Submission error:', err);
         alert('Submission failed. CSV file will be downloaded instead.');
-        downloadCSV(buildSubmissionData());
+        const submissionData = buildSubmissionData();
+        downloadCSV(submissionData);
         ok.textContent = '⚠️ Submission error. CSV downloaded as fallback.';
         ok.style.display = 'block';
         document.getElementById('newBtn').style.display = 'inline-block';
@@ -1677,6 +1894,13 @@
 
       document.getElementById('saveBtn').addEventListener('click', saveDraft);
       document.getElementById('restoreBtn').addEventListener('click', restoreDraft);
+      
+      // Auto fill for testing
+      document.getElementById('autoFillBtn').addEventListener('click', () => {
+        if (confirm('This will fill the form with test data. Continue?')) {
+          autoFillTestData();
+        }
+      });
 
       // Form submission
       document.getElementById('clubForm').addEventListener('submit', async (e) => {
