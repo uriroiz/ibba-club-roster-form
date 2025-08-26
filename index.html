@@ -287,94 +287,6 @@
       100% { transform: rotate(360deg); }
     }
 
-    .submission-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      z-index: 10000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(3px);
-    }
-
-    .submission-modal {
-      background: white;
-      padding: 40px 30px;
-      border-radius: 16px;
-      text-align: center;
-      max-width: 500px;
-      margin: 20px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      animation: modalAppear 0.3s ease;
-    }
-
-    @keyframes modalAppear {
-      from { opacity: 0; transform: scale(0.9) translateY(-20px); }
-      to { opacity: 1; transform: scale(1) translateY(0); }
-    }
-
-    .submission-spinner {
-      width: 50px;
-      height: 50px;
-      border: 4px solid #e5e7eb;
-      border-top-color: #3b82f6;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 20px;
-    }
-
-    .submission-progress {
-      width: 100%;
-      height: 6px;
-      background: #e5e7eb;
-      border-radius: 3px;
-      margin: 20px 0;
-      overflow: hidden;
-    }
-
-    .submission-progress-bar {
-      height: 100%;
-      background: linear-gradient(90deg, #3b82f6, #1d4ed8);
-      border-radius: 3px;
-      transition: width 0.5s ease;
-    }
-
-    .submission-steps {
-      text-align: left;
-      margin-top: 25px;
-      font-size: 14px;
-    }
-
-    .submission-step {
-      display: flex;
-      align-items: center;
-      margin: 8px 0;
-      color: #6b7280;
-    }
-
-    .submission-step.active {
-      color: #3b82f6;
-      font-weight: 600;
-    }
-
-    .submission-step.completed {
-      color: #10b981;
-    }
-
-    .submission-step-icon {
-      width: 16px;
-      height: 16px;
-      margin-right: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-    }
-
     .pulse-dot {
       width: 8px;
       height: 8px;
@@ -445,7 +357,6 @@
       .team-info { grid-template-columns: 1fr; gap: 12px; }
       .team-tabs { justify-content: center; }
       .overview-grid { grid-template-columns: 1fr; }
-      .submission-modal { margin: 10px; padding: 30px 20px; }
       
       .tooltip .tooltiptext {
         width: 200px;
@@ -465,7 +376,7 @@
     <p class="subtitle">Submit rosters for multiple teams from your club • Powered by Pixellot Advantage</p>
 
     <div class="version-info" aria-live="polite">
-      <span id="versionBadge" class="version">Version 5.5.0 - ENHANCED PROTECTION</span>
+      <span id="versionBadge" class="version">Version 5.6.0 - ENHANCED STAFF VALIDATION</span>
       <span class="date">Updated: August 2025</span>
     </div>
 
@@ -657,7 +568,7 @@
                 <h3>👨‍💼 Coaching Staff</h3>
                 <p class="subtitle" style="margin-bottom: 16px; font-size: 14px; color: #64748b;">
                   <strong>Head Coach:</strong> All fields required. 
-                  <strong>Other Staff:</strong> If any field is filled, all fields are required for that person.
+                  <strong>Other Staff:</strong> If first name is entered, all fields (first name, last name, email, and phone) are required.
                 </p>
                 <table>
                   <thead>
@@ -684,38 +595,38 @@
                     <tr class="staff-row">
                       <td>18</td>
                       <td><strong>Asst. Coach</strong></td>
-                      <td><input type="text" name="asst1_first" placeholder="First name (optional)" /></td>
-                      <td><input type="text" name="asst1_last" placeholder="Last name (optional)" /></td>
+                      <td><input type="text" name="asst1_first" placeholder="First name" /></td>
+                      <td><input type="text" name="asst1_last" placeholder="Last name" /></td>
                       <td>-</td>
-                      <td><input type="email" name="asst1_email" placeholder="Email (optional)" /></td>
-                      <td><input type="tel" name="asst1_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
+                      <td><input type="email" name="asst1_email" placeholder="Email" /></td>
+                      <td><input type="tel" name="asst1_phone" placeholder="Phone" inputmode="tel" /></td>
                     </tr>
                     <tr class="staff-row">
                       <td>19</td>
                       <td><strong>Asst. Coach</strong></td>
-                      <td><input type="text" name="asst2_first" placeholder="First name (optional)" /></td>
-                      <td><input type="text" name="asst2_last" placeholder="Last name (optional)" /></td>
+                      <td><input type="text" name="asst2_first" placeholder="First name" /></td>
+                      <td><input type="text" name="asst2_last" placeholder="Last name" /></td>
                       <td>-</td>
-                      <td><input type="email" name="asst2_email" placeholder="Email (optional)" /></td>
-                      <td><input type="tel" name="asst2_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
+                      <td><input type="email" name="asst2_email" placeholder="Email" /></td>
+                      <td><input type="tel" name="asst2_phone" placeholder="Phone" inputmode="tel" /></td>
                     </tr>
                     <tr class="staff-row">
                       <td>20</td>
                       <td><strong>Asst. Coach</strong></td>
-                      <td><input type="text" name="asst3_first" placeholder="First name (optional)" /></td>
-                      <td><input type="text" name="asst3_last" placeholder="Last name (optional)" /></td>
+                      <td><input type="text" name="asst3_first" placeholder="First name" /></td>
+                      <td><input type="text" name="asst3_last" placeholder="Last name" /></td>
                       <td>-</td>
-                      <td><input type="email" name="asst3_email" placeholder="Email (optional)" /></td>
-                      <td><input type="tel" name="asst3_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
+                      <td><input type="email" name="asst3_email" placeholder="Email" /></td>
+                      <td><input type="tel" name="asst3_phone" placeholder="Phone" inputmode="tel" /></td>
                     </tr>
                     <tr class="staff-row">
                       <td>21</td>
                       <td><strong>GM</strong></td>
-                      <td><input type="text" name="gm_first" placeholder="First name (optional)" /></td>
-                      <td><input type="text" name="gm_last" placeholder="Last name (optional)" /></td>
+                      <td><input type="text" name="gm_first" placeholder="First name" /></td>
+                      <td><input type="text" name="gm_last" placeholder="Last name" /></td>
                       <td>-</td>
-                      <td><input type="email" name="gm_email" placeholder="Email (optional)" /></td>
-                      <td><input type="tel" name="gm_phone" placeholder="Phone (optional)" inputmode="tel" /></td>
+                      <td><input type="email" name="gm_email" placeholder="Email" /></td>
+                      <td><input type="tel" name="gm_phone" placeholder="Phone" inputmode="tel" /></td>
                     </tr>
                   </tbody>
                 </table>
@@ -762,7 +673,7 @@
     const DATA_SINK_URL = 'https://script.google.com/macros/s/AKfycbxchgyxazvH9t4N0prpLTboqeAlb6kRz6xUj-klQ1HIYtrZjs9qeKxWVqTttVJKdREj/exec';
     const DATA_SINK_KEY = 'Pixellot2@25';
 
-    const APP_VERSION = '5.5.0 - ENHANCED PROTECTION';
+    const APP_VERSION = '5.6.0 - ENHANCED STAFF VALIDATION';
     const BUILD_DATE = new Date().toISOString().slice(0,10);
 
     const CURRENT_SEASON_START_YEAR = 2025;
@@ -772,20 +683,14 @@
 
     const DEFAULT_PLAYER_ROWS = 16;
     const HARD_MAX_PLAYERS = 40;
-    const STORAGE_KEY = "ibbaMultiTeamDraft_v550";
+    const MIN_REQUIRED_PLAYERS = 8; // Minimum required players per team
+    const STORAGE_KEY = "ibbaMultiTeamDraft_v560"; // bumped for enhanced staff validation
 
     // === ENHANCED SUBMISSION PROTECTION GLOBALS ===
     let submissionState = {
       isSubmitting: false,
       lastSubmissionTime: 0,
-      submissionId: null,
-      currentStep: 0,
-      steps: [
-        { id: 'validate', text: 'Validating multi-team roster data' },
-        { id: 'email', text: 'Sending confirmation emails' },
-        { id: 'save', text: 'Saving all teams to database' },
-        { id: 'download', text: 'Generating CSV files' }
-      ]
+      submissionId: null
     };
 
     const MIN_SUBMISSION_INTERVAL = 30000; // 30 seconds between attempts
@@ -1097,10 +1002,11 @@
         
         const incompleteTeams = [];
         clubData.teams.forEach(team => {
-          const hasPlayers = team.players?.some(p => p.jersey && p.first && p.last && p.position) || false;
+          const completePlayers = team.players?.filter(p => p.jersey && p.first && p.last && p.position) || [];
+          const hasMinPlayers = completePlayers.length >= MIN_REQUIRED_PLAYERS;
           const hasStaff = team.staff?.some(s => s.first && s.last) || false;
           
-          if (!hasPlayers || !hasStaff) {
+          if (!hasMinPlayers || !hasStaff) {
             incompleteTeams.push(team);
           }
         });
@@ -1108,7 +1014,7 @@
         canProceed = incompleteTeams.length === 0;
         
         if (!canProceed) {
-          reasonText = `${incompleteTeams.length} team(s) need players and staff`;
+          reasonText = `${incompleteTeams.length} team(s) need ${MIN_REQUIRED_PLAYERS}+ players and staff`;
         }
       }
       
@@ -1219,12 +1125,12 @@
       for (const team of clubData.teams) {
         const teamName = getFullTeamName(team);
         
-        // Check for at least one complete player
+        // Check for at least 8 complete players
         const completePlayers = team.players?.filter(p => p.jersey && p.first && p.last && p.position) || [];
-        if (completePlayers.length === 0) {
+        if (completePlayers.length < MIN_REQUIRED_PLAYERS) {
           return {
             valid: false,
-            message: `${teamName} needs at least one complete player (jersey, first name, last name, position are required).`
+            message: `${teamName} needs at least ${MIN_REQUIRED_PLAYERS} complete players (jersey, first name, last name, position are required). Currently has ${completePlayers.length} complete players.`
           };
         }
         
@@ -1317,18 +1223,25 @@
 
     function validateStaffCompleteness(team) {
       const staff = team.staff || [];
-      const roles = ['Assistant Coach 1', 'Assistant Coach 2', 'Assistant Coach 3', 'General Manager'];
+      const roles = ['Head Coach', 'Assistant Coach 1', 'Assistant Coach 2', 'Assistant Coach 3', 'General Manager'];
       
-      for (let i = 1; i < staff.length; i++) { // Skip head coach (index 0)
+      for (let i = 0; i < staff.length; i++) {
         const staffMember = staff[i];
-        const roleName = roles[i - 1] || `Staff member ${i + 1}`;
+        const roleName = roles[i] || `Staff member ${i + 1}`;
         
-        const hasAny = staffMember.first || staffMember.last || staffMember.email || staffMember.phone;
-        const hasAll = staffMember.first?.trim() && staffMember.last?.trim() && 
-                      staffMember.email?.trim() && staffMember.phone?.trim();
-        
-        if (hasAny && !hasAll) {
-          return `${roleName} information is incomplete. All fields (first name, last name, email, phone) are required if any are filled.`;
+        if (i === 0) {
+          // Head coach - all fields required
+          if (!staffMember.first?.trim()) return `${roleName} first name is required`;
+          if (!staffMember.last?.trim()) return `${roleName} last name is required`;
+          if (!staffMember.email?.trim()) return `${roleName} email is required`;
+          if (!staffMember.phone?.trim()) return `${roleName} phone is required`;
+        } else {
+          // Other staff - if first name is filled, all fields required
+          if (staffMember.first?.trim()) {
+            if (!staffMember.last?.trim()) return `${roleName} last name is required when first name is entered`;
+            if (!staffMember.email?.trim()) return `${roleName} email is required when first name is entered`;
+            if (!staffMember.phone?.trim()) return `${roleName} phone is required when first name is entered`;
+          }
         }
       }
       
@@ -1651,9 +1564,10 @@
     }
 
     function hasCompleteRoster(team) {
-      const hasPlayers = team.players?.some(p => p.jersey && p.first && p.last && p.position) || false;
+      const completePlayers = team.players?.filter(p => p.jersey && p.first && p.last && p.position) || [];
+      const hasMinPlayers = completePlayers.length >= MIN_REQUIRED_PLAYERS;
       const hasStaff = team.staff?.some(s => s.first && s.last) || false;
-      return hasPlayers && hasStaff;
+      return hasMinPlayers && hasStaff;
     }
 
     function showTeamRoster(teamId) {
@@ -2223,12 +2137,12 @@
           });
           summary += '\n';
           
-          summary += 'PLAYERS:\n';
-          summary += '------------------------\n';
+          summary += `PLAYERS (${team.players.length}) - Sorted by Jersey Number:\n`;
+          summary += '------------------------------------------------------------\n';
           team.players.forEach(p => {
-            const heightText = p.height ? ` | Height: ${p.height}cm` : '';
-            const emailText = p.email ? ` | ${p.email}` : '';
-            summary += `#${p.jersey} - ${p.firstName} ${p.lastName} (${positionToFullName(p.position)})${heightText}${emailText}\n`;
+            const heightText = p.height ? ` | Height: ${p.height}` : '';
+            const emailText = p.email ? ` | Email: ${p.email}` : '';
+            summary += `#${p.jersey} - Name: ${p.firstName} ${p.lastName} | Position: ${positionToFullName(p.position)}${heightText}${emailText}\n`;
           });
           summary += '\n';
         }
@@ -2367,8 +2281,6 @@
       setTimeout(() => el.style.display = 'none', 3000); 
     }
 
-    // === ENHANCED SUBMISSION PROTECTION FUNCTIONS ===
-    
     function generateSubmissionId() {
       return 'ibba_multi_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
@@ -2443,46 +2355,34 @@
       return 'Your multi-team roster is being submitted. Are you sure you want to leave?';
     }
 
-    // === SUBMISSION MODAL ===
-    function showSubmissionModal() {
+    // === ENHANCED MODAL FUNCTIONS ===
+    function showFullScreenModal(content) {
       // Remove any existing modal
-      const existing = document.getElementById('submission-overlay');
-      if (existing) existing.remove();
+      hideEnhancedModal();
       
       const overlay = document.createElement('div');
-      overlay.id = 'submission-overlay';
+      overlay.id = 'enhanced-submission-overlay';
       overlay.className = 'submission-overlay';
-      
-      overlay.innerHTML = `
-        <div class="submission-modal">
-          <div class="submission-spinner"></div>
-          <h3 style="margin: 0 0 10px; color: #1f2937;">Submitting Multi-Team Rosters</h3>
-          <p style="margin: 0 0 20px; color: #6b7280;">Please don't close this window or navigate away</p>
-          
-          <div class="submission-progress">
-            <div class="submission-progress-bar" id="progress-bar" style="width: 0%"></div>
-          </div>
-          
-          <div class="submission-steps" id="submission-steps">
-            ${submissionState.steps.map((step, index) => `
-              <div class="submission-step" id="step-${step.id}">
-                <div class="submission-step-icon" id="icon-${step.id}">
-                  <div class="pulse-dot"></div>
-                </div>
-                <span>${step.text}</span>
-              </div>
-            `).join('')}
-          </div>
-          
-          <div style="margin-top: 25px; font-size: 12px; color: #9ca3af;">
-            Submission ID: <code>${submissionState.submissionId}</code>
-          </div>
-        </div>
+      overlay.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8); z-index: 10000; display: flex;
+        justify-content: center; align-items: center;
       `;
       
-      document.body.appendChild(overlay);
+      const modal = document.createElement('div');
+      modal.className = 'submission-modal';
+      modal.style.cssText = `
+        background: white; padding: 40px; border-radius: 16px; text-align: center;
+        max-width: 500px; margin: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        animation: modalAppear 0.3s ease-out;
+      `;
+      modal.innerHTML = content;
       
-      // Make it impossible to close
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+      document.body.style.overflow = 'hidden'; // Prevent scrolling
+      
+      // Prevent modal from being closed by clicking outside
       overlay.addEventListener('click', (e) => {
         if (e.target === overlay) {
           e.preventDefault();
@@ -2491,91 +2391,89 @@
       });
     }
 
-    function updateSubmissionProgress() {
-      const progress = ((submissionState.currentStep + 1) / submissionState.steps.length) * 100;
-      const progressBar = document.getElementById('progress-bar');
-      if (progressBar) {
-        progressBar.style.width = progress + '%';
-      }
-      
-      // Update step visual states
-      submissionState.steps.forEach((step, index) => {
-        const stepEl = document.getElementById(`step-${step.id}`);
-        const iconEl = document.getElementById(`icon-${step.id}`);
-        
-        if (!stepEl || !iconEl) return;
-        
-        if (index < submissionState.currentStep) {
-          // Completed
-          stepEl.className = 'submission-step completed';
-          iconEl.innerHTML = '✓';
-        } else if (index === submissionState.currentStep) {
-          // Active
-          stepEl.className = 'submission-step active';
-          iconEl.innerHTML = '<div class="pulse-dot"></div>';
-        } else {
-          // Pending
-          stepEl.className = 'submission-step';
-          iconEl.innerHTML = '<div style="width:8px;height:8px;background:#e5e7eb;border-radius:50%;"></div>';
-        }
-      });
-    }
-
-    function hideSubmissionModal() {
-      const overlay = document.getElementById('submission-overlay');
+    function hideEnhancedModal() {
+      const overlay = document.getElementById('enhanced-submission-overlay');
       if (overlay) {
         overlay.style.opacity = '0';
-        setTimeout(() => overlay.remove(), 300);
+        setTimeout(() => {
+          overlay.remove();
+          document.body.style.overflow = ''; // Restore scrolling
+        }, 300);
       }
+    }
+
+    function showSubmittingModal() {
+      showFullScreenModal(`
+        <div style="width: 60px; height: 60px; border: 4px solid #e5e7eb; border-top-color: #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; margin: 20px auto;"></div>
+        <h2 style="margin: 0 0 20px; color: #1f2937; font-size: 1.8rem;">Submitting Multi-Team Rosters...</h2>
+        <p style="margin: 10px 0; color: #374151; line-height: 1.5;"><strong>Please wait - do not close this page or navigate away.</strong></p>
+        <p style="margin: 10px 0; color: #374151; line-height: 1.5;">We're processing your ${clubData.teams.length} team roster${clubData.teams.length !== 1 ? 's' : ''} and sending confirmation emails.</p>
+        <p style="margin: 10px 0; color: #374151; line-height: 1.5;">This usually takes 15-30 seconds for multi-team submissions.</p>
+      `);
+    }
+
+    function showSuccessModal() {
+      showFullScreenModal(`
+        <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem; font-weight: bold; animation: pulse 2s infinite;">✓</div>
+        <h2 style="margin: 0 0 20px; color: #10b981; font-size: 1.8rem;">Multi-Team Rosters Submitted Successfully!</h2>
+        <p style="margin: 10px 0; color: #374151; line-height: 1.5;"><strong>Your IBBA club's ${clubData.teams.length} team roster${clubData.teams.length !== 1 ? 's have' : ' has'} been submitted.</strong></p>
+        <p style="margin: 10px 0; color: #374151; line-height: 1.5;">• CSV file downloaded to your device<br>
+           • Data saved to IBBA system<br>
+           • All roster information processed</p>
+        <div style="margin: 20px 0; padding: 16px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; color: #166534;">
+          <strong>Next Steps:</strong><br>
+          Keep the CSV file as your official roster records for all teams.
+        </div>
+        <button type="button" onclick="window.location.href='https://www.pixellot.tv'" style="margin-top: 20px; padding: 12px 18px; background: #3b82f6; color: white; border: none; border-radius: 10px; font-weight: 800; cursor: pointer;">
+          Return to Main Page
+        </button>
+      `);
+    }
+
+    function showErrorModal(message) {
+      showFullScreenModal(`
+        <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem;">!</div>
+        <h2 style="color: #ef4444; margin: 0 0 20px; font-size: 1.8rem;">Multi-Team Submission Issue</h2>
+        <p style="margin: 10px 0; color: #374151; line-height: 1.5;"><strong>There was a problem with the email system.</strong></p>
+        <p style="margin: 10px 0; color: #374151; line-height: 1.5;">${message}</p>
+        <div style="margin: 20px 0; padding: 16px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; color: #991b1b;">
+          <strong>Your CSV file has been downloaded.</strong><br>
+          Please email it manually to: <strong>pixellotibba@gmail.com</strong>
+        </div>
+        <button type="button" onclick="window.location.href='https://www.pixellot.tv'" style="margin-top: 20px; padding: 12px 18px; background: #3b82f6; color: white; border: none; border-radius: 10px; font-weight: 800; cursor: pointer;">
+          Return to Main Page
+        </button>
+      `);
     }
 
     // === MAIN SUBMISSION PROCESS ===
-    async function updateStep(stepId, action) {
-      submissionState.currentStep = submissionState.steps.findIndex(s => s.id === stepId);
-      updateSubmissionProgress();
-      
-      await action();
-      
-      // Mark as completed
-      const stepEl = document.getElementById(`step-${stepId}`);
-      const iconEl = document.getElementById(`icon-${stepId}`);
-      if (stepEl && iconEl) {
-        stepEl.className = 'submission-step completed';
-        iconEl.innerHTML = '✓';
-      }
-    }
-
     async function processSubmission() {
       try {
-        // Step 1: Validation
-        await updateStep('validate', async () => {
-          console.log('📋 Validating multi-team data...');
-          
-          // Enhanced validation logic for multi-team
-          const submitEmail = clubData.submitterEmail;
-          if (submitEmail) {
-            const { ok: okEmail, suggestion } = emailValid(submitEmail);
-            if (!okEmail && suggestion) {
-              const use = confirm('Did you mean "' + suggestion + '" ?');
-              if (use) {
-                document.getElementById('submitterEmail').value = suggestion;
-                clubData.submitterEmail = suggestion;
-              } else {
-                throw new Error('Email validation failed');
-              }
-            } else if (!okEmail) {
-              throw new Error('Invalid email address');
+        console.log('📋 Processing multi-team submission...');
+        
+        // Enhanced validation logic for multi-team
+        const submitEmail = clubData.submitterEmail;
+        if (submitEmail) {
+          const { ok: okEmail, suggestion } = emailValid(submitEmail);
+          if (!okEmail && suggestion) {
+            const use = confirm('Did you mean "' + suggestion + '" ?');
+            if (use) {
+              document.getElementById('submitterEmail').value = suggestion;
+              clubData.submitterEmail = suggestion;
+            } else {
+              throw new Error('Email validation failed');
             }
+          } else if (!okEmail) {
+            throw new Error('Invalid email address');
           }
-          
-          await delay(1500); // Longer validation for multi-team
-        });
+        }
         
         const submissionData = buildSubmissionData();
         const submissionParams = {
           submission_id: submissionState.submissionId,
           club_name: submissionData.clubName,
           season: submissionData.season,
+          season_label: seasonLabel(parseInt(submissionData.season.split('-')[0], 10)),
           submitter_name: submissionData.submitterName,
           submitter_email: submissionData.submitterEmail,
           total_teams: submissionData.teams.length,
@@ -2584,41 +2482,31 @@
           timestamp: new Date().toISOString()
         };
         
-        // Step 2: Send Email
-        await updateStep('email', async () => {
-          console.log('📧 Sending multi-team confirmation email...');
-          
-          const controller = new AbortController();
-          const timeout = setTimeout(() => controller.abort(), 25000); // 25 second timeout for multi-team
-          
-          try {
-            await sendEmailViaAPI(submissionParams, { signal: controller.signal });
-            console.log('✅ Email sent successfully');
-          } finally {
-            clearTimeout(timeout);
-          }
-        });
+        console.log('📧 Sending multi-team confirmation email...');
         
-        // Step 3: Save Data
-        await updateStep('save', async () => {
-          console.log('💾 Saving all team data...');
-          
-          try {
-            await sendToSheet(submissionData);
-            console.log('✅ Data saved successfully');
-          } catch (error) {
-            console.warn('⚠️ Data save failed, continuing anyway:', error);
-            // Don't fail the whole process for data sink issues
-          }
-        });
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 25000); // 25 second timeout for multi-team
         
-        // Step 4: Generate Files
-        await updateStep('download', async () => {
-          console.log('📁 Generating CSV files...');
-          downloadCSV(submissionData);
-          await delay(2000); // Let download start for multi-team
-          console.log('✅ Files generated');
-        });
+        try {
+          await sendEmailViaAPI(submissionParams, { signal: controller.signal });
+          console.log('✅ Email sent successfully');
+        } finally {
+          clearTimeout(timeout);
+        }
+        
+        console.log('💾 Saving all team data...');
+        try {
+          await sendToSheet(submissionData);
+          console.log('✅ Data saved successfully');
+        } catch (error) {
+          console.warn('⚠️ Data save failed, continuing anyway:', error);
+          // Don't fail the whole process for data sink issues
+        }
+        
+        console.log('📁 Generating CSV files...');
+        downloadCSV(submissionData);
+        await delay(2000); // Let download start for multi-team
+        console.log('✅ Files generated');
         
         // Success!
         showSubmissionSuccess();
@@ -2631,7 +2519,7 @@
 
     // === SUCCESS AND ERROR HANDLING ===
     function showSubmissionSuccess() {
-      hideSubmissionModal();
+      hideEnhancedModal();
       unlockUI();
       
       const ok = document.getElementById('okMsg');
@@ -2645,15 +2533,19 @@
       submitBtn.classList.add('btn-success');
       submitBtn.innerHTML = '✅ Successfully Submitted';
       submitBtn.disabled = true; // Keep disabled to prevent resubmission
+      
+      // Show success modal
+      showSuccessModal();
     }
 
     function handleSubmissionError(error) {
-      hideSubmissionModal();
+      hideEnhancedModal();
       unlockUI();
       
       submissionState.isSubmitting = false; // Allow retry on error
       
-      alert(`Multi-team submission failed: ${error.message}\n\nPlease try again or contact support if the problem persists.\n\nSubmission ID: ${submissionState.submissionId}`);
+      // Show error modal instead of alert
+      showErrorModal('The email system is temporarily unavailable, but your roster data has been saved.');
       
       console.error('Multi-team submission error details:', {
         submissionId: submissionState.submissionId,
@@ -2818,13 +2710,12 @@
         submissionState.isSubmitting = true;
         submissionState.lastSubmissionTime = now;
         submissionState.submissionId = generateSubmissionId();
-        submissionState.currentStep = 0;
         
         console.log('✅ Multi-team submission started with ID:', submissionState.submissionId);
         
         // IMMEDIATE UI LOCKDOWN
         lockdownUI();
-        showSubmissionModal();
+        showSubmittingModal();
         
         try {
           await processSubmission();
