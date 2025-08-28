@@ -88,7 +88,7 @@
     .team-status.incomplete { background: var(--warn); color: white; }
     .team-status.empty { background: #e5e7eb; color: var(--muted); }
 
-    .team-info { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
+    .team-info { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
     .remove-team { background: var(--err); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; }
     .remove-team:hover { background: #dc2626; }
 
@@ -376,7 +376,7 @@
     <p class="subtitle">Submit rosters for multiple teams from your club • Powered by Pixellot Advantage</p>
 
     <div class="version-info" aria-live="polite">
-      <span id="versionBadge" class="version">Version 5.6.0 - ENHANCED STAFF VALIDATION</span>
+      <span id="versionBadge" class="version">Version 5.7.0 - VENUE TRACKING</span>
       <span class="date">Updated: August 2025</span>
     </div>
 
@@ -673,7 +673,7 @@
     const DATA_SINK_URL = 'https://script.google.com/macros/s/AKfycbxchgyxazvH9t4N0prpLTboqeAlb6kRz6xUj-klQ1HIYtrZjs9qeKxWVqTttVJKdREj/exec';
     const DATA_SINK_KEY = 'Pixellot2@25';
 
-    const APP_VERSION = '5.6.0 - ENHANCED STAFF VALIDATION';
+    const APP_VERSION = '5.7.0 - VENUE TRACKING';
     const BUILD_DATE = new Date().toISOString().slice(0,10);
 
     const CURRENT_SEASON_START_YEAR = 2025;
@@ -684,7 +684,7 @@
     const DEFAULT_PLAYER_ROWS = 16;
     const HARD_MAX_PLAYERS = 40;
     const MIN_REQUIRED_PLAYERS = 8; // Minimum required players per team
-    const STORAGE_KEY = "ibbaMultiTeamDraft_v560"; // bumped for enhanced staff validation
+    const STORAGE_KEY = "ibbaMultiTeamDraft_v570"; // bumped for venue tracking
 
     // === ENHANCED SUBMISSION PROTECTION GLOBALS ===
     let submissionState = {
@@ -701,7 +701,7 @@
       season: '',
       submitterName: '',
       submitterEmail: '',
-      teams: [] // { id, nickname, ageGroup, league, players: [], staff: [] }
+      teams: [] // { id, nickname, ageGroup, league, venue, players: [], staff: [] }
     };
 
     let currentStep = 1;
@@ -1320,6 +1320,7 @@
         nickname: '',
         ageGroup: '',
         league: '',
+        venue: '',
         players: [],
         staff: []
       };
@@ -1342,6 +1343,8 @@
       if (team) {
         if (field === 'nickname') {
           value = formatTeamNickname(value);
+        } else if (field === 'venue') {
+          value = ucWords(value.trim());
         }
         team[field] = value;
         
@@ -1451,6 +1454,14 @@
               <input type="text" value="${team.nickname}" placeholder="e.g., EAGLES, COACH_SMITH (optional)" 
                      onchange="updateTeam(${team.id}, 'nickname', this.value)" 
                      oninput="updateTeam(${team.id}, 'nickname', this.value)" />
+            </div>
+            <div>
+              <label class="tooltip">Camera Venue
+                <span class="tooltiptext">Optional: Enter the venue/location where the Pixellot camera is installed for this team's games.</span>
+              </label>
+              <input type="text" value="${team.venue || ''}" placeholder="e.g., Main Gym, Court A (optional)" 
+                     onchange="updateTeam(${team.id}, 'venue', this.value)" 
+                     oninput="updateTeam(${team.id}, 'venue', this.value)" />
             </div>
             <div>
               <label class="required tooltip">Age Group
@@ -2034,6 +2045,9 @@
         if (team.nickname && team.nickname.trim()) {
           html += `<p><strong>Nickname:</strong> ${team.nickname}</p>`;
         }
+        if (team.venue && team.venue.trim()) {
+          html += `<p><strong>Venue:</strong> ${team.venue}</p>`;
+        }
         html += `<p><strong>Age Group:</strong> ${team.ageGroup} (${ageGroupToEnglish(team.ageGroup)})</p>`;
         html += `<p><strong>League:</strong> ${team.league} (${leagueToEnglish(team.league)})</p>`;
         
@@ -2082,6 +2096,7 @@
         teams: clubData.teams.map(team => ({
           nickname: team.nickname || '',
           fullName: getFullTeamName(team),
+          venue: team.venue || '',
           ageGroup: team.ageGroup,
           ageGroupEnglish: ageGroupToEnglish(team.ageGroup),
           league: team.league,
@@ -2122,6 +2137,9 @@
         summary += `TEAM ${idx + 1}: ${team.fullName}\n`;
         if (team.nickname && team.nickname.trim()) {
           summary += `Nickname: ${team.nickname}\n`;
+        }
+        if (team.venue && team.venue.trim()) {
+          summary += `Venue: ${team.venue}\n`;
         }
         summary += `Age Group: ${team.ageGroupEnglish}\n`;
         summary += `League: ${team.leagueEnglish}\n`;
@@ -2178,6 +2196,9 @@
         csv += `TEAM ${idx + 1}: ${team.fullName}\n`;
         if (team.nickname && team.nickname.trim()) {
           csv += `Nickname: ${team.nickname}\n`;
+        }
+        if (team.venue && team.venue.trim()) {
+          csv += `Venue: ${team.venue}\n`;
         }
         csv += `Age Group: ${team.ageGroupEnglish}\n`;
         csv += `League: ${team.leagueEnglish}\n\n`;
@@ -2688,20 +2709,20 @@
         e.preventDefault();
         e.stopPropagation();
         
-        console.log('🚀 Multi-team submit attempt at:', new Date().toISOString());
+        console.log('Multi-team submit attempt at:', new Date().toISOString());
         
         // IMMEDIATE PREVENTION CHECKS
         const now = Date.now();
         
         if (submissionState.isSubmitting) {
-          console.log('❌ Already submitting, blocked');
+          console.log('Already submitting, blocked');
           showQuickMessage('Multi-team submission already in progress!', 'warning');
           return false;
         }
         
         if (now - submissionState.lastSubmissionTime < MIN_SUBMISSION_INTERVAL) {
           const waitTime = Math.ceil((MIN_SUBMISSION_INTERVAL - (now - submissionState.lastSubmissionTime)) / 1000);
-          console.log(`❌ Too soon, blocked. Wait ${waitTime} seconds`);
+          console.log(`Too soon, blocked. Wait ${waitTime} seconds`);
           showQuickMessage(`Please wait ${waitTime} more seconds before submitting again.`, 'warning');
           return false;
         }
@@ -2711,7 +2732,7 @@
         submissionState.lastSubmissionTime = now;
         submissionState.submissionId = generateSubmissionId();
         
-        console.log('✅ Multi-team submission started with ID:', submissionState.submissionId);
+        console.log('Multi-team submission started with ID:', submissionState.submissionId);
         
         // IMMEDIATE UI LOCKDOWN
         lockdownUI();
@@ -2720,7 +2741,7 @@
         try {
           await processSubmission();
         } catch (error) {
-          console.error('💥 Multi-team submission failed:', error);
+          console.error('Multi-team submission failed:', error);
           handleSubmissionError(error);
         } finally {
           // Only reset state on completion or error
@@ -2778,9 +2799,9 @@
         
         const success = clearAllData();
         if (success) {
-          flashOk('✅ All data cleared successfully! Form is now empty.');
+          flashOk('All data cleared successfully! Form is now empty.');
         } else {
-          alert('❌ Clear failed - check console for details');
+          alert('Clear failed - check console for details');
         }
       });
       
@@ -2866,7 +2887,7 @@
         updateNextButtonState();
       }, 100);
       
-      console.log('🛡️ IBBA Multi-Team Form with enhanced protection initialized');
+      console.log('IBBA Multi-Team Form with venue tracking initialized');
     });
   </script>
 </body>
