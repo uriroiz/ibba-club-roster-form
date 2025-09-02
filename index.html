@@ -376,8 +376,8 @@
     <p class="subtitle">Submit rosters for multiple teams from your club • Powered by Pixellot Advantage</p>
 
     <div class="version-info" aria-live="polite">
-      <span id="versionBadge" class="version">Version 5.7.0 - VENUE TRACKING</span>
-      <span class="date">Updated: August 2025</span>
+      <span id="versionBadge" class="version">Version 5.7.1 - VENUE TRACKING</span>
+    <span class="date">Updated: September 2025</span>
     </div>
 
     <!-- Progress Indicator -->
@@ -664,16 +664,20 @@
 
   <script>
     // === Configuration ===
-    const EmailJSConfig = Object.freeze({
-      publicKey: "_r4Y7hg0AGi5DhIcF",
-      serviceId: "service_4bdvcf9",
-      templateId: "template_6o8secn"
-    });
+const EmailJSConfig = Object.freeze({
+  publicKey: "_r4Y7hg0AGi5DhIcF",
+  serviceId: "service_4bdvcf9",
+  // Existing single-team template (kept for backward compatibility)
+  templateIdSingle: "template_6o8secn",
+  // New multi-team template – create in EmailJS and paste its ID here
+  templateIdMulti: "template_mt_roster" // <-- replace with your actual template ID
+});
+
 
     const DATA_SINK_URL = 'https://script.google.com/macros/s/AKfycbxchgyxazvH9t4N0prpLTboqeAlb6kRz6xUj-klQ1HIYtrZjs9qeKxWVqTttVJKdREj/exec';
     const DATA_SINK_KEY = 'Pixellot2@25';
 
-    const APP_VERSION = '5.7.0 - VENUE TRACKING';
+    const APP_VERSION = '5.7.1 - VENUE TRACKING';
     const BUILD_DATE = new Date().toISOString().slice(0,10);
 
     const CURRENT_SEASON_START_YEAR = 2025;
@@ -2490,53 +2494,74 @@
         }
         
         const submissionData = buildSubmissionData();
+
+        // Derive season label and a clear, descriptive subject
+        const seasonStartYear = parseInt(submissionData.season.split('-')[0], 10);
+        const seasonShort = seasonLabel(seasonStartYear);
+        const emailSubject = `IBBA Roster: ${submissionData.clubName} (${seasonShort}) – Multi-Team`;
+
         const submissionParams = {
           submission_id: submissionState.submissionId,
           club_name: submissionData.clubName,
           season: submissionData.season,
-          season_label: seasonLabel(parseInt(submissionData.season.split('-')[0], 10)),
+          season_label: seasonShort,
           submitter_name: submissionData.submitterName,
           submitter_email: submissionData.submitterEmail,
           total_teams: submissionData.teams.length,
           total_players: submissionData.teams.reduce((sum, team) => sum + team.players.length, 0),
           roster_data: buildSubmissionSummary(submissionData),
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+
+          // Populate legacy single-team placeholders so existing templates render correct subjects
+          team_name: submissionData.clubName,
+          league: seasonShort,
+
+          // Optional: some EmailJS templates support {{subject}}
+          subject: emailSubject
         };
-        
+
         console.log('📧 Sending multi-team confirmation email...');
-        
+
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 25000); // 25 second timeout for multi-team
-        
+
         try {
-          await sendEmailViaAPI(submissionParams, { signal: controller.signal });
+          const isMulti = submissionData.teams.length > 1;
+          await sendEmailViaAPI(
+            submissionParams,
+            {
+              signal: controller.signal,
+              templateId: isMulti ? EmailJSConfig.templateIdMulti : EmailJSConfig.templateIdSingle
+            }
+          );
           console.log('✅ Email sent successfully');
         } finally {
           clearTimeout(timeout);
         }
-        
+
         console.log('💾 Saving all team data...');
         try {
           await sendToSheet(submissionData);
           console.log('✅ Data saved successfully');
         } catch (error) {
           console.warn('⚠️ Data save failed, continuing anyway:', error);
-          // Don't fail the whole process for data sink issues
+          // Do not fail the whole process for data sink issues
         }
-        
+
         console.log('📁 Generating CSV files...');
         downloadCSV(submissionData);
         await delay(2000); // Let download start for multi-team
         console.log('✅ Files generated');
-        
+
         // Success!
         showSubmissionSuccess();
-        
+
       } catch (error) {
         console.error('💥 Multi-team process failed:', error);
         throw error;
       }
     }
+
 
     // === SUCCESS AND ERROR HANDLING ===
     function showSubmissionSuccess() {
@@ -2580,12 +2605,13 @@
     async function sendEmailViaAPI(params, options) {
       const url = 'https://api.emailjs.com/api/v1.0/email/send';
       
-      const payload = {
-        service_id: EmailJSConfig.serviceId,
-        template_id: EmailJSConfig.templateId,
-        user_id: EmailJSConfig.publicKey,
-        template_params: params
-      };
+const payload = {
+  service_id: EmailJSConfig.serviceId,
+  template_id: options?.templateId || EmailJSConfig.templateIdSingle,
+  user_id: EmailJSConfig.publicKey,
+  template_params: params
+};
+
       
       const requestOptions = {
         method: 'POST',
