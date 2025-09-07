@@ -376,7 +376,7 @@
     <p class="subtitle">Submit rosters for multiple teams from your club • Powered by Pixellot Advantage</p>
 
     <div class="version-info" aria-live="polite">
-      <span id="versionBadge" class="version">Version 5.7.1 - VENUE TRACKING</span>
+      <span id="versionBadge" class="version">Version 5.8.0 - NO MIN PLAYERS</span>
     <span class="date">Updated: September 2025</span>
     </div>
 
@@ -493,6 +493,9 @@
               <!-- Players Section -->
               <div class="roster-section">
                 <h3>🎯 Players</h3>
+                <p class="subtitle" style="margin-bottom: 16px; font-size: 14px; color: #64748b;">
+                  <strong>Note:</strong> Team rosters can be submitted with any number of players (including zero). Add players as needed.
+                </p>
                 
                 <!-- Bulk Operations -->
                 <div class="bulk-ops">
@@ -673,11 +676,10 @@ const EmailJSConfig = Object.freeze({
   templateIdMulti: "template_mt_roster" // <-- replace with your actual template ID
 });
 
-
     const DATA_SINK_URL = 'https://script.google.com/macros/s/AKfycbxchgyxazvH9t4N0prpLTboqeAlb6kRz6xUj-klQ1HIYtrZjs9qeKxWVqTttVJKdREj/exec';
     const DATA_SINK_KEY = 'Pixellot2@25';
 
-    const APP_VERSION = '5.7.1 - VENUE TRACKING';
+    const APP_VERSION = '5.8.0 - NO MIN PLAYERS';
     const BUILD_DATE = new Date().toISOString().slice(0,10);
 
     const CURRENT_SEASON_START_YEAR = 2025;
@@ -687,8 +689,8 @@ const EmailJSConfig = Object.freeze({
 
     const DEFAULT_PLAYER_ROWS = 16;
     const HARD_MAX_PLAYERS = 40;
-    const MIN_REQUIRED_PLAYERS = 0; // Minimum required players per team
-    const STORAGE_KEY = "ibbaMultiTeamDraft_v570"; // bumped for venue tracking
+    const MIN_REQUIRED_PLAYERS = 0; // Changed from 8 to 0 - no minimum required
+    const STORAGE_KEY = "ibbaMultiTeamDraft_v580"; // bumped for no minimum players
 
     // === ENHANCED SUBMISSION PROTECTION GLOBALS ===
     let submissionState = {
@@ -1004,13 +1006,13 @@ const EmailJSConfig = Object.freeze({
           saveCurrentTeamRoster();
         }
         
+        // REMOVED MINIMUM PLAYER REQUIREMENT
+        // Now check only for head coach requirement
         const incompleteTeams = [];
         clubData.teams.forEach(team => {
-          const completePlayers = team.players?.filter(p => p.jersey && p.first && p.last && p.position) || [];
-          const hasMinPlayers = completePlayers.length >= MIN_REQUIRED_PLAYERS;
-          const hasStaff = team.staff?.some(s => s.first && s.last) || false;
+          const hasHeadCoach = team.staff?.[0]?.first && team.staff?.[0]?.last;
           
-          if (!hasMinPlayers || !hasStaff) {
+          if (!hasHeadCoach) {
             incompleteTeams.push(team);
           }
         });
@@ -1018,7 +1020,7 @@ const EmailJSConfig = Object.freeze({
         canProceed = incompleteTeams.length === 0;
         
         if (!canProceed) {
-          reasonText = `${incompleteTeams.length} team(s) need ${MIN_REQUIRED_PLAYERS}+ players and staff`;
+          reasonText = `${incompleteTeams.length} team(s) need head coach information`;
         }
       }
       
@@ -1114,7 +1116,7 @@ const EmailJSConfig = Object.freeze({
           saveCurrentTeamRoster();
         }
         
-        // Enhanced roster validation
+        // SIMPLIFIED VALIDATION - REMOVED MINIMUM PLAYER REQUIREMENT
         const validationResults = validateAllTeamRosters();
         if (!validationResults.valid) {
           alert(validationResults.message);
@@ -1129,35 +1131,30 @@ const EmailJSConfig = Object.freeze({
       for (const team of clubData.teams) {
         const teamName = getFullTeamName(team);
         
-        // Check for at least 8 complete players
-        const completePlayers = team.players?.filter(p => p.jersey && p.first && p.last && p.position) || [];
-        if (completePlayers.length < MIN_REQUIRED_PLAYERS) {
-          return {
-            valid: false,
-            message: `${teamName} needs at least ${MIN_REQUIRED_PLAYERS} complete players (jersey, first name, last name, position are required). Currently has ${completePlayers.length} complete players.`
-          };
+        // REMOVED MINIMUM PLAYER CHECK - teams can now have 0 players
+        
+        // Check for player completeness only if players exist
+        if (team.players && team.players.length > 0) {
+          const playerValidation = validatePlayersCompleteness(team);
+          if (playerValidation) {
+            return {
+              valid: false,
+              message: `${teamName}: ${playerValidation}`
+            };
+          }
+          
+          // Check for duplicate jerseys only if players exist
+          const jerseys = team.players?.map(p => normJersey(p.jersey)).filter(Boolean) || [];
+          const duplicates = jerseys.filter((jersey, index) => jerseys.indexOf(jersey) !== index);
+          if (duplicates.length > 0) {
+            return {
+              valid: false,
+              message: `${teamName} has duplicate jersey numbers: ${duplicates.join(', ')}`
+            };
+          }
         }
         
-        // Check for player completeness
-        const playerValidation = validatePlayersCompleteness(team);
-        if (playerValidation) {
-          return {
-            valid: false,
-            message: `${teamName}: ${playerValidation}`
-          };
-        }
-        
-        // Check for duplicate jerseys
-        const jerseys = team.players?.map(p => normJersey(p.jersey)).filter(Boolean) || [];
-        const duplicates = jerseys.filter((jersey, index) => jerseys.indexOf(jersey) !== index);
-        if (duplicates.length > 0) {
-          return {
-            valid: false,
-            message: `${teamName} has duplicate jersey numbers: ${duplicates.join(', ')}`
-          };
-        }
-        
-        // Check head coach
+        // Check head coach (still required)
         const headCoachValidation = validateHeadCoach(team);
         if (headCoachValidation) {
           return {
@@ -1579,10 +1576,9 @@ const EmailJSConfig = Object.freeze({
     }
 
     function hasCompleteRoster(team) {
-      const completePlayers = team.players?.filter(p => p.jersey && p.first && p.last && p.position) || [];
-      const hasMinPlayers = completePlayers.length >= MIN_REQUIRED_PLAYERS;
-      const hasStaff = team.staff?.some(s => s.first && s.last) || false;
-      return hasMinPlayers && hasStaff;
+      // SIMPLIFIED - now only requires head coach, players are optional
+      const hasHeadCoach = team.staff?.[0]?.first && team.staff?.[0]?.last;
+      return hasHeadCoach;
     }
 
     function showTeamRoster(teamId) {
@@ -2069,7 +2065,7 @@ const EmailJSConfig = Object.freeze({
           });
           html += '</ul>';
         } else {
-          html += '<p style="color: #ef4444; font-weight: 600;">⚠️ No players added</p>';
+          html += '<p style="color: #64748b; font-weight: 400;">📝 No players added yet (can submit with 0 players)</p>';
         }
         
         if (completeStaff.length > 0) {
@@ -2562,7 +2558,6 @@ const EmailJSConfig = Object.freeze({
       }
     }
 
-
     // === SUCCESS AND ERROR HANDLING ===
     function showSubmissionSuccess() {
       hideEnhancedModal();
@@ -2605,14 +2600,13 @@ const EmailJSConfig = Object.freeze({
     async function sendEmailViaAPI(params, options) {
       const url = 'https://api.emailjs.com/api/v1.0/email/send';
       
-const payload = {
-  service_id: EmailJSConfig.serviceId,
-  template_id: options?.templateId || EmailJSConfig.templateIdSingle,
-  user_id: EmailJSConfig.publicKey,
-  template_params: params
-};
+      const payload = {
+        service_id: EmailJSConfig.serviceId,
+        template_id: options?.templateId || EmailJSConfig.templateIdSingle,
+        user_id: EmailJSConfig.publicKey,
+        template_params: params
+      };
 
-      
       const requestOptions = {
         method: 'POST',
         headers: { 
@@ -2659,7 +2653,6 @@ const payload = {
       for (let attempt = 1; attempt <= 3; attempt++) {
         try {
           await fetch(url, {
-            method: 'POST',
             mode: 'no-cors',
             headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify(payload)
@@ -2913,7 +2906,7 @@ const payload = {
         updateNextButtonState();
       }, 100);
       
-      console.log('IBBA Multi-Team Form with venue tracking initialized');
+      console.log('IBBA Multi-Team Form - No minimum players requirement initialized');
     });
   </script>
 </body>
