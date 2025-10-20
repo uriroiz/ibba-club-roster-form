@@ -376,7 +376,7 @@
     <p class="subtitle">Submit rosters for multiple teams from your club • Powered by Pixellot Advantage</p>
 
     <div class="version-info" aria-live="polite">
-      <span id="versionBadge" class="version">Version 5.8.0 - NO MIN PLAYERS</span>
+      <span id="versionBadge" class="version">Version 5.8.1 - NO MIN PLAYERS</span>
     <span class="date">Updated: September 2025</span>
     </div>
 
@@ -679,7 +679,7 @@ const EmailJSConfig = Object.freeze({
     const DATA_SINK_URL = 'https://script.google.com/macros/s/AKfycbxchgyxazvH9t4N0prpLTboqeAlb6kRz6xUj-klQ1HIYtrZjs9qeKxWVqTttVJKdREj/exec';
     const DATA_SINK_KEY = 'Pixellot2@25';
 
-    const APP_VERSION = '5.8.0 - NO MIN PLAYERS';
+    const APP_VERSION = '5.8.1 - NO MIN PLAYERS';
     const BUILD_DATE = new Date().toISOString().slice(0,10);
 
     const CURRENT_SEASON_START_YEAR = 2025;
@@ -690,7 +690,7 @@ const EmailJSConfig = Object.freeze({
     const DEFAULT_PLAYER_ROWS = 16;
     const HARD_MAX_PLAYERS = 40;
     const MIN_REQUIRED_PLAYERS = 0; // Changed from 8 to 0 - no minimum required
-    const STORAGE_KEY = "ibbaMultiTeamDraft_v580"; // bumped for no minimum players
+    const STORAGE_KEY = "ibbaMultiTeamDraft_v581"; // bumped for CSV download fix
 
     // === ENHANCED SUBMISSION PROTECTION GLOBALS ===
     let submissionState = {
@@ -2516,40 +2516,53 @@ const EmailJSConfig = Object.freeze({
           subject: emailSubject
         };
 
-        console.log('📧 Sending multi-team confirmation email...');
-
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 25000); // 25 second timeout for multi-team
-
+        // 🟢 STEP 1: DOWNLOAD CSV FIRST (CRITICAL - MUST SUCCEED)
+        console.log('📁 Generating CSV files...');
         try {
-          const isMulti = submissionData.teams.length > 1;
-          await sendEmailViaAPI(
-            submissionParams,
-            {
-              signal: controller.signal,
-              templateId: isMulti ? EmailJSConfig.templateIdMulti : EmailJSConfig.templateIdSingle
-            }
-          );
-          console.log('✅ Email sent successfully');
-        } finally {
-          clearTimeout(timeout);
+          downloadCSV(submissionData);
+          await delay(1500);
+          console.log('✅ CSV downloaded successfully to user device');
+        } catch (csvError) {
+          console.error('💥 CSV download failed:', csvError);
+          throw new Error('Could not generate CSV file for download. This is critical.');
         }
 
-        console.log('💾 Saving all team data...');
+        // 🟡 STEP 2: SEND EMAIL (NON-CRITICAL - WARN IF FAILS BUT CONTINUE)
+        console.log('📧 Sending multi-team confirmation email...');
+        try {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 25000); // 25 second timeout for multi-team
+
+          try {
+            const isMulti = submissionData.teams.length > 1;
+            await sendEmailViaAPI(
+              submissionParams,
+              {
+                signal: controller.signal,
+                templateId: isMulti ? EmailJSConfig.templateIdMulti : EmailJSConfig.templateIdSingle
+              }
+            );
+            console.log('✅ Email sent successfully');
+          } finally {
+            clearTimeout(timeout);
+          }
+        } catch (emailError) {
+          console.warn('⚠️ Email send failed (non-critical), but CSV was successfully downloaded:', emailError);
+          // Don't throw - email failure is not critical since CSV was saved
+        }
+
+        // 🟡 STEP 3: SAVE DATA TO SHEET (NON-CRITICAL - WARN IF FAILS BUT CONTINUE)
+        console.log('💾 Saving all team data to backup sheet...');
         try {
           await sendToSheet(submissionData);
-          console.log('✅ Data saved successfully');
-        } catch (error) {
-          console.warn('⚠️ Data save failed, continuing anyway:', error);
-          // Do not fail the whole process for data sink issues
+          console.log('✅ Data saved to backup sheet successfully');
+        } catch (sheetError) {
+          console.warn('⚠️ Sheet save failed (non-critical), but CSV was successfully downloaded:', sheetError);
+          // Don't throw - sheet failure is not critical since CSV was saved
         }
 
-        console.log('📁 Generating CSV files...');
-        downloadCSV(submissionData);
-        await delay(2000); // Let download start for multi-team
-        console.log('✅ Files generated');
-
-        // Success!
+        // Success - CSV was definitely downloaded
+        console.log('✅ Multi-team submission completed successfully');
         showSubmissionSuccess();
 
       } catch (error) {
@@ -2585,8 +2598,8 @@ const EmailJSConfig = Object.freeze({
       
       submissionState.isSubmitting = false; // Allow retry on error
       
-      // Show error modal instead of alert
-      showErrorModal('The email system is temporarily unavailable, but your roster data has been saved.');
+      // Show error modal with updated message
+      showErrorModal('Your roster data should have been downloaded to your computer. If the download did not appear, try again. The email notification system may be temporarily unavailable.');
       
       console.error('Multi-team submission error details:', {
         submissionId: submissionState.submissionId,
