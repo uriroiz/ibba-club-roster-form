@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IBBA Club Multi-Team Roster Submission – Pixellot Advantage</title>
+  <meta name="description" content="IBBA multi-team roster submission with progress tracking and bulk operations." />
+  
+  <!-- External CSS -->
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="container" role="main">
+    <h1>🏀 IBBA Club Multi-Team Roster Submission</h1>
+    <p class="subtitle">Submit rosters for multiple teams from your club • Powered by Pixellot Advantage</p>
+
+    <div class="version-info" aria-live="polite">
+      <span id="versionBadge" class="version">Version 5.8.1 - NO MIN PLAYERS</span>
+    <span class="date">Updated: September 2025</span>
+    </div>
+
+    <!-- Progress Indicator -->
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div id="progressFill" class="progress-fill" style="width: 25%"></div>
+      </div>
+      <div class="steps">
+        <div class="step active" data-step="1">
+          <div class="step-circle">1</div>
+          <div class="step-label">Club Info</div>
+        </div>
+        <div class="step pending" data-step="2">
+          <div class="step-circle">2</div>
+          <div class="step-label">Teams</div>
+        </div>
+        <div class="step pending" data-step="3">
+          <div class="step-circle">3</div>
+          <div class="step-label">Rosters</div>
+        </div>
+        <div class="step pending" data-step="4">
+          <div class="step-circle">4</div>
+          <div class="step-label">Review</div>
+        </div>
+      </div>
+    </div>
+
+    <form id="clubForm" novalidate>
+      <!-- Step 1: Club Information -->
+      <div class="form-step active" data-step="1">
+        <section class="form-section" aria-labelledby="club-info-h">
+          <h2 id="club-info-h">🏆 Club Information</h2>
+          <div class="grid">
+            <div class="col-6">
+              <label for="clubName" class="required tooltip">Club Name
+                <span class="tooltiptext">Enter your basketball club's official name (e.g., "Hapoel Kfar Saba", "Maccabi Tel Aviv")</span>
+              </label>
+              <input id="clubName" name="clubName" type="text" placeholder="e.g., Hapoel Kfar Saba" autocomplete="organization" required />
+              <div id="clubNameError" class="field-error" role="alert" aria-live="assertive"></div>
+            </div>
+            <div class="col-6">
+              <label for="season" class="required tooltip">Season
+                <span class="tooltiptext">Select the basketball season year for this roster submission</span>
+              </label>
+              <select id="season" name="season" required></select>
+              <div id="seasonError" class="field-error" role="alert" aria-live="assertive"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section" aria-labelledby="contact-h">
+          <h2 id="contact-h">📝 Contact Information</h2>
+          <div class="grid">
+            <div class="col-6">
+              <label for="submitterName" class="required tooltip">Your Name
+                <span class="tooltiptext">Enter your full name as the person submitting this roster (coach, manager, or club official)</span>
+              </label>
+              <input id="submitterName" name="submitterName" type="text" placeholder="Enter your full name" autocomplete="name" required />
+              <div id="submitterNameError" class="field-error" role="alert" aria-live="assertive"></div>
+            </div>
+            <div class="col-6">
+              <label for="submitterEmail" class="required tooltip">Your Email
+                <span class="tooltiptext">Enter your email address - this will be included in the CSV file for contact purposes</span>
+              </label>
+              <input id="submitterEmail" name="submitterEmail" type="email" placeholder="Enter your email address" autocomplete="email" inputmode="email" required />
+              <div id="submitterEmailError" class="field-error" role="alert" aria-live="assertive"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Step 2: Teams Management -->
+      <div class="form-step" data-step="2">
+        <section class="teams-section" aria-labelledby="teams-h">
+          <h2 id="teams-h">👥 Team Management</h2>
+          <p class="subtitle">Add all the teams from your club that need roster submission</p>
+          
+          <div id="teamsContainer">
+            <!-- Teams will be added here dynamically -->
+          </div>
+          
+          <div class="add-team-card" id="addTeamCard">
+            <div class="add-team-icon">➕</div>
+            <h3>Add New Team</h3>
+            <p>Click to add another team to your club</p>
+          </div>
+        </section>
+      </div>
+
+      <!-- Step 3: Rosters -->
+      <div class="form-step" data-step="3">
+        <div id="noTeamsMessage" class="no-teams-message">
+          <div class="icon">🏀</div>
+          <h3>No Teams Added Yet</h3>
+          <p>Go back to step 2 to add teams before managing rosters</p>
+        </div>
+
+        <div id="rosterManagement" style="display: none;">
+          <section class="roster-section" aria-labelledby="roster-h">
+            <h2 id="roster-h">📝 Team Rosters</h2>
+            
+            <div class="team-selector">
+              <p class="subtitle">Select a team to manage its roster</p>
+              <div id="teamTabs" class="team-tabs">
+                <!-- Team tabs will be added here dynamically -->
+              </div>
+            </div>
+
+            <div id="activeRosterSection" style="display: none;">
+              <div id="dupWarn" class="status status--warn" role="alert" aria-live="assertive"></div>
+              <div id="emailWarn" class="status status--warn" role="alert" aria-live="assertive"></div>
+              
+              <!-- Players Section -->
+              <div class="roster-section">
+                <h3>🎯 Players</h3>
+                <p class="subtitle" style="margin-bottom: 16px; font-size: 14px; color: #64748b;">
+                  <strong>Note:</strong> Team rosters can be submitted with any number of players (including zero). Add players as needed.
+                </p>
+                
+                <!-- Bulk Operations -->
+                <div class="bulk-ops">
+                  <h3>⚡ Bulk Operations</h3>
+                  <div class="bulk-workflow">
+                    <div class="bulk-step">
+                      <span class="step-number">1</span>
+                      <div class="step-content">
+                        <label class="bulk-select-all">
+                          <input type="checkbox" id="selectAllPlayers">
+                          <strong>Select Players</strong>
+                        </label>
+                        <small>Check individual players below or use "Select All"</small>
+                      </div>
+                    </div>
+                    
+                    <div class="bulk-step">
+                      <span class="step-number">2</span>
+                      <div class="step-content">
+                        <label for="bulkPosition"><strong>Choose Position</strong></label>
+                        <select id="bulkPosition" class="bulk-select">
+                          <option value="">Choose position to apply...</option>
+                          <option value="G">🏃‍♂️ Guard (G)</option>
+                          <option value="F">🏀 Forward (F)</option>
+                          <option value="C">🏢 Center (C)</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div class="bulk-step">
+                      <span class="step-number">3</span>
+                      <div class="step-content">
+                        <button type="button" class="btn btn-primary" id="applyBulkPosition">
+                          ✨ Apply Position
+                        </button>
+                        <button type="button" class="btn btn-outline" id="clearSelected">
+                          🗑️ Clear Selection
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div id="bulkStatus" class="bulk-status">
+                    <span id="selectionCount">0 players selected</span>
+                  </div>
+                </div>
+
+                <div class="table-tools">
+                  <button type="button" class="btn btn-outline" id="addRowBtn">+ Add Player</button>
+                  <button type="button" class="btn btn-outline" id="removeRowBtn">− Remove Last</button>
+                  <span id="rowCountHelp" class="subtitle" aria-live="polite">0 rows</span>
+                </div>
+                
+                <table aria-describedby="rowCountHelp">
+                  <thead>
+                    <tr>
+                      <th style="width:40px">Select</th>
+                      <th style="width:64px">S/N</th>
+                      <th style="width:90px">Jersey #</th>
+                      <th style="min-width:160px">First Name</th>
+                      <th style="min-width:160px">Last Name</th>
+                      <th style="width:90px">Height (CM)</th>
+                      <th style="width:100px">Position</th>
+                      <th style="min-width:220px">Email Address</th>
+                    </tr>
+                  </thead>
+                  <tbody id="playersTable"></tbody>
+                </table>
+              </div>
+
+              <!-- Staff Section -->
+              <div class="roster-section">
+                <h3>👨‍💼 Coaching Staff</h3>
+                <p class="subtitle" style="margin-bottom: 16px; font-size: 14px; color: #64748b;">
+                  <strong>Head Coach:</strong> All fields required. 
+                  <strong>Other Staff:</strong> If first name is entered, all fields (first name, last name, email, and phone) are required.
+                </p>
+                <table>
+                  <thead>
+                    <tr>
+                      <th style="width:64px">S/N</th>
+                      <th style="width:140px">Role</th>
+                      <th>First Name</th>
+                      <th>Last Name</th>
+                      <th style="width:100px">Position</th>
+                      <th>Email Address</th>
+                      <th style="width:140px">Phone</th>
+                    </tr>
+                  </thead>
+                  <tbody id="staffTable">
+                    <tr class="staff-row">
+                      <td>17</td>
+                      <td><strong>Head Coach</strong></td>
+                      <td><input type="text" name="coach_first" placeholder="First name" required /></td>
+                      <td><input type="text" name="coach_last" placeholder="Last name" required /></td>
+                      <td>-</td>
+                      <td><input type="email" name="coach_email" placeholder="Email" required /></td>
+                      <td><input type="tel" name="coach_phone" placeholder="Phone" inputmode="tel" required /></td>
+                    </tr>
+                    <tr class="staff-row">
+                      <td>18</td>
+                      <td><strong>Asst. Coach</strong></td>
+                      <td><input type="text" name="asst1_first" placeholder="First name" /></td>
+                      <td><input type="text" name="asst1_last" placeholder="Last name" /></td>
+                      <td>-</td>
+                      <td><input type="email" name="asst1_email" placeholder="Email" /></td>
+                      <td><input type="tel" name="asst1_phone" placeholder="Phone" inputmode="tel" /></td>
+                    </tr>
+                    <tr class="staff-row">
+                      <td>19</td>
+                      <td><strong>Asst. Coach</strong></td>
+                      <td><input type="text" name="asst2_first" placeholder="First name" /></td>
+                      <td><input type="text" name="asst2_last" placeholder="Last name" /></td>
+                      <td>-</td>
+                      <td><input type="email" name="asst2_email" placeholder="Email" /></td>
+                      <td><input type="tel" name="asst2_phone" placeholder="Phone" inputmode="tel" /></td>
+                    </tr>
+                    <tr class="staff-row">
+                      <td>20</td>
+                      <td><strong>Asst. Coach</strong></td>
+                      <td><input type="text" name="asst3_first" placeholder="First name" /></td>
+                      <td><input type="text" name="asst3_last" placeholder="Last name" /></td>
+                      <td>-</td>
+                      <td><input type="email" name="asst3_email" placeholder="Email" /></td>
+                      <td><input type="tel" name="asst3_phone" placeholder="Phone" inputmode="tel" /></td>
+                    </tr>
+                    <tr class="staff-row">
+                      <td>21</td>
+                      <td><strong>GM</strong></td>
+                      <td><input type="text" name="gm_first" placeholder="First name" /></td>
+                      <td><input type="text" name="gm_last" placeholder="Last name" /></td>
+                      <td>-</td>
+                      <td><input type="email" name="gm_email" placeholder="Email" /></td>
+                      <td><input type="tel" name="gm_phone" placeholder="Phone" inputmode="tel" /></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- Step 4: Review -->
+      <div class="form-step" data-step="4">
+        <section class="form-section">
+          <h2>📋 Review Your Submission</h2>
+          <div id="reviewContent"></div>
+        </section>
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="step-navigation">
+        <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">← Previous</button>
+        <div class="buttons">
+          <button type="button" class="btn btn-secondary" id="clearBtn">🗑️ Clear All</button>
+          <button type="button" class="btn btn-outline" id="saveBtn">💾 Save Draft</button>
+          <button type="button" class="btn btn-outline" id="restoreBtn">↩ Restore Draft</button>
+          <button type="button" class="btn btn-success" id="newBtn" style="display:none">📋 New Submission</button>
+        </div>
+        <button type="button" class="btn btn-primary" id="nextBtn">Next →</button>
+        <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">🚀 Submit All Teams</button>
+      </div>
+
+      <div id="loading" class="loading">🔄 Submitting your club rosters...</div>
+      <div id="okMsg" class="status status--ok" role="status" aria-live="polite">✅ All team rosters submitted successfully!</div>
+    </form>
+  </div>
+
+  <!-- External JavaScript (Load in correct order for dependencies) -->
+  <script src="js/constants.js"></script>
+  <script src="js/validation.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/teams.js"></script>
+  <script src="js/roster.js"></script>
+  <script src="js/form.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
+

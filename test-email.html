@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmailJS Debug Test</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 10px 5px;
+    }
+    button:hover {
+      background: #2563eb;
+    }
+    .log {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      max-height: 500px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+    .success { color: #10b981; }
+    .error { color: #ef4444; }
+    .warning { color: #f59e0b; }
+    .info { color: #3b82f6; }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0 15px 0;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    label {
+      font-weight: 600;
+      color: #374151;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧪 EmailJS Debug Test</h1>
+    <p>This page will help you test your EmailJS configuration and see exactly what's happening.</p>
+    
+    <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+      <strong>⚠️ Important:</strong> Check your browser console (F12) for detailed logs!
+    </div>
+
+    <div>
+      <label>Service ID:</label>
+      <input type="text" id="serviceId" value="service_4bdvcf9" />
+      
+      <label>Template ID:</label>
+      <input type="text" id="templateId" value="template_6o8secn" />
+      
+      <label>Public Key (User ID):</label>
+      <input type="text" id="publicKey" value="_r4Y7hg0AGi5DhIcF" />
+      
+      <label>Test Email Address:</label>
+      <input type="email" id="testEmail" placeholder="your@email.com" />
+    </div>
+
+    <button onclick="testEmailSimple()">📧 Test Simple Email</button>
+    <button onclick="testEmailFull()">🚀 Test Full Template</button>
+    <button onclick="clearLog()">🗑️ Clear Log</button>
+
+    <div id="log" class="log">Waiting for test...</div>
+  </div>
+
+  <script>
+    function log(message, type = 'info') {
+      const logDiv = document.getElementById('log');
+      const timestamp = new Date().toLocaleTimeString();
+      const colors = {
+        success: 'success',
+        error: 'error',
+        warning: 'warning',
+        info: 'info'
+      };
+      logDiv.innerHTML += `<span class="${colors[type]}">[${timestamp}] ${message}</span>\n`;
+      logDiv.scrollTop = logDiv.scrollHeight;
+      
+      // Also log to browser console
+      console.log(`[${timestamp}] ${message}`);
+    }
+
+    function clearLog() {
+      document.getElementById('log').innerHTML = 'Log cleared.\n';
+    }
+
+    async function testEmailSimple() {
+      log('=== Starting Simple Email Test ===', 'info');
+      
+      const serviceId = document.getElementById('serviceId').value;
+      const templateId = document.getElementById('templateId').value;
+      const publicKey = document.getElementById('publicKey').value;
+      const testEmail = document.getElementById('testEmail').value;
+
+      if (!testEmail) {
+        log('❌ Please enter a test email address', 'error');
+        alert('Please enter your email address first!');
+        return;
+      }
+
+      log('📝 Configuration:', 'info');
+      log(`  Service ID: ${serviceId}`, 'info');
+      log(`  Template ID: ${templateId}`, 'info');
+      log(`  Public Key: ${publicKey}`, 'info');
+      log(`  Test Email: ${testEmail}`, 'info');
+
+      const url = 'https://api.emailjs.com/api/v1.0/email/send';
+      
+      const payload = {
+        service_id: serviceId,
+        template_id: templateId,
+        user_id: publicKey,
+        template_params: {
+          to_email: testEmail,
+          from_name: 'EmailJS Test',
+          message: 'This is a simple test email from your debug page.',
+          club_name: 'Test Club',
+          submitter_name: 'Test User',
+          submitter_email: testEmail,
+          team_name: 'Test Team',
+          season: '2025-2026',
+          league: '2025/26'
+        }
+      };
+
+      log('📤 Sending request to EmailJS...', 'info');
+      log('Payload: ' + JSON.stringify(payload, null, 2), 'info');
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        log(`📥 Response Status: ${response.status}`, response.ok ? 'success' : 'error');
+        
+        if (response.ok) {
+          const responseText = await response.text();
+          log(`✅ SUCCESS! Email sent successfully!`, 'success');
+          log(`Response: ${responseText}`, 'success');
+          alert('✅ Email sent successfully! Check your inbox.');
+        } else {
+          const errorText = await response.text();
+          log(`❌ FAILED! Status ${response.status}`, 'error');
+          log(`Error: ${errorText}`, 'error');
+          alert(`❌ Email failed!\nStatus: ${response.status}\nError: ${errorText}`);
+        }
+      } catch (error) {
+        log(`❌ EXCEPTION: ${error.message}`, 'error');
+        log(`Error details: ${error.stack}`, 'error');
+        alert(`❌ Exception occurred:\n${error.message}`);
+      }
+
+      log('=== Test Complete ===\n', 'info');
+    }
+
+    async function testEmailFull() {
+      log('=== Starting Full Template Test ===', 'info');
+      
+      const serviceId = document.getElementById('serviceId').value;
+      const templateId = document.getElementById('templateId').value;
+      const publicKey = document.getElementById('publicKey').value;
+      const testEmail = document.getElementById('testEmail').value;
+
+      if (!testEmail) {
+        log('❌ Please enter a test email address', 'error');
+        alert('Please enter your email address first!');
+        return;
+      }
+
+      const url = 'https://api.emailjs.com/api/v1.0/email/send';
+      
+      // Simulate the full form data
+      const payload = {
+        service_id: serviceId,
+        template_id: templateId,
+        user_id: publicKey,
+        template_params: {
+          submission_id: 'test_' + Date.now(),
+          club_name: 'Test Basketball Club',
+          season: '2025-2026',
+          season_label: '2025/26',
+          submitter_name: 'Test Submitter',
+          submitter_email: testEmail,
+          total_teams: 2,
+          total_players: 15,
+          roster_data: `IBBA MULTI-TEAM ROSTER SUBMISSION
+===================================
+
+Club: Test Basketball Club
+Season: 2025-2026
+Submitted by: Test Submitter
+Email: ${testEmail}
+Total Teams: 2
+Total Players: 15
+
+TEAM 1: Test Basketball Club Eagles (U16 Boys)
+Age Group: U16 Boys
+League: Regional
+Players: 8
+
+PLAYERS (8) - Sorted by Jersey Number:
+------------------------------------------------------------
+#5 - Name: John Doe | Position: Guard
+#7 - Name: Jane Smith | Position: Forward
+#10 - Name: Bob Johnson | Position: Center
+
+COACHING STAFF:
+----------------------------
+Head Coach: Mike Coach | mike@example.com | 555-1234
+
+---
+
+TEAM 2: Test Basketball Club Tigers (U14 Girls)
+Age Group: U14 Girls
+League: Regional
+Players: 7
+
+PLAYERS (7) - Sorted by Jersey Number:
+------------------------------------------------------------
+#3 - Name: Alice Brown | Position: Guard
+#8 - Name: Carol White | Position: Forward
+
+COACHING STAFF:
+----------------------------
+Head Coach: Sarah Coach | sarah@example.com | 555-5678
+
+---
+`,
+          team_name: 'Test Basketball Club',
+          league: '2025/26',
+          subject: 'IBBA Roster: Test Basketball Club (2025/26) – Multi-Team',
+          timestamp: new Date().toISOString()
+        }
+      };
+
+      log('📤 Sending FULL template test to EmailJS...', 'info');
+      log('Full payload: ' + JSON.stringify(payload, null, 2), 'info');
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        log(`📥 Response Status: ${response.status}`, response.ok ? 'success' : 'error');
+        
+        if (response.ok) {
+          const responseText = await response.text();
+          log(`✅ SUCCESS! Full template email sent!`, 'success');
+          log(`Response: ${responseText}`, 'success');
+          alert('✅ Full template email sent successfully! Check your inbox.');
+        } else {
+          const errorText = await response.text();
+          log(`❌ FAILED! Status ${response.status}`, 'error');
+          log(`Error: ${errorText}`, 'error');
+          alert(`❌ Email failed!\nStatus: ${response.status}\nError: ${errorText}`);
+        }
+      } catch (error) {
+        log(`❌ EXCEPTION: ${error.message}`, 'error');
+        log(`Error details: ${error.stack}`, 'error');
+        alert(`❌ Exception occurred:\n${error.message}`);
+      }
+
+      log('=== Test Complete ===\n', 'info');
+    }
+
+    // Initial log message
+    log('EmailJS Debug Test Page Ready', 'success');
+    log('Open your browser console (F12) for detailed logs', 'info');
+  </script>
+</body>
+</html>
+
